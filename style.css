@@ -1,0 +1,233 @@
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  color: #333;
+  animation: fadeIn 1s ease-out;
+}
+
+header,
+footer {
+  background: #333;
+  color: #fff;
+  text-align: center;
+  padding: 1rem 0;
+  animation: fadeIn 1s ease-out;
+}
+
+nav {
+  background: #444;
+  color: #fff;
+  padding: 1rem;
+  text-align: center;
+  animation: fadeIn 1s ease-out;
+}
+
+nav a,
+footer a {
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+nav a:hover,
+footer a:hover {
+  color: #ff6347;
+}
+
+.hero {
+  background: url("hero.jpg") no-repeat center center/cover;
+  color: #fff;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.section_1 {
+  padding: 2rem;
+  background: #fff;
+  margin: 1rem 0;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  animation: fadeIn 1s forwards;
+}
+
+body.dark-theme .section_1 {
+  background: #333;
+  color: #ecf0f1;
+}
+
+.projects,
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+.project-card,
+.skill {
+  background: #ffffff;
+  border: 1px solid #333;
+  border-radius: 5px;
+  margin: 1rem;
+  padding: 1rem;
+  width: 30%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+  opacity: 0;
+  animation: fadeIn 1s ease-out 0.5s forwards;
+  color: #333;
+}
+
+body.dark-theme .project-card,
+body.dark-theme .skill{
+  background: #444444;
+  border: 1px solid #ecf0f1;
+  color: #ecf0f1;
+}
+
+.project-card:hover,
+.skill:hover {
+  transform: scale(1.05);
+}
+
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 500px;
+  margin: 0 auto;
+  animation: slideIn 1s ease-out 1s;
+}
+form input,
+form textarea,
+form button {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 100%;
+  background: #ffffff;
+  color: #333;
+}
+
+form button {
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+body.dark-theme form input,
+body.dark-theme form textarea,
+body.dark-theme form button {
+  background: #444444;
+  color: #ecf0f1;
+  border: 1px solid #fff;
+}
+
+form button:hover {
+  background: #ff6347;
+}
+
+/* Dark theme styles */
+body.dark-theme {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+}
+
+header.dark-theme,
+nav.dark-theme,
+footer.dark-theme {
+  background-color: #1a252f;
+}
+
+nav.dark-theme a,
+footer.dark-theme a {
+  color: #ecf0f1;
+}
+
+.hero.dark-theme {
+  background-color: #34495e;
+}
+
+.project-card.dark-theme,
+.skill.dark-theme {
+  background-color: #2c3e50;
+  border: 1px solid #34495e;
+  color: #ecf0f1;
+}
+
+form input.dark-theme,
+form textarea.dark-theme {
+  background-color: #34495e;
+  color: #ecf0f1;
+  border: 1px solid #2c3e50;
+}
+
+form button.dark-theme {
+  background-color: #3498db;
+  color: white;
+}
+
+form button.dark-theme:hover {
+  background-color: #2980b9;
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  color: var(--header-text);
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s, color 0.3s;
+  will-change: background-color, color;
+  z-index: 1000; /* Ensure the toggle button is above other elements */
+}
+
+.theme-toggle:hover {
+  background-color: #f4f4f4;
+}
+
+body.dark-theme .theme-toggle {
+  background-color: #34495e;
+  color: #ecf0f1;
+}
+
+body.dark-theme .theme-toggle:hover {
+  background-color: #2c3e50;
+}
