@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Sun, Moon } from "lucide-react";
+import { siteContent } from "@/content/site";
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -43,13 +44,15 @@ export function ThemeToggle() {
     );
   }
 
+  const label = theme === "light" ? siteContent.nav.themeToDark : siteContent.nav.themeToLight;
+
   return (
     <button
       type="button"
       onClick={toggleTheme}
       className="inline-flex items-center justify-center w-11 h-11 border border-[var(--rule)] rounded-[4px] bg-[var(--surface)] text-[var(--ink)] hover:border-[var(--ink)] cursor-pointer transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
-      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
-      title={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
+      aria-label={label}
+      title={label}
     >
       {theme === "light" ? (
         <Moon size={18} strokeWidth={1.5} aria-hidden="true" />
@@ -59,4 +62,3 @@ export function ThemeToggle() {
     </button>
   );
 }
-

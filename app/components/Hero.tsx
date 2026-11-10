@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { m, useScroll, useTransform } from "motion/react";
-import { ArrowDown, Download, ExternalLink, Mail } from "lucide-react";
+import { ArrowDown, Download, Mail, ArrowUpRight } from "lucide-react";
 import { Github, Linkedin } from "./Icons";
-import { profile } from "@/content/profile";
+import { siteContent } from "@/content/site";
+import { contactContent } from "@/content/contact";
+import { mediaManifest } from "@/content/media";
 
 export function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
 
-  // Mark hero-seen in sessionStorage on mount for subsequent visits
   useEffect(() => {
     try {
       if (!sessionStorage.getItem("hero-seen")) {
@@ -19,7 +20,6 @@ export function Hero() {
     } catch {}
   }, []);
 
-  // Scroll-linked fade & rise (max 24px) as hero scrolls out
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -28,105 +28,166 @@ export function Hero() {
   const y = useTransform(scrollYProgress, [0, 1], [0, -24]);
   const opacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.15]);
 
+  const resumeSlot = mediaManifest["resume-pdf"];
+  const isResumeAvailable = Boolean(resumeSlot?.src);
+
   return (
     <section
       id="hero"
       ref={heroRef}
-      className="relative min-h-[calc(100svh-66px)] max-h-[920px] flex flex-col justify-center py-12 md:py-20 border-b border-[var(--rule)]"
+      className="relative flex flex-col justify-center py-16 md:py-24 border-b border-[var(--rule)]"
     >
       <m.div style={{ y, opacity }} className="max-w-[1120px] mx-auto px-4 sm:px-8 w-full">
-        {/* Status Line: Mono with small solid accent square (never pulsing dot) */}
-        <div className="hero-fade-1 mb-6">
-          <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-medium">
+        {/* Eyebrow: Status Line */}
+        <div className="hero-fade-1 mb-5">
+          <div className="inline-flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-medium">
             <span
-              className="inline-block w-2 h-2 bg-[var(--accent)] rounded-none shrink-0"
+              className="inline-block w-2 h-[2px] bg-[var(--accent)] shrink-0"
               aria-hidden="true"
             />
-            <span>{profile.statusLine}</span>
+            <span>{siteContent.hero.eyebrow}</span>
           </div>
         </div>
 
-        {/* Headline / Name in Source Serif 4 clamp: line masked */}
-        <div className="hero-mask mb-4">
-          <h1 className="hero-line-1 font-serif text-[clamp(2.75rem,6vw,4.5rem)] font-normal tracking-tight text-[var(--ink)] leading-[1.08]">
-            {profile.name}
+        {/* Name and Headline in Source Serif 4 */}
+        <div className="hero-mask mb-3">
+          <h1 className="hero-line-1 font-serif text-[clamp(2.5rem,5.5vw,4.25rem)] font-normal tracking-tight text-[var(--ink)] leading-[1.08]">
+            <span className="block font-medium">{siteContent.hero.name}</span>
+            <span className="block font-normal text-2xl sm:text-3xl md:text-4xl text-[var(--ink-muted)] mt-1">
+              {siteContent.hero.headline}
+            </span>
           </h1>
         </div>
 
-        {/* 1px Accent Rule drawing left-to-right (scaleX 0 to 1, 600ms) */}
-        <div className="py-4 max-w-xl">
+        {/* 1px Accent Rule */}
+        <div className="py-3 max-w-xl">
           <div className="hero-rule h-[1px] w-full bg-[var(--accent)]" />
         </div>
 
-        {/* Positioning Sentence */}
-        <div className="hero-fade-2 max-w-[62ch] mb-8">
-          <p className="font-sans text-base sm:text-lg text-[var(--ink-muted)] leading-[1.65]">
-            {profile.positioning}
+        {/* Intro */}
+        <div className="hero-fade-2 max-w-[64ch] mb-6">
+          <p className="font-sans text-base sm:text-lg text-[var(--ink)] leading-[1.65]">
+            {siteContent.hero.intro}
           </p>
         </div>
 
-        {/* Action Buttons: Radius 4px, min 44px touch height */}
-        <div className="hero-fade-3 flex flex-wrap items-center gap-4 mb-10">
-          <a
-            href="#projects"
-            className="group inline-flex items-center gap-2 px-5 min-h-[44px] rounded-[4px] bg-[var(--ink)] text-[var(--paper)] text-sm font-medium hover:opacity-90 cursor-pointer transition-opacity focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
-          >
-            <span>View projects</span>
-            <ArrowDown
-              size={16}
-              strokeWidth={1.5}
-              className="transition-transform duration-150 group-hover:translate-y-1"
-              aria-hidden="true"
-            />
-          </a>
+        {/* Focus row */}
+        <div className="hero-fade-2 flex flex-wrap items-center gap-2 mb-4 font-mono text-xs text-[var(--ink-muted)]">
+          <span className="text-[var(--accent)] font-semibold uppercase tracking-wider">
+            {siteContent.hero.focusLabel}:
+          </span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {siteContent.hero.focusItems.map((item) => (
+              <span
+                key={item}
+                className="px-2 py-0.5 border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink)] rounded-[2px]"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
 
+        {/* Currently Building row (clickable to open Student Organizer) */}
+        <div className="hero-fade-2 mb-8">
           <a
-            href="/resume.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 min-h-[44px] rounded-[4px] border border-[var(--rule)] bg-[var(--paper)] text-[var(--ink)] text-sm font-medium hover:border-[var(--ink)] cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+            href="#project/student-organizer"
+            className="inline-flex flex-wrap items-baseline gap-2 font-mono text-xs p-2.5 border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/40 hover:border-[var(--accent)] hover:bg-[var(--surface)] transition-colors group"
           >
-            <Download size={16} strokeWidth={1.5} aria-hidden="true" />
-            <span>Download resume (PDF)</span>
+            <span className="text-[var(--accent)] font-semibold uppercase tracking-wider">
+              {siteContent.hero.currentlyLabel}:
+            </span>
+            <span className="font-sans text-sm text-[var(--ink)] group-hover:text-[var(--accent)] transition-colors">
+              {siteContent.hero.currentlyValue} &rarr;
+            </span>
           </a>
         </div>
 
-        {/* Quiet Row of Text Links (GitHub, LinkedIn, Email) with 200ms underline draw */}
-        <div className="hero-fade-3 flex flex-wrap items-center gap-6 pt-4 border-t border-[var(--rule)] text-xs font-mono text-[var(--ink-muted)]">
+        {/* 3-Tier CTAs */}
+        <div className="hero-fade-3 flex flex-wrap items-center gap-3 mb-10">
+          {/* Primary CTA: View selected work */}
           <a
-            href={profile.githubUrl}
+            href="#projects"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[4px] bg-[var(--ink)] text-[var(--paper)] text-xs font-mono font-medium hover:opacity-90 transition-opacity cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+          >
+            <span>{siteContent.hero.ctaPrimary}</span>
+            <ArrowDown className="w-3.5 h-3.5" />
+          </a>
+
+          {/* Secondary CTA: Download résumé */}
+          {isResumeAvailable ? (
+            <a
+              href={resumeSlot.src!}
+              download="Kartik-Koundal-Resume.pdf"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[4px] border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink)] text-xs font-mono font-medium hover:border-[var(--accent)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>{siteContent.hero.ctaSecondary}</span>
+            </a>
+          ) : (
+            <div className="relative group">
+              <button
+                type="button"
+                aria-disabled="true"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[4px] border border-[var(--rule)] bg-[var(--surface)]/50 text-[var(--ink-muted)] text-xs font-mono font-medium opacity-60 cursor-not-allowed"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>{siteContent.hero.ctaSecondary}</span>
+              </button>
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-[#111315] text-white px-2.5 py-1 rounded-[4px] font-mono text-[10px] whitespace-nowrap shadow-lg border border-white/10 z-20">
+                {contactContent.resumePending}
+              </div>
+            </div>
+          )}
+
+          {/* Tertiary CTA: Get in touch */}
+          <a
+            href="#contact"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[4px] text-[var(--ink-muted)] hover:text-[var(--ink)] text-xs font-mono font-medium hover:underline transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+          >
+            <span>{siteContent.hero.ctaTertiary}</span>
+            &rarr;
+          </a>
+        </div>
+
+        {/* Links row */}
+        <div className="hero-fade-3 flex flex-wrap items-center gap-x-4 gap-y-2 pt-4 border-t border-[var(--rule)] text-xs font-mono text-[var(--ink-muted)]">
+          <a
+            href="https://github.com/Kartikk-git"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 hover:text-[var(--accent)] hover:underline underline-offset-4 transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+            className="inline-flex items-center gap-1.5 hover:text-[var(--accent)] hover:underline underline-offset-4 transition-colors"
           >
-            <Github size={14} strokeWidth={1.5} aria-hidden="true" />
+            <Github size={13} strokeWidth={1.5} aria-hidden="true" />
             <span>GitHub</span>
           </a>
 
+          <span className="text-[var(--rule)] select-none">/</span>
+
           <a
-            href={profile.linkedinUrl}
+            href="https://www.linkedin.com/in/kartik-koundal-a41574323/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 hover:text-[var(--accent)] hover:underline underline-offset-4 transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+            className="inline-flex items-center gap-1.5 hover:text-[var(--accent)] hover:underline underline-offset-4 transition-colors"
           >
-            <Linkedin size={14} strokeWidth={1.5} aria-hidden="true" />
+            <Linkedin size={13} strokeWidth={1.5} aria-hidden="true" />
             <span>LinkedIn</span>
           </a>
 
+          <span className="text-[var(--rule)] select-none">/</span>
+
           <a
-            href={`mailto:${profile.email}`}
-            className="inline-flex items-center gap-1.5 hover:text-[var(--accent)] hover:underline underline-offset-4 transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+            href={`mailto:${contactContent.primary.email}?subject=${encodeURIComponent(contactContent.mailtoSubject)}`}
+            className="inline-flex items-center gap-1.5 hover:text-[var(--accent)] hover:underline underline-offset-4 transition-colors"
           >
-            <Mail size={14} strokeWidth={1.5} aria-hidden="true" />
-            <span>{profile.email}</span>
+            <Mail size={13} strokeWidth={1.5} aria-hidden="true" />
+            <span>{contactContent.primary.email}</span>
           </a>
 
-          <span className="text-[var(--ink-muted)]/70">
-            {profile.location}
-          </span>
-        </div>
+          <span className="text-[var(--rule)] select-none">/</span>
 
-        {/* TODO(owner): Add /public/images/portrait.jpg if a portrait is desired. Banned if absent. */}
+          <span>New Delhi, India</span>
+        </div>
       </m.div>
     </section>
   );

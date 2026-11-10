@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import { m, AnimatePresence } from "motion/react";
 import { RotateCcw, ArrowLeft, Check, ShieldAlert, Sparkles } from "lucide-react";
@@ -16,6 +17,9 @@ import {
 } from "@/lib/motion";
 
 export default function MotionStyleguidePage() {
+  if (process.env.NODE_ENV === "production") {
+    notFound();
+  }
   const [simulateReducedMotion, setSimulateReducedMotion] = useState(false);
   const [replayKey, setReplayKey] = useState(0);
 

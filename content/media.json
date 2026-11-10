@@ -1,0 +1,232 @@
+{
+  "p1-shot-1": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "9/19.5",
+    "label": "Onboarding",
+    "caption": "Onboarding: the first-run carousel that introduces the app",
+    "project": "Student Organizer"
+  },
+  "p1-shot-2": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "9/19.5",
+    "label": "Dashboard",
+    "caption": "Dashboard: pending assignments, attendance, upcoming exams and active courses",
+    "project": "Student Organizer"
+  },
+  "p1-shot-3": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "9/19.5",
+    "label": "Courses",
+    "caption": "Courses: course list with live assignment progress",
+    "project": "Student Organizer"
+  },
+  "p1-shot-4": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "9/19.5",
+    "label": "Assignments",
+    "caption": "Assignments: tasks with status and priority",
+    "project": "Student Organizer"
+  },
+  "p1-shot-5": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "9/19.5",
+    "label": "Calendar and attendance",
+    "caption": "Calendar and attendance: the Compose calendar with tap-to-mark attendance",
+    "project": "Student Organizer"
+  },
+  "p1-shot-6": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "9/19.5",
+    "label": "Notes",
+    "caption": "Notes: study notes filtered by course",
+    "project": "Student Organizer"
+  },
+  "p1-demo": {
+    "type": "video",
+    "src": null,
+    "ratio": "16/9",
+    "label": "Student Organizer walkthrough",
+    "caption": "Demo: a short walkthrough of adding a course, logging attendance and filtering notes",
+    "project": "Student Organizer"
+  },
+  "p1-arch": {
+    "type": "diagram",
+    "src": null,
+    "ratio": "16/9",
+    "label": "Architecture",
+    "caption": "Architecture: how activities, fragments, Compose UI and Room fit together",
+    "project": "Student Organizer"
+  },
+  "p1-erd": {
+    "type": "diagram",
+    "src": null,
+    "ratio": "16/9",
+    "label": "Database",
+    "caption": "Database: the five Room entities and their relationships",
+    "project": "Student Organizer"
+  },
+  "p2-shot-1": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "16/10",
+    "label": "MPLAD Overview",
+    "caption": "MPLAD frontend governance dashboard view",
+    "project": "MPLAD"
+  },
+  "p2-shot-2": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "16/10",
+    "label": "Fund Analytics",
+    "caption": "Constituency fund allocation and utilization table",
+    "project": "MPLAD"
+  },
+  "p2-shot-3": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "16/10",
+    "label": "Project Tracker",
+    "caption": "Local development project progress view",
+    "project": "MPLAD"
+  },
+  "p3-shot-1": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "16/10",
+    "label": "Hospital Home",
+    "caption": "Healthcare services landing page layout",
+    "project": "Hospital Management"
+  },
+  "p3-shot-2": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "16/10",
+    "label": "Appointments",
+    "caption": "Doctor appointment request schedule interface",
+    "project": "Hospital Management"
+  },
+  "p4-shot-1": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "16/10",
+    "label": "Portfolio v1",
+    "caption": "Earlier single-page portfolio layout on GitHub Pages",
+    "project": "Portfolio v1"
+  },
+  "p5-shot-1": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "16/10",
+    "label": "Performance",
+    "caption": "Weekly, monthly and all-time Chart.js visual telemetry",
+    "project": "TEJOVIK"
+  },
+  "p5-shot-2": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "16/10",
+    "label": "CHETVIK Analysis",
+    "caption": "Cognitive readiness score and burnout gauge calculator",
+    "project": "TEJOVIK"
+  },
+  "p5-shot-3": {
+    "type": "screenshot",
+    "src": null,
+    "ratio": "16/10",
+    "label": "CHETVIK Chat",
+    "caption": "Automated wellness check-in assistant interface",
+    "project": "TEJOVIK"
+  },
+  "p5-demo": {
+    "type": "video",
+    "src": null,
+    "ratio": "16/9",
+    "label": "TEJOVIK walkthrough",
+    "caption": "TEJOVIK interactive wellness platform walkthrough",
+    "project": "TEJOVIK"
+  },
+  "cred-java": {
+    "type": "certificate",
+    "src": null,
+    "ratio": "4/3",
+    "label": "NPTEL Programming in Java",
+    "caption": "NPTEL IIT Kharagpur Elite Certificate (95%)",
+    "title": "Programming in Java"
+  },
+  "cred-codechef-1": {
+    "type": "certificate",
+    "src": null,
+    "ratio": "4/3",
+    "label": "Python Skill Assessment",
+    "caption": "CodeChef Python Assessment (90%)",
+    "title": "Python Skill Assessment"
+  },
+  "cred-codechef-2": {
+    "type": "certificate",
+    "src": null,
+    "ratio": "4/3",
+    "label": "Git/GitHub Track",
+    "caption": "CodeChef Git and GitHub Learning Track",
+    "title": "Git/GitHub"
+  },
+  "cred-codechef-3": {
+    "type": "certificate",
+    "src": null,
+    "ratio": "4/3",
+    "label": "Learn HTML/CSS",
+    "caption": "CodeChef HTML/CSS Foundation",
+    "title": "Learn HTML/CSS"
+  },
+  "cred-codechef-4": {
+    "type": "certificate",
+    "src": null,
+    "ratio": "4/3",
+    "label": "CSS Intermediate",
+    "caption": "CodeChef CSS Intermediate Track",
+    "title": "CSS Intermediate"
+  },
+  "cred-codechef-5": {
+    "type": "certificate",
+    "src": null,
+    "ratio": "4/3",
+    "label": "Projects using HTML/CSS",
+    "caption": "CodeChef HTML/CSS Projects Track",
+    "title": "Projects using HTML/CSS"
+  },
+  "cred-gcloud-1": {
+    "type": "certificate",
+    "src": null,
+    "ratio": "4/3",
+    "label": "Prompt Design in Vertex AI",
+    "caption": "Google Cloud Skill Badge",
+    "title": "Prompt Design in Vertex AI"
+  },
+  "cred-gcloud-2": {
+    "type": "certificate",
+    "src": null,
+    "ratio": "4/3",
+    "label": "Develop GenAI Apps with Gemini and Streamlit",
+    "caption": "Google Cloud Skill Badge",
+    "title": "Develop GenAI Apps with Gemini and Streamlit"
+  },
+  "cred-gcloud-3": {
+    "type": "certificate",
+    "src": null,
+    "ratio": "4/3",
+    "label": "Deploy and Manage Applications on Google App Engine",
+    "caption": "Google Cloud Skill Badge",
+    "title": "Deploy and Manage Applications on Google App Engine"
+  },
+  "resume-pdf": {
+    "type": "file",
+    "src": null,
+    "label": "Résumé",
+    "title": "Kartik-Koundal-Resume.pdf"
+  }
+}

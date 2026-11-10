@@ -18,13 +18,13 @@ const ROOM_ENTITIES = [
 ] as const;
 
 export default function StudentOrganizerPage() {
-  const project = projects.find((p) => p.slug === "student-organizer");
+  const project = projects.find((p: any) => p.slug === "student-organizer");
   if (!project) notFound();
 
   return (
     <CaseStudyTemplate
       project={project}
-      prevProject={{
+      nextProject={{
         title: "TEJOVIK",
         href: "/projects/tejovik",
       }}

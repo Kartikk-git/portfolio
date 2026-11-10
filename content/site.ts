@@ -1,0 +1,53 @@
+// Verbatim site content from content/website-content.md
+export const siteContent = {
+  title: "Kartik Koundal | Android and Web Developer",
+  description: "Computer Science student at Dronacharya College of Engineering building native Android apps in Kotlin and web applications in Python and JavaScript. Open to software and Android internships.",
+  nav: {
+    itemsRaw: "Projects · About · Skills · Education · Contact",
+    items: ["Projects","About","Skills","Education","Contact"],
+    searchLabel: "Search",
+    searchPlaceholder: "Search sections, projects and skills",
+    searchEmpty: "Nothing matches that. Try a project name or a technology.",
+    searchGroups: "Sections · Projects · Skills",
+    resume: "Résumé",
+    themeToLight: "Switch to light theme",
+    themeToDark: "Switch to dark theme",
+    menuOpen: "Open menu",
+    menuClose: "Close menu",
+  },
+  hero: {
+    eyebrow: "Open to software and Android internships",
+    name: "Kartik Koundal",
+    headline: "I build native Android apps and data-driven web tools.",
+    intro: "I'm a B.Tech Computer Science student at Dronacharya College of Engineering. My main project is Student Organizer, an offline-first Android app written in Kotlin with Jetpack Compose and Room. I also build web applications with Python, Flask and JavaScript, and I'm looking for an internship where I can work on a real codebase and learn from code review.",
+    focusLabel: "Focus",
+    focusItemsRaw: "Kotlin · Jetpack Compose · Python · Flask · TypeScript",
+    focusItems: ["Kotlin","Jetpack Compose","Python","Flask","TypeScript"],
+    currentlyLabel: "Currently building",
+    currentlyValue: "Student Organizer, an offline-first Android app for courses, assignments and attendance",
+    ctaPrimary: "View selected work",
+    ctaSecondary: "Download résumé",
+    ctaTertiary: "Get in touch",
+    linksRaw: "GitHub · LinkedIn · koundal.k29@gmail.com · New Delhi, India",
+    links: ["GitHub","LinkedIn","koundal.k29@gmail.com","New Delhi, India"],
+    scrollCue: "Scroll to explore",
+  },
+  footer: {
+    line: "© 2026 Kartik Koundal · New Delhi, India",
+    top: "Back to top",
+  },
+  toast: {
+    emailCopied: "Email address copied",
+    copyFailed: "Couldn't copy. The address is koundal.k29@gmail.com",
+  },
+  ui: {
+    lightboxClose: "Close image viewer",
+    lightboxPrev: "Previous image",
+    lightboxNext: "Next image",
+    lightboxCounter: "Image {i} of {n}",
+    modalClose: "Close",
+    linkExternal: "Opens in a new tab",
+    skip: "Skip to main content",
+    reducedMotionNote: "Animations reduced to respect your device setting.",
+  }
+};

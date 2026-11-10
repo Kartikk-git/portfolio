@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState, useRef } from "react";
 import { m, AnimatePresence } from "motion/react";
 import {
   Search,
@@ -14,14 +13,18 @@ import {
   Code,
   X,
   Compass,
+  Download,
 } from "lucide-react";
 import { Github, Linkedin } from "./Icons";
-import { profile } from "@/content/profile";
-import { projects } from "@/content/projects";
+import { siteContent } from "@/content/site";
+import { projectsContent } from "@/content/projects";
+import { skillsContent } from "@/content/skills";
+import { contactContent } from "@/content/contact";
+import { mediaManifest } from "@/content/media";
 
 interface CommandItem {
   id: string;
-  category: "Navigation" | "Projects" | "Actions" | "External";
+  category: "Sections" | "Projects" | "Skills" | "Actions" | "External";
   label: string;
   detail?: string;
   shortcut?: string;
@@ -39,9 +42,7 @@ export function CommandPalette({
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
 
-  // Focus input when opened
   useEffect(() => {
     if (isOpen) {
       setQuery("");
@@ -50,7 +51,6 @@ export function CommandPalette({
     }
   }, [isOpen]);
 
-  // Lock body scroll when palette is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -62,17 +62,14 @@ export function CommandPalette({
     };
   }, [isOpen]);
 
-  // Keyboard navigation & Esc key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return;
-
       if (e.key === "Escape") {
         e.preventDefault();
         onClose();
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
@@ -88,120 +85,142 @@ export function CommandPalette({
   };
 
   const copyEmail = () => {
-    navigator.clipboard.writeText(profile.email);
+    navigator.clipboard.writeText(contactContent.primary.email);
     onClose();
   };
 
+  const resumeSlot = mediaManifest["resume-pdf"];
+
   const commands: CommandItem[] = [
-    // Navigation
+    // Sections
     {
-      id: "nav-hero",
-      category: "Navigation",
-      label: "Go to Top / Hero",
-      detail: "Introduction and positioning",
+      id: "sec-hero",
+      category: "Sections",
+      label: "Hero / Introduction",
+      detail: siteContent.hero.eyebrow,
       icon: Compass,
       onSelect: () => {
-        router.push("/#hero");
+        window.location.hash = "hero";
         onClose();
       },
     },
     {
-      id: "nav-projects",
-      category: "Navigation",
-      label: "Jump to Projects",
-      detail: "Selected engineering works",
+      id: "sec-projects",
+      category: "Sections",
+      label: "Projects",
+      detail: `${projectsContent.counter} — Selected Works`,
       icon: FolderGit2,
       onSelect: () => {
-        router.push("/#projects");
+        window.location.hash = "projects";
         onClose();
       },
     },
     {
-      id: "nav-about",
-      category: "Navigation",
-      label: "Jump to About",
-      detail: "Background and engineering focus",
+      id: "sec-about",
+      category: "Sections",
+      label: "About",
+      detail: "Background, story & strengths",
       icon: FileText,
       onSelect: () => {
-        router.push("/#about");
+        window.location.hash = "about";
         onClose();
       },
     },
     {
-      id: "nav-skills",
-      category: "Navigation",
-      label: "Jump to Skills",
-      detail: "Technical stack and interactive explorer",
+      id: "sec-activity",
+      category: "Sections",
+      label: "Activity & Contributions",
+      detail: "GitHub & LeetCode commit telemetry",
       icon: Code,
       onSelect: () => {
-        router.push("/#skills");
+        window.location.hash = "activity";
         onClose();
       },
     },
     {
-      id: "nav-education",
-      category: "Navigation",
-      label: "Jump to Education & Credentials",
+      id: "sec-skills",
+      category: "Sections",
+      label: "Technical Stack",
+      detail: "Languages, Android, Web & Core fundamentals",
+      icon: Code,
+      onSelect: () => {
+        window.location.hash = "skills";
+        onClose();
+      },
+    },
+    {
+      id: "sec-education",
+      category: "Sections",
+      label: "Education & Credentials",
       detail: "Degree and verified certifications",
       icon: FileText,
       onSelect: () => {
-        router.push("/#education");
+        window.location.hash = "education";
         onClose();
       },
     },
     {
-      id: "nav-contact",
-      category: "Navigation",
-      label: "Jump to Contact",
-      detail: "Direct email and professional links",
+      id: "sec-contact",
+      category: "Sections",
+      label: "Contact",
+      detail: contactContent.primary.email,
       icon: Mail,
       onSelect: () => {
-        router.push("/#contact");
+        window.location.hash = "contact";
         onClose();
       },
     },
 
-    // Case Studies
-    {
-      id: "case-tejovik",
-      category: "Projects",
-      label: "TEJOVIK Case Study",
-      detail: "Student Performance & Wellness Platform (Flask, Chart.js)",
+    // Projects
+    ...projectsContent.items.map((p) => ({
+      id: `proj-${p.slug}`,
+      category: "Projects" as const,
+      label: p.title,
+      detail: `${p.badge} — ${p.tags.slice(0, 3).join(", ")}`,
       icon: FolderGit2,
       onSelect: () => {
-        router.push("/projects/tejovik");
+        window.location.hash = `#project/${p.slug}`;
         onClose();
       },
-    },
-    {
-      id: "case-student-organizer",
-      category: "Projects",
-      label: "Student Organizer Case Study",
-      detail: "Native Android app (Compose, Room, Coroutines)",
-      icon: FolderGit2,
+    })),
+
+    // Skills
+    ...Object.keys(skillsContent.tooltips).map((skill) => ({
+      id: `skill-${skill.toLowerCase().replace(/[^a-z0-9]/g, "-")}`,
+      category: "Skills" as const,
+      label: skill,
+      detail: (skillsContent.tooltips as Record<string, string>)[skill],
+      icon: Code,
       onSelect: () => {
-        router.push("/projects/student-organizer");
+        window.location.hash = "skills";
         onClose();
       },
-    },
+    })),
 
     // Actions
     {
       id: "act-copy-email",
       category: "Actions",
       label: "Copy Email Address",
-      detail: profile.email,
+      detail: contactContent.primary.email,
       icon: Mail,
       onSelect: copyEmail,
     },
     {
-      id: "act-resume",
+      id: "act-download-resume",
       category: "Actions",
-      label: "Download Resume (PDF)",
-      detail: "PDF format",
-      icon: FileText,
+      label: "Download Résumé (PDF)",
+      detail: resumeSlot?.src ? "Kartik-Koundal-Resume.pdf" : contactContent.resumePending,
+      icon: Download,
       onSelect: () => {
-        window.open("/resume.pdf", "_blank");
+        if (resumeSlot?.src) {
+          const a = document.createElement("a");
+          a.href = resumeSlot.src;
+          a.download = "Kartik-Koundal-Resume.pdf";
+          a.click();
+        } else {
+          alert(contactContent.resumePending);
+        }
         onClose();
       },
     },
@@ -209,20 +228,20 @@ export function CommandPalette({
       id: "act-toggle-theme",
       category: "Actions",
       label: "Toggle Color Theme",
-      detail: "Switch between paper (light) and dark themes",
-      icon: Sun,
+      detail: "Switch between paper and dark themes",
+      icon: Moon,
       onSelect: toggleTheme,
     },
 
-    // External Links
+    // External Profiles
     {
       id: "ext-github",
       category: "External",
       label: "GitHub Profile",
-      detail: profile.githubUrl,
+      detail: "github.com/Kartikk-git",
       icon: Github,
       onSelect: () => {
-        window.open(profile.githubUrl, "_blank", "noopener,noreferrer");
+        window.open("https://github.com/Kartikk-git", "_blank");
         onClose();
       },
     },
@@ -230,21 +249,10 @@ export function CommandPalette({
       id: "ext-linkedin",
       category: "External",
       label: "LinkedIn Profile",
-      detail: profile.linkedinUrl,
+      detail: "linkedin.com/in/kartik-koundal-a41574323",
       icon: Linkedin,
       onSelect: () => {
-        window.open(profile.linkedinUrl, "_blank", "noopener,noreferrer");
-        onClose();
-      },
-    },
-    {
-      id: "ext-credly",
-      category: "External",
-      label: "Credly Certifications",
-      detail: profile.credlyUrl,
-      icon: ExternalLink,
-      onSelect: () => {
-        window.open(profile.credlyUrl, "_blank", "noopener,noreferrer");
+        window.open("https://www.linkedin.com/in/kartik-koundal-a41574323/", "_blank");
         onClose();
       },
     },
@@ -252,40 +260,39 @@ export function CommandPalette({
       id: "ext-leetcode",
       category: "External",
       label: "LeetCode Profile",
-      detail: profile.leetcodeUrl,
-      icon: ExternalLink,
+      detail: "leetcode.com/u/kartikk-git",
+      icon: Code,
       onSelect: () => {
-        window.open(profile.leetcodeUrl, "_blank", "noopener,noreferrer");
+        window.open("https://leetcode.com/u/kartikk-git/", "_blank");
         onClose();
       },
     },
   ];
 
-  const filteredCommands = commands.filter((cmd) => {
-    if (!query.trim()) return true;
-    const q = query.toLowerCase();
-    return (
-      cmd.label.toLowerCase().includes(q) ||
-      (cmd.detail && cmd.detail.toLowerCase().includes(q)) ||
-      cmd.category.toLowerCase().includes(q)
-    );
-  });
+  const filtered = query.trim()
+    ? commands.filter(
+        (c) =>
+          c.label.toLowerCase().includes(query.toLowerCase()) ||
+          (c.detail && c.detail.toLowerCase().includes(query.toLowerCase())) ||
+          c.category.toLowerCase().includes(query.toLowerCase())
+      )
+    : commands;
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [query]);
+
+  const handleKeyDownInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setSelectedIndex((prev) =>
-        prev < filteredCommands.length - 1 ? prev + 1 : 0
-      );
+      setSelectedIndex((prev) => (prev < filtered.length - 1 ? prev + 1 : 0));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setSelectedIndex((prev) =>
-        prev > 0 ? prev - 1 : filteredCommands.length - 1
-      );
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : filtered.length - 1));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (filteredCommands[selectedIndex]) {
-        filteredCommands[selectedIndex].onSelect();
+      if (filtered[selectedIndex]) {
+        filtered[selectedIndex].onSelect();
       }
     }
   };
@@ -293,111 +300,84 @@ export function CommandPalette({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Command Palette"
-        >
-          {/* Backdrop with 200ms opacity transition */}
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-[#16181D]/60 dark:bg-black/80"
-          />
-
-          {/* Modal Container */}
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-[#111315]/80 backdrop-blur-sm">
           <m.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full max-w-xl bg-[var(--paper)] text-[var(--ink)] border border-[var(--rule)] rounded-[4px] shadow-lg overflow-hidden z-10"
+            transition={{ duration: 0.2 }}
+            className="w-full max-w-xl bg-[var(--paper)] border border-[var(--rule)] rounded-[4px] shadow-2xl overflow-hidden flex flex-col"
           >
-            {/* Input Header */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--rule)] bg-[var(--surface)]">
-              <Search size={18} strokeWidth={1.5} className="text-[var(--ink-muted)] shrink-0" />
+            {/* Search Input Bar */}
+            <div className="flex items-center px-4 py-3 border-b border-[var(--rule)] bg-[var(--surface)]/30">
+              <Search className="w-4 h-4 text-[var(--ink-muted)] shrink-0 mr-3" />
               <input
                 ref={inputRef}
                 type="text"
                 value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value);
-                  setSelectedIndex(0);
-                }}
-                onKeyDown={handleKeyDown}
-                placeholder="Type a command or search..."
-                className="w-full bg-transparent text-sm text-[var(--ink)] placeholder-[var(--ink-muted)] outline-none font-sans"
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={handleKeyDownInput}
+                placeholder={siteContent.nav.searchPlaceholder}
+                className="w-full bg-transparent font-sans text-sm text-[var(--ink)] placeholder:text-[var(--ink-muted)] outline-none"
               />
               <button
-                type="button"
                 onClick={onClose}
-                className="text-[var(--ink-muted)] hover:text-[var(--ink)] p-1 rounded-[2px] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
-                aria-label="Close command palette"
+                className="font-mono text-xs text-[var(--ink-muted)] hover:text-[var(--ink)] px-2 py-0.5"
+                title="Close palette"
               >
-                <X size={16} strokeWidth={1.5} />
+                [Esc]
               </button>
             </div>
 
-            {/* List Results */}
-            <div className="max-h-80 overflow-y-auto divide-y divide-[var(--rule)]/50 py-1">
-              {filteredCommands.length === 0 ? (
-                <div className="p-8 text-center text-xs font-mono text-[var(--ink-muted)]">
-                  No matching commands found.
+            {/* Results List */}
+            <div className="max-h-80 overflow-y-auto p-2 divide-y divide-[var(--rule)]/30">
+              {filtered.length === 0 ? (
+                <div className="p-6 text-center text-sm font-sans text-[var(--ink-muted)]">
+                  {siteContent.nav.searchEmpty}
                 </div>
               ) : (
-                filteredCommands.map((item, index) => {
+                filtered.map((item, idx) => {
+                  const isSelected = idx === selectedIndex;
                   const Icon = item.icon;
-                  const isSelected = index === selectedIndex;
                   return (
                     <div
                       key={item.id}
                       onClick={item.onSelect}
-                      onMouseEnter={() => setSelectedIndex(index)}
-                      className={`flex items-center justify-between px-4 py-2.5 text-xs font-mono cursor-pointer transition-colors ${
+                      onMouseEnter={() => setSelectedIndex(idx)}
+                      role="option"
+                      aria-selected={isSelected}
+                      className={`flex items-center justify-between p-2.5 rounded-[2px] cursor-pointer transition-colors ${
                         isSelected
-                          ? "bg-[var(--surface)] text-[var(--accent)] font-semibold"
-                          : "text-[var(--ink)] hover:bg-[var(--surface)]/50"
+                          ? "bg-[var(--surface)] text-[var(--ink)] border-l-2 border-[var(--accent)]"
+                          : "text-[var(--ink-muted)] hover:bg-[var(--surface)]/50"
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <Icon size={16} strokeWidth={1.5} className="shrink-0 text-[var(--ink-muted)]" />
-                        <div className="truncate">
-                          <span className="font-sans text-sm">{item.label}</span>
+                        <Icon className={`w-4 h-4 shrink-0 ${isSelected ? "text-[var(--accent)]" : "text-[var(--ink-muted)]"}`} />
+                        <div className="min-w-0 truncate">
+                          <span className={`block font-medium text-sm truncate ${isSelected ? "text-[var(--ink)]" : ""}`}>
+                            {item.label}
+                          </span>
                           {item.detail && (
-                            <span className="block text-[11px] text-[var(--ink-muted)] font-mono truncate">
+                            <span className="block text-xs text-[var(--ink-muted)] truncate">
                               {item.detail}
                             </span>
                           )}
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-2 shrink-0 ml-4">
-                        <span className="text-[10px] uppercase tracking-wider text-[var(--ink-muted)]">
-                          {item.category}
-                        </span>
-                      </div>
+                      <span className="font-mono text-[10px] uppercase text-[var(--ink-muted)] shrink-0 ml-3">
+                        {item.category}
+                      </span>
                     </div>
                   );
                 })
               )}
             </div>
 
-            {/* Footer with keyboard guidance */}
-            <div className="px-4 py-2 border-t border-[var(--rule)] bg-[var(--surface)]/50 flex justify-between items-center text-[11px] font-mono text-[var(--ink-muted)]">
-              <div className="flex items-center gap-2">
-                <span>&uarr;&darr; Navigate</span>
-                <span>&middot;</span>
-                <span>&crarr; Select</span>
-                <span>&middot;</span>
-                <span>Esc Close</span>
-              </div>
-              <div className="text-[10px] text-[var(--accent)]">
-                Ctrl / Cmd + K
-              </div>
+            {/* Footer hints */}
+            <div className="px-4 py-2 bg-[var(--surface)]/50 border-t border-[var(--rule)]/40 flex items-center justify-between text-[11px] font-mono text-[var(--ink-muted)]">
+              <span>Navigate &uarr;&darr; · Select &crarr;</span>
+              <span>ESC to close</span>
             </div>
           </m.div>
         </div>

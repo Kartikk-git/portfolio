@@ -1,0 +1,34 @@
+// Verbatim activity content from content/website-content.md
+export const activityContent = {
+  eyebrow: "03 · Commit log",
+  heading: "Activity & Contributions",
+  intro: "A public record of the code I push and the problems I solve. Both charts are generated from my GitHub and LeetCode profiles and cover the past year. They show volume, not quality, so for the work itself, see the projects above.",
+  tabs: "All activity · GitHub ({githubTotal}) · LeetCode ({leetcodeTotal})",
+  github: {
+    title: "{n} contributions in the last year",
+    description: "Commits, pull requests and issues on public repositories. Only public activity is shown.",
+    source: "Kartikk-git on GitHub",
+    footer: "Public GitHub contributions · past year",
+  },
+  leetcode: {
+    title: "{n} submissions across {d} active days",
+    description: "Daily LeetCode submissions. I use it to keep data structures and algorithms practice steady alongside project work.",
+    source: "kartikk-git on LeetCode",
+    footer: "Public LeetCode problem solving · past year",
+  },
+  legend: "Less · More",
+  monthsRaw: "Jan · Feb · Mar · Apr · May · Jun · Jul · Aug · Sep · Oct · Nov · Dec",
+  months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+  daysRaw: "Mon · Wed · Fri",
+  days: ["Mon","Wed","Fri"],
+  tooltip: {
+    github: "{n} contributions on {weekday}, {date}",
+    githubZero: "No contributions on {weekday}, {date}",
+    leetcode: "{n} submissions on {weekday}, {date}",
+    leetcodeZero: "No submissions on {weekday}, {date}",
+  },
+  summarySrOnly: "Activity chart. {n} entries over the last year. The busiest day was {busiestDate} with {busiestCount}.",
+  loading: "Loading activity…",
+  error: "Activity data couldn't be loaded right now. You can view it directly on {source}.",
+  filterHint: "Select a tab to focus on one source.",
+};

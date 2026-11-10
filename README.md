@@ -1,112 +1,98 @@
-# Kartik Koundal — Personal Portfolio
+# Kartik Koundal — Developer Portfolio
 
-Editorial, typography-first personal portfolio of Kartik Koundal, Computer Science student at Dronacharya College of Engineering, built for software engineering and native Android internship applications.
+Personal engineering portfolio for Kartik Koundal, a B.Tech Computer Science student at Dronacharya College of Engineering, built for software engineering and native Android internship applications.
 
-Built with Next.js 15 (App Router, static export), TypeScript (strict), Tailwind CSS v4, Motion (LazyMotion with `domMax`), and self-hosted Google Fonts (`next/font`).
-
----
-
-## Architecture & Design System
-
-- **Aesthetic Direction:** Editorial restraint, high typography discipline (Source Serif 4 for headings, IBM Plex Sans for body, IBM Plex Mono for code/metadata). No purple/pink AI gradients, no floating shapes, no glassmorphism, no fake stats.
-- **Palette:**
-  - Light (Paper `#FAFAF7`, Ink `#16181D`, Accent `#1B6B4F`, Surface `#F3F2EC`, Rule `#DAD8CF`)
-  - Dark (Background `#111315`, Ink `#E9E8E3`, Accent `#5FB38F`, Surface `#181B1E`, Rule `#2A2E32`)
-- **Tokens & Motion:** Single source of truth in [`lib/motion.ts`](file:///D:/apps/p1/lib/motion.ts) and [`design-system/kartik-portfolio/MASTER.md`](file:///D:/apps/p1/design-system/kartik-portfolio/MASTER.md).
-- **Interactive Stack Explorer:** Clicking or focusing any technology in the Skills section highlights matching projects and dims non-matching projects to 35% opacity.
-- **Command Palette:** Global keyboard palette on `Ctrl/Cmd+K` or header search button.
+Built with **Next.js 15 (App Router, static export)**, **TypeScript (strict)**, **Tailwind CSS v4**, and **Motion**.
 
 ---
 
-## Project Structure
+## Visual Identity & Design Tokens
+
+- **Editorial Restraint**: Designed like a high-grade engineering publication. No AI gradients, glowing blurred blobs, or generic card grids.
+- **Color System** (defined in `app/globals.css` and documented in [`docs/design-tokens.md`](docs/design-tokens.md)):
+  - **Light Theme (Paper)**: Base `#FAFAF7`, Surface `#F3F2EC`, Hairline Rule `#DAD8CF`, Ink `#16181D`, Muted Ink `#5A5F69`, Accent `#1B6B4F` (deep green, 5.9:1 contrast).
+  - **Dark Theme**: Background `#111315`, Surface `#181B1E`, Hairline Rule `#2A2E32`, Ink `#E9E8E3`, Muted Ink `#A2A7AE`, Accent `#5FB38F` (8.3:1 contrast).
+- **Typography**:
+  - Headings: **Source Serif 4** (Display title `h2` at `text-3xl font-semibold tracking-tight`, name display clamp `2.5rem–4.25rem`).
+  - Body & UI: **IBM Plex Sans** (Standard body at `text-base leading-[1.65]`).
+  - Metadata, Overlines & Code: **IBM Plex Mono** (Labels at `text-xs uppercase tracking-[0.06em]`).
+
+---
+
+## Content System & Source of Truth
+
+The website content layer strictly separates presentation from copy:
 
 ```
-.
-├── app
-│   ├── components
-│   │   ├── Header.tsx              # Sticky minimal header, sliding active indicator, 2px progress bar
-│   │   ├── Hero.tsx                # Keyframed pre-hydration intro, clamp typography, status badge
-│   │   ├── ProjectsSection.tsx     # Ruled horizontal project rows (not a card grid), touch accordion
-│   │   ├── AboutSection.tsx        # Plain 3-sentence profile from verified facts
-│   │   ├── SkillsSection.tsx       # Grouped typographic text lists & interactive Stack Explorer
-│   │   ├── EducationSection.tsx    # Ruled credentials table (NPTEL Java Elite lead) & education history
-│   │   ├── ContactSection.tsx      # Email copy with live announcement, profiles & location
-│   │   ├── Footer.tsx              # Name, year, three links
-│   │   ├── CommandPalette.tsx      # Ctrl+K combobox dialog
-│   │   ├── ThemeToggle.tsx         # Hand-tuned paper/dark switcher
-│   │   ├── MotionProvider.tsx      # LazyMotion with domMax
-│   │   ├── CaseStudyTemplate.tsx   # Shared template for deep-dive case studies
-│   │   └── Icons.tsx               # Geometric SVG icons matching 1.5 stroke Lucide style
-│   ├── fonts.ts                    # Self-hosted Source Serif 4, IBM Plex Sans, IBM Plex Mono
-│   ├── globals.css                 # Tailwind v4 @theme, variables, hero keyframes
-│   ├── layout.tsx                  # Root layout, theme bootstrapper script, JSON-LD Person schema
-│   ├── page.tsx                    # Home page coordinating all sections & stack filter state
-│   ├── robots.ts                   # Search engine crawling rules (noindex styleguide)
-│   ├── sitemap.ts                  # Static sitemap export
-│   ├── projects
-│   │   ├── tejovik                 # Flagship web platform case study
-│   │   └── student-organizer       # Native Android app case study with Room entities
-│   └── styleguide
-│       ├── page.tsx                # Internal token & contrast verification route
-│       └── motion/page.tsx         # Live motion tokens & reduced-motion simulator
-├── content
-│   ├── profile.ts                  # Personal information, links, and grouped skills
-│   ├── projects.ts                 # Project definitions, architectures, features, and repos
-│   ├── education.ts                # Degree and school records
-│   └── certifications.ts           # NPTEL, CodeChef tracks, Google Cloud Credly badges
-└── design-system
-    └── kartik-portfolio
-        └── MASTER.md               # Reconciled design system master file
+content/
+├── website-content.md          # Canonical single source of truth (Deliverable A)
+├── site.ts                     # Nav, hero, footer, and UI strings
+├── projects.ts                 # 5 projects (Student Organizer, MPLAD, Hospital, Portfolio v1, TEJOVIK)
+├── about.ts                    # Story, background, at a glance facts, how I work strengths
+├── activity.ts                 # Commit log & activity chart templates
+├── skills.ts                   # 4 categories & skill chip tooltips
+├── credentials.ts              # Verified certificates, formal education, modal labels
+├── contact.ts                  # Direct contact details, mailto subject, profile links
+├── media.json                  # Media manifest for all 22 asset slots
+├── media.ts                    # Media slot definitions and placeholder copy
+├── github-contributions.json   # 315 public commits from real GitHub calendar
+└── leetcode-contributions.json # 144 submissions across 18 days from real LeetCode data
+```
+
+### Content Validation
+Run the validator to guarantee every string matches canonical copy verbatim:
+```bash
+npm run check:content
 ```
 
 ---
 
-## How to Edit Content
+## Key Features & Interactions
 
-All content is strictly separated from presentation logic:
-
-1. **Profile, Bio & Social Links:** Edit [`content/profile.ts`](file:///D:/apps/p1/content/profile.ts).
-2. **Projects & Case Studies:** Edit [`content/projects.ts`](file:///D:/apps/p1/content/projects.ts).
-3. **Education Records:** Edit [`content/education.ts`](file:///D:/apps/p1/content/education.ts).
-4. **Certifications & Badges:** Edit [`content/certifications.ts`](file:///D:/apps/p1/content/certifications.ts).
-
----
-
-## Adding Assets & Owner Supply List
-
-- **Resume PDF:** Place your final compiled resume at `public/resume.pdf`. The header and hero buttons will automatically serve it.
-- **Project Screenshots:** Place 16:10 screenshots in `public/projects/tejovik/` and `public/projects/student-organizer/` to populate the case study frames.
-- **Portrait (Optional):** If you wish to feature a portrait, place it at `public/images/portrait.jpg`.
+1. **Slide-Over Project Detail Panels**:
+   - Every project card opens an accessible detail panel (720px slide-over on desktop, full-screen on mobile).
+   - Deep-linked via URL hashes (`#project/student-organizer`, `#project/tejovik`, etc.).
+   - Includes a sticky mini-nav with scroll-spy, previous/next project navigation, and a gallery strip.
+2. **Designed Media Placeholders & Lightbox**:
+   - When assets are pending (`src: null` in `content/media.json`), components render custom aspect-ratio placeholders with hairline borders, monospace tags, and hatch backgrounds.
+   - Clicking any gallery item opens a full-screen, keyboard-navigable Lightbox.
+   - To supply a real asset, simply change `"src": "/path/to/image.png"` in `content/media.json`.
+3. **Live Contribution Heatmaps**:
+   - Real GitHub contributions (315 commits) and LeetCode problem solving (144 submissions across 18 days).
+   - Tab switching between *All activity*, *GitHub*, and *LeetCode*.
+   - Month labels can be clicked to highlight that month's cells for 2 seconds.
+   - Hovering legend intensity levels isolates matching days.
+4. **Credential Preview Modal**:
+   - Timeline items feature a "Preview certificate" action opening `CertificateModal.tsx` with a metadata sidebar (*Issuer*, *Issued*, *Score*, *Credential ID*, *Verify*).
+   - CodeChef modal steps through all 5 completed tracks and assessments.
+5. **Command Palette (`⌘K` / `Ctrl+K`)**:
+   - Keyboard-operable modal searching across sections, projects, skills, and actions (toggle theme, copy email, download resume).
+6. **Developer Review Mode (`?review=1`)**:
+   - Visiting `/?review=1` activates review mode, outlining unconfirmed (`confirm: true`) statements with amber tags for quick audit.
 
 ---
 
 ## Development & Building
 
 ```bash
-# Install dependencies
-npm install
+# Verify all content matches canonical copy verbatim
+npm run check:content
 
-# Run local development server
-npm run dev
-
-# Run strict TypeScript type check
+# Run TypeScript typecheck
 npx tsc --noEmit
+
+# Start Next.js development server
+npm run dev
 
 # Build production static export (outputs to /out)
 npm run build
+
+# Serve static output locally on port 3000
+npm run serve
 ```
 
 ---
 
-## Deployment (Vercel or GitHub Pages)
+## Static Deployment
 
-### Vercel Deployment
-1. Push the repository to GitHub.
-2. Import the project into Vercel.
-3. Framework Preset: **Next.js**.
-4. Build Command: `npm run build`.
-5. Output Directory: `out` (or default Next.js output).
-
-### GitHub Pages Deployment
-The app is configured for static export (`output: "export"` in `next.config.ts`). The static files in `out/` can be served directly from GitHub Pages or any static CDN.
-
+The site exports pure HTML/CSS/JS to `/out` and is 100% compatible with GitHub Pages, Vercel, Netlify, or any static hosting provider.

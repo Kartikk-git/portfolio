@@ -10,13 +10,13 @@ export const metadata: Metadata = {
 };
 
 export default function TejovikPage() {
-  const project = projects.find((p) => p.slug === "tejovik");
+  const project = projects.find((p: any) => p.slug === "tejovik");
   if (!project) notFound();
 
   return (
     <CaseStudyTemplate
       project={project}
-      nextProject={{
+      prevProject={{
         title: "Student Organizer",
         href: "/projects/student-organizer",
       }}

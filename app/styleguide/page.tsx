@@ -1,14 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { notFound } from "next/navigation";
 import { ExternalLink, ArrowUpRight, Download, Check } from "lucide-react";
 import { ThemeToggle } from "@/app/components/ThemeToggle";
 import { lightContrastData, darkContrastData } from "./contrast";
 import { projects } from "@/content/projects";
 
 export default function StyleguidePage() {
+  if (process.env.NODE_ENV === "production") {
+    notFound();
+  }
   const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
-  const tejovik = projects[0];
+  const tejovik: any = projects[0];
 
   useEffect(() => {
     const updateThemeState = () => {

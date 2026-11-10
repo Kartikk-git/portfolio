@@ -1,41 +1,47 @@
 import type { Metadata } from "next";
 import { sourceSerif4, ibmPlexSans, ibmPlexMono } from "./fonts";
 import { MotionProvider } from "./components/MotionProvider";
-import { profile } from "@/content/profile";
+import { siteContent } from "@/content/site";
+import { contactContent } from "@/content/contact";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: `${profile.name} — Computer Science Student & Developer`,
-  description: profile.positioning,
+  title: siteContent.title,
+  description: siteContent.description,
   metadataBase: new URL("https://kartikk-git.github.io"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: `${profile.name} — Computer Science Student & Developer`,
-    description: profile.positioning,
+    title: siteContent.title,
+    description: siteContent.description,
     url: "https://kartikk-git.github.io",
-    siteName: `${profile.name} Portfolio`,
-    locale: "en_US",
+    siteName: siteContent.title,
+    locale: "en_GB",
     type: "website",
   },
   twitter: {
     card: "summary",
-    title: `${profile.name} — Computer Science Student & Developer`,
-    description: profile.positioning,
+    title: siteContent.title,
+    description: siteContent.description,
   },
   robots: {
     index: true,
     follow: true,
+  },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
   },
 };
 
 const jsonLdPerson = {
   "@context": "https://schema.org",
   "@type": "Person",
-  name: profile.name,
+  name: siteContent.hero.name,
   url: "https://kartikk-git.github.io",
-  email: profile.email,
+  email: contactContent.primary.email,
   address: {
     "@type": "PostalAddress",
     addressLocality: "New Delhi",
@@ -46,13 +52,13 @@ const jsonLdPerson = {
     name: "Dronacharya College of Engineering",
   },
   sameAs: [
-    profile.githubUrl,
-    profile.linkedinUrl,
-    profile.credlyUrl,
-    profile.leetcodeUrl,
+    "https://github.com/Kartikk-git",
+    "https://www.linkedin.com/in/kartik-koundal-a41574323/",
+    "https://www.credly.com/users/kartik-koundal",
+    "https://leetcode.com/u/kartikk-git/",
   ],
-  jobTitle: "Computer Science Student & Software Engineer",
-  description: profile.positioning,
+  jobTitle: "Android and Web Developer",
+  description: siteContent.description,
 };
 
 export default function RootLayout({
@@ -63,33 +69,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sourceSerif4.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable}`}
       suppressHydrationWarning
+      className={`${sourceSerif4.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable}`}
     >
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  if (sessionStorage.getItem('hero-seen')) {
-                    document.documentElement.setAttribute('data-hero-seen', 'true');
-                  }
-                  var params = new URLSearchParams(window.location.search);
-                  var qTheme = params.get('theme');
-                  var sTheme = localStorage.getItem('theme');
-                  if (qTheme === 'dark' || qTheme === 'light') {
-                    document.documentElement.setAttribute('data-theme', qTheme);
-                  } else if (sTheme === 'dark' || sTheme === 'light') {
-                    document.documentElement.setAttribute('data-theme', sTheme);
-                  } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                  } else {
-                    document.documentElement.setAttribute('data-theme', 'light');
-                  }
-                } catch (e) {}
-              })();
-            `,
+            __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.setAttribute('data-theme','light');}}catch(e){}})();`,
           }}
         />
         <script
@@ -97,7 +83,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdPerson) }}
         />
       </head>
-      <body className="min-h-screen bg-[var(--paper)] text-[var(--ink)] antialiased">
+      <body className="font-sans antialiased bg-[var(--paper)] text-[var(--ink)] min-h-screen">
         <MotionProvider>{children}</MotionProvider>
       </body>
     </html>

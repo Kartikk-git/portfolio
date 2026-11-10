@@ -1,16 +1,21 @@
 "use client";
 
-import { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { m, useInView, useScroll, useTransform } from "motion/react";
 import { ExternalLink, Award, GraduationCap } from "lucide-react";
-import { education } from "@/content/education";
-import { certifications } from "@/content/certifications";
+import { credentialsContent } from "@/content/credentials";
 import { ruleDrawVariants, revealVariants } from "@/lib/motion";
+import { CertificateModal } from "./CertificateModal";
 
-export function EducationSection() {
+interface EducationSectionProps {
+  isReviewMode?: boolean;
+}
+
+export function EducationSection({ isReviewMode = false }: EducationSectionProps) {
   const containerRef = useRef<HTMLElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: "-10% 0px" });
+  const [modalCertId, setModalCertId] = useState<string | null>(null);
 
   // Vertical timeline line draws as user scrolls through the section
   const { scrollYProgress } = useScroll({
@@ -20,148 +25,208 @@ export function EducationSection() {
 
   const scaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
+  const certList = credentialsContent.certifications;
+  const currentCertIdx = certList.findIndex((c) => c.id === modalCertId);
+
   return (
     <section
       id="education"
       ref={containerRef}
-      className="py-20 md:py-28 border-b border-[var(--rule)]"
+      className="py-20 md:py-28 border-b border-[var(--rule)] scroll-mt-16"
     >
       <div className="max-w-[1120px] mx-auto px-4 sm:px-8">
         {/* Section Header */}
         <div className="mb-12">
           <div className="flex items-baseline justify-between mb-2">
-            <span className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-medium">
-              04 / Academic &amp; Credentials
-            </span>
+            <div className="font-mono text-xs uppercase tracking-[0.06em]">
+              <span className="text-[var(--accent)] font-semibold">{credentialsContent.eyebrow}</span>
+            </div>
             <span className="font-mono text-xs text-[var(--ink-muted)]">
-              Verified Proof
+              Formal &amp; Verified
             </span>
           </div>
 
-          <h2 className="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[var(--ink)]">
-            Education &amp; Certifications
+          <h2 className="font-serif text-3xl font-semibold tracking-tight text-[var(--ink)]">
+            {credentialsContent.heading}
           </h2>
 
-          <p className="mt-2 text-sm text-[var(--ink-muted)] max-w-[62ch]">
-            Formal academic background and verified technical certifications from NPTEL IIT Kharagpur, CodeChef, and Google Cloud.
+          <p className="mt-2 text-sm text-[var(--ink-muted)] max-w-[62ch] leading-[1.6]">
+            {credentialsContent.intro}
           </p>
 
-          {/* Section Divider Line */}
-          <div className="pt-6">
+          {/* Section Divider Line with Classic Editorial Accent Rule */}
+          <div className="pt-6 relative">
             <m.div
               variants={ruleDrawVariants}
               initial="hidden"
               animate={isInView ? "visible" : "hidden"}
               className="h-[1px] w-full bg-[var(--rule)]"
             />
+            <div className="absolute left-0 bottom-0 h-[2px] w-12 bg-[var(--accent)] z-10" />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 relative" ref={timelineRef}>
-          {/* 1. Certifications & Credentials Column (NPTEL Java Elite Lead) */}
-          <div>
-            <div className="flex items-center gap-2 mb-6">
-              <Award size={18} strokeWidth={1.5} className="text-[var(--accent)]" />
-              <h3 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--ink)] font-semibold">
-                Certifications &amp; Credentials
+        {/* Left-Ruled Architectural Timeline */}
+        <div className="relative pl-6 sm:pl-8 border-l border-[var(--rule)] space-y-12 max-w-[960px]" ref={timelineRef}>
+          {/* Scroll-linked vertical accent line */}
+          <m.div
+            style={{ scaleY, transformOrigin: "top" }}
+            className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-[var(--accent)] z-10"
+          />
+
+          {/* Group 1: Certifications & Verified Credentials */}
+          <div className="space-y-8">
+            <div className="flex items-center gap-2">
+              <Award size={16} strokeWidth={1.5} className="text-[var(--accent)]" />
+              <h3 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
+                {credentialsContent.groupCert}
               </h3>
             </div>
 
-            <div className="divide-y divide-[var(--rule)] border-t border-b border-[var(--rule)]">
-              {certifications.map((cert, index) => (
+            <div className="space-y-8">
+              {certList.map((cert, index) => (
                 <m.div
-                  key={cert.title}
+                  key={cert.id}
                   variants={revealVariants}
                   initial="hidden"
                   animate={isInView ? "visible" : "hidden"}
                   custom={index}
-                  className="py-6 space-y-1.5"
+                  className="relative group space-y-2"
                 >
-                  <div className="flex items-baseline justify-between gap-4">
-                    <h4 className="font-serif text-lg font-semibold text-[var(--ink)]">
-                      {cert.title}
-                    </h4>
-                    <span className="font-mono text-xs text-[var(--ink-muted)] shrink-0">
-                      {cert.periodOrDate}
-                    </span>
-                  </div>
+                  {/* Node: 5px square on the vertical rule line */}
+                  <div
+                    className="absolute -left-[27px] sm:-left-[35px] top-1.5 w-[5px] h-[5px] rounded-none z-20 bg-[var(--accent)]"
+                    aria-hidden="true"
+                  />
 
-                  <div className="font-mono text-xs text-[var(--ink-muted)]">
-                    {cert.issuer}
-                  </div>
-
-                  {cert.highlight && (
-                    <div className="pt-1 font-mono text-xs font-semibold text-[var(--accent)]">
-                      {cert.highlight}
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                    <div className="flex flex-wrap items-baseline gap-2">
+                      <h4 className="font-serif text-lg font-semibold text-[var(--ink)]">
+                        {cert.title}
+                      </h4>
+                      {cert.badge && (
+                        <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--accent)] px-2 py-0.5 border border-[var(--accent)]/40 rounded-[2px] font-medium bg-[var(--surface)]">
+                          {cert.badge}
+                        </span>
+                      )}
+                      {isReviewMode && cert.confirm && (
+                        <span className="font-mono text-[10px] px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 rounded-[2px]">
+                          confirm
+                        </span>
+                      )}
                     </div>
-                  )}
 
-                  {cert.note && (
-                    <p className="pt-1 font-sans text-xs text-[var(--ink-muted)] leading-[1.6]">
-                      {cert.note}
-                    </p>
-                  )}
+                    <div className="font-mono text-xs text-[var(--ink-muted)] shrink-0">
+                      {cert.meta}
+                    </div>
+                  </div>
 
-                  {cert.link && (
-                    <div className="pt-2">
+                  <p className="font-sans text-sm text-[var(--ink-muted)] leading-relaxed max-w-[72ch]">
+                    {cert.body}
+                  </p>
+
+                  {/* Actions: Preview certificate + Verify link */}
+                  <div className="flex items-center gap-4 pt-1">
+                    <button
+                      onClick={() => setModalCertId(cert.id)}
+                      className="font-mono text-xs text-[var(--accent)] hover:underline inline-flex items-center gap-1 cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
+                    >
+                      Preview certificate &rarr;
+                    </button>
+
+                    {cert.verifyUrl ? (
                       <a
-                        href={cert.link}
+                        href={cert.verifyUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 font-mono text-xs text-[var(--accent)] hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
+                        className="font-mono text-xs text-[var(--ink-muted)] hover:text-[var(--ink)] hover:underline inline-flex items-center gap-1"
                       >
-                        <span>View credential on Credly</span>
-                        <ExternalLink size={12} strokeWidth={1.5} aria-hidden="true" />
+                        <span>{cert.verifyLabel}</span>
+                        <ExternalLink className="w-3 h-3" />
                       </a>
-                    </div>
-                  )}
+                    ) : (
+                      isReviewMode && (
+                        <span className="font-mono text-[10px] text-amber-600 dark:text-amber-400">
+                          Verify: link unconfirmed
+                        </span>
+                      )
+                    )}
+                  </div>
                 </m.div>
               ))}
             </div>
           </div>
 
-          {/* 2. Education Column */}
-          <div>
-            <div className="flex items-center gap-2 mb-6">
-              <GraduationCap size={18} strokeWidth={1.5} className="text-[var(--accent)]" />
-              <h3 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--ink)] font-semibold">
-                Formal Education
+          {/* Group 2: Formal Education */}
+          <div className="space-y-8 pt-4">
+            <div className="flex items-center gap-2">
+              <GraduationCap size={16} strokeWidth={1.5} className="text-[var(--accent)]" />
+              <h3 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
+                {credentialsContent.groupFormal}
               </h3>
             </div>
 
-            <div className="divide-y divide-[var(--rule)] border-t border-b border-[var(--rule)]">
-              {education.map((edu, index) => (
+            <div className="space-y-8">
+              {credentialsContent.education.map((edu, index) => (
                 <m.div
-                  key={edu.degree}
+                  key={edu.id}
                   variants={revealVariants}
                   initial="hidden"
                   animate={isInView ? "visible" : "hidden"}
-                  custom={index + 3}
-                  className="py-6 space-y-1.5"
+                  custom={index + certList.length}
+                  className="relative group space-y-1.5"
                 >
-                  <div className="flex items-baseline justify-between gap-4">
-                    <h4 className="font-serif text-lg font-semibold text-[var(--ink)]">
-                      {edu.degree}
-                    </h4>
+                  {/* Node */}
+                  <div
+                    className="absolute -left-[27px] sm:-left-[35px] top-1.5 w-[5px] h-[5px] rounded-none z-20 bg-[var(--rule)] group-hover:bg-[var(--ink)] transition-colors"
+                    aria-hidden="true"
+                  />
+
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                    <div className="flex items-baseline gap-2">
+                      <h4 className="font-serif text-lg font-semibold text-[var(--ink)]">
+                        {edu.title}
+                      </h4>
+                      {isReviewMode && edu.confirm && (
+                        <span className="font-mono text-[10px] px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 rounded-[2px]">
+                          confirm CGPA
+                        </span>
+                      )}
+                    </div>
                     <span className="font-mono text-xs text-[var(--ink-muted)] shrink-0">
-                      {edu.period}
+                      {edu.meta}
                     </span>
                   </div>
 
-                  <div className="font-mono text-xs text-[var(--ink-muted)]">
-                    {edu.institution}
-                  </div>
-
-                  <div className="pt-1 font-mono text-xs font-medium text-[var(--ink)]">
-                    Score: <span className="text-[var(--accent)] font-semibold">{edu.grade}</span>
-                  </div>
+                  {edu.body && (
+                    <p className="font-sans text-sm text-[var(--ink-muted)] leading-relaxed max-w-[72ch]">
+                      {edu.body}
+                    </p>
+                  )}
                 </m.div>
               ))}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Certificate Modal */}
+      {modalCertId && (
+        <CertificateModal
+          certId={modalCertId}
+          onClose={() => setModalCertId(null)}
+          onPrev={
+            currentCertIdx > 0
+              ? () => setModalCertId(certList[currentCertIdx - 1].id)
+              : undefined
+          }
+          onNext={
+            currentCertIdx < certList.length - 1
+              ? () => setModalCertId(certList[currentCertIdx + 1].id)
+              : undefined
+          }
+        />
+      )}
     </section>
   );
 }
-

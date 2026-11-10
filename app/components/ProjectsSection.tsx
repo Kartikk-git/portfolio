@@ -1,243 +1,214 @@
 "use client";
 
-import { useState, useRef } from "react";
-import Link from "next/link";
+import React, { useState, useEffect, useRef } from "react";
 import { m, useInView } from "motion/react";
-import { ArrowUpRight, ExternalLink, ChevronDown } from "lucide-react";
-import { projects, Project } from "@/content/projects";
+import { ArrowUpRight, ExternalLink } from "lucide-react";
+import { projectsContent, ProjectItem } from "@/content/projects";
 import { ruleDrawVariants, revealVariants } from "@/lib/motion";
+import { ProjectDetail } from "./ProjectDetail";
 
 interface ProjectsSectionProps {
-  activeSkill?: string | null;
+  isReviewMode?: boolean;
 }
 
-export function ProjectsSection({ activeSkill }: ProjectsSectionProps) {
+export function ProjectsSection({ isReviewMode = false }: ProjectsSectionProps) {
   const containerRef = useRef<HTMLElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: "-10% 0px" });
-  const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
+  const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
 
-  const toggleAccordion = (slug: string) => {
-    setExpandedSlug((prev) => (prev === slug ? null : slug));
+  // Check URL hash on load and popstate
+  useEffect(() => {
+    const checkHash = () => {
+      const hash = window.location.hash;
+      if (hash.startsWith("#project/")) {
+        const slug = hash.replace("#project/", "");
+        const matched = projectsContent.items.find((p) => p.slug === slug);
+        if (matched) {
+          setSelectedProject(matched);
+        }
+      } else {
+        setSelectedProject(null);
+      }
+    };
+
+    checkHash();
+    window.addEventListener("hashchange", checkHash);
+    return () => window.removeEventListener("hashchange", checkHash);
+  }, []);
+
+  const openProject = (project: ProjectItem) => {
+    setSelectedProject(project);
+    window.location.hash = `#project/${project.slug}`;
+  };
+
+  const closeProject = () => {
+    setSelectedProject(null);
+    if (window.location.hash.startsWith("#project/")) {
+      window.history.pushState(null, "", window.location.pathname + window.location.search);
+    }
   };
 
   return (
     <section
       id="projects"
       ref={containerRef}
-      className="py-20 md:py-28 border-b border-[var(--rule)]"
+      className="py-20 md:py-28 border-b border-[var(--rule)] scroll-mt-16"
     >
       <div className="max-w-[1120px] mx-auto px-4 sm:px-8">
         {/* Section Header */}
         <div className="mb-12">
           <div className="flex items-baseline justify-between mb-2">
-            <span className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-medium">
-              01 / Engineering Works
-            </span>
+            <div className="font-mono text-xs uppercase tracking-[0.06em]">
+              <span className="text-[var(--accent)] font-semibold">{projectsContent.eyebrow}</span>
+            </div>
             <span className="font-mono text-xs text-[var(--ink-muted)]">
-              4 Projects &middot; 2 Case Studies
+              {projectsContent.counter}
             </span>
           </div>
 
-          <h2 className="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[var(--ink)]">
-            Selected Projects
+          <h2 className="font-serif text-3xl font-semibold tracking-tight text-[var(--ink)]">
+            {projectsContent.heading}
           </h2>
 
-          <p className="mt-2 text-sm text-[var(--ink-muted)] max-w-[62ch]">
-            Web backends, real-time analytics dashboards, and offline-first native Android applications.
+          <p className="mt-2 text-sm text-[var(--ink-muted)] max-w-[62ch] leading-[1.6]">
+            {projectsContent.intro}
           </p>
 
-          {/* Section 1px Rule drawing left-to-right (scaleX 0 to 1, 600ms) */}
-          <div className="pt-6">
+          {/* Section Divider Line with Classic Editorial Accent Rule */}
+          <div className="pt-6 relative">
             <m.div
               variants={ruleDrawVariants}
               initial="hidden"
               animate={isInView ? "visible" : "hidden"}
               className="h-[1px] w-full bg-[var(--rule)]"
             />
+            <div className="absolute left-0 bottom-0 h-[2px] w-12 bg-[var(--accent)] z-10" />
           </div>
         </div>
 
-        {/* Project Rows List (Not a card grid!) */}
-        <div className="divide-y divide-[var(--rule)] border-t border-b border-[var(--rule)]">
-          {projects.map((project, index) => {
-            const isMatch =
-              !activeSkill ||
-              project.stack.some(
-                (s) => s.toLowerCase() === activeSkill.toLowerCase()
-              );
-
-            const isExpanded = expandedSlug === project.slug;
-
+        {/* Project Cards List */}
+        <div className="space-y-4">
+          {projectsContent.items.map((project, index) => {
             return (
               <m.article
-                key={project.slug}
+                key={project.id}
                 variants={revealVariants}
                 initial="hidden"
                 animate={isInView ? "visible" : "hidden"}
                 custom={index}
-                style={{
-                  opacity: isMatch ? 1 : 0.35,
-                  transition: "opacity 200ms cubic-bezier(0.22, 1, 0.36, 1)",
+                onClick={() => openProject(project)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    openProject(project);
+                  }
                 }}
-                className="group relative py-8 md:py-10 transition-colors"
+                className="group relative border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/30 hover:border-[var(--accent)]/60 hover:bg-[var(--surface)]/60 p-5 sm:p-6 transition-all duration-160 cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               >
-                {/* Desktop & Mobile Main Row Content */}
-                <div className="flex flex-col lg:flex-row lg:items-baseline justify-between gap-4 lg:gap-8">
-                  {/* Index + Title */}
-                  <div className="flex items-baseline gap-4 min-w-[280px]">
-                    <span className="font-mono text-xs text-[var(--ink-muted)] tabular-nums">
+                {/* Top Row: Index + Title + Badges (Left) vs Detail CTA (Right) */}
+                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 pb-3 border-b border-[var(--rule)]/50">
+                  <div className="flex flex-wrap items-baseline gap-3">
+                    <span className="font-mono text-xs text-[var(--accent)] font-semibold tabular-nums">
                       0{index + 1}
                     </span>
 
-                    <div className="flex items-baseline gap-3">
-                      {project.hasCaseStudy ? (
-                        <Link
-                          href={`/projects/${project.slug}`}
-                          className="font-serif text-xl sm:text-2xl font-semibold text-[var(--ink)] group-hover:text-[var(--accent)] group-hover:translate-x-1.5 transition-all duration-150 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
-                        >
-                          {project.title}
-                        </Link>
-                      ) : (
-                        <span className="font-serif text-xl sm:text-2xl font-semibold text-[var(--ink)] group-hover:text-[var(--accent)] group-hover:translate-x-1.5 transition-all duration-150">
-                          {project.title}
-                        </span>
-                      )}
+                    <h3 className="font-serif text-xl sm:text-2xl font-semibold text-[var(--ink)] group-hover:text-[var(--accent)] group-hover:translate-x-0.5 transition-all duration-160">
+                      {project.title}
+                    </h3>
 
-                      {project.isFlagship && (
-                        <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--accent)] px-1.5 py-0.5 border border-[var(--accent)]/40 rounded-[2px] font-medium">
-                          Flagship
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* One-Line Description */}
-                  <div className="flex-1 max-w-[62ch]">
-                    <p className="text-sm text-[var(--ink-muted)] leading-[1.6]">
-                      {project.description}
-                    </p>
-                  </div>
-
-                  {/* Links & Actions */}
-                  <div className="flex items-center gap-4 shrink-0 pt-2 lg:pt-0">
-                    {/* Repo Link */}
-                    {project.repoUrl && (
-                      <a
-                        href={project.repoUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 font-mono text-xs text-[var(--ink-muted)] hover:text-[var(--accent)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
-                        aria-label={`${project.title} GitHub repository`}
-                      >
-                        <span>Code</span>
-                        <ExternalLink size={13} strokeWidth={1.5} aria-hidden="true" />
-                      </a>
-                    )}
-
-                    {/* Live Demo Link (only if verified) */}
-                    {project.liveUrl && (
-                      <a
-                        href={project.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 font-mono text-xs text-[var(--ink-muted)] hover:text-[var(--accent)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
-                        aria-label={`${project.title} live website`}
-                      >
-                        <span>Live</span>
-                        <ExternalLink size={13} strokeWidth={1.5} aria-hidden="true" />
-                      </a>
-                    )}
-
-                    {/* Case Study Link */}
-                    {project.hasCaseStudy && (
-                      <Link
-                        href={`/projects/${project.slug}`}
-                        className="inline-flex items-center gap-1 font-mono text-xs text-[var(--accent)] font-medium hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
-                      >
-                        <span>Case study</span>
-                        <ArrowUpRight
-                          size={14}
-                          strokeWidth={1.5}
-                          className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
-                          aria-hidden="true"
-                        />
-                      </Link>
-                    )}
-
-                    {/* Mobile Touch Accordion Toggle */}
-                    <button
-                      type="button"
-                      onClick={() => toggleAccordion(project.slug)}
-                      className="lg:hidden p-1.5 border border-[var(--rule)] rounded-[4px] text-[var(--ink-muted)] hover:text-[var(--ink)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
-                      aria-label={`Toggle details for ${project.title}`}
-                      aria-expanded={isExpanded}
-                    >
-                      <ChevronDown
-                        size={14}
-                        strokeWidth={1.5}
-                        className={`transition-transform duration-150 ${
-                          isExpanded ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Stack in mono separated by slashes */}
-                <div className="mt-4 pl-8 lg:pl-10 font-mono text-xs text-[var(--ink-muted)]">
-                  {project.stack.map((item, i) => (
-                    <span key={item}>
-                      <span
-                        className={
-                          activeSkill &&
-                          item.toLowerCase() === activeSkill.toLowerCase()
-                            ? "text-[var(--accent)] font-bold"
-                            : ""
-                        }
-                      >
-                        {item}
-                      </span>
-                      {i < project.stack.length - 1 && (
-                        <span className="text-[var(--rule)] mx-1.5" aria-hidden="true">
-                          /
-                        </span>
-                      )}
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--accent)] px-2 py-0.5 border border-[var(--rule)] rounded-[2px] font-medium bg-[var(--surface)]">
+                      {project.badge}
                     </span>
-                  ))}
+
+                    {isReviewMode && project.confirmFlags?.contribution && (
+                      <span className="font-mono text-[10px] px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 rounded-[2px]">
+                        confirm
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1 text-[var(--ink-muted)] group-hover:text-[var(--accent)] transition-colors text-xs font-mono">
+                    <span>{projectsContent.card.cta}</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-0.5" />
+                  </div>
                 </div>
 
-                {/* Touch Accordion Details (Expanded on Mobile) */}
-                {isExpanded && (
-                  <div className="mt-4 pt-4 border-t border-[var(--rule)]/60 pl-8 lg:hidden space-y-3 font-sans text-xs text-[var(--ink-muted)]">
-                    <div className="font-mono uppercase text-[11px] text-[var(--accent)]">
-                      {project.subtitle}
-                    </div>
-                    {project.features && (
-                      <ul className="list-disc list-inside space-y-1">
-                        {project.features.slice(0, 3).map((f, fi) => (
-                          <li key={fi}>{f}</li>
-                        ))}
-                      </ul>
-                    )}
-                    {project.hasCaseStudy && (
-                      <div className="pt-2">
-                        <Link
-                          href={`/projects/${project.slug}`}
-                          className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-[var(--accent)]"
-                        >
-                          <span>Open full case study &rarr;</span>
-                        </Link>
-                      </div>
-                    )}
-                    {/* TODO(owner): Add real project screenshots in /public/projects/<slug>/ */}
+                {/* Description */}
+                <p className="mt-4 font-sans text-base leading-[1.65] text-[var(--ink-muted)] max-w-[72ch]">
+                  {project.cardText}
+                </p>
+
+                {/* Tags and Direct Links Bottom Row */}
+                <div className="mt-5 pt-4 border-t border-[var(--rule)]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  {/* Tag chips */}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {project.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="font-mono text-[11px] px-2 py-0.5 border border-[var(--rule)] bg-[var(--paper)] text-[var(--ink-muted)] rounded-[2px]"
+                      >
+                        {tag}
+                      </span>
+                    ))}
                   </div>
-                )}
+
+                  {/* External links: Source, Live, Original */}
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex flex-wrap items-center gap-3 font-mono text-xs text-[var(--ink-muted)]"
+                  >
+                    {project.links.source && (
+                      <a
+                        href={project.links.source}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-[var(--accent)] hover:underline underline-offset-4 inline-flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-[var(--accent)] rounded-[2px] p-0.5"
+                      >
+                        <span>{projectsContent.card.source}</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                    {project.links.live && (
+                      <a
+                        href={project.links.live}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-[var(--accent)] hover:underline underline-offset-4 inline-flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-[var(--accent)] rounded-[2px] p-0.5"
+                      >
+                        <span>{projectsContent.card.live}</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                    {project.links.original && (
+                      <a
+                        href={project.links.original}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-[var(--accent)] hover:underline underline-offset-4 inline-flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-[var(--accent)] rounded-[2px] p-0.5"
+                      >
+                        <span>Original</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                  </div>
+                </div>
               </m.article>
             );
           })}
         </div>
       </div>
+
+      {/* Slide-over Project Detail Panel */}
+      {selectedProject && (
+        <ProjectDetail
+          project={selectedProject}
+          onClose={closeProject}
+          onSelectProject={(p) => openProject(p)}
+          isReviewMode={isReviewMode}
+        />
+      )}
     </section>
   );
 }
-
