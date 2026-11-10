@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kartik Koundal — Resume</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* A4 print sheet. Editorial, restrained. Same spirit as the portfolio. */
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: #FAFAF7;
+    color: #16181D;
+    font-family: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+    font-size: 8.8pt;
+    line-height: 1.35;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .sheet {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 12mm 15mm 8mm 15mm;
+    margin: 0 auto;
+  }
+  a { color: #1B6B4F; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .mono { font-family: "IBM Plex Mono", Consolas, monospace; }
+
+  /* Header */
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 8mm; }
+  h1 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 22pt; font-weight: 700; letter-spacing: -0.01em; line-height: 1.05;
+  }
+  .head-meta { text-align: right; font-size: 7.6pt; color: #5A5F69; line-height: 1.6; white-space: nowrap; }
+  .head-meta strong { color: #16181D; font-weight: 600; }
+  .accent-rule {
+    height: 1.5px; background: #1B6B4F;
+    margin: 3.2mm 0 2.2mm 0;
+    transform-origin: left;
+  }
+  .positioning { font-size: 9.6pt; color: #16181D; max-width: 165mm; }
+  .status { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 7.4pt; color: #1B6B4F; margin-top: 1mm; letter-spacing: 0.02em; }
+
+  /* Sections */
+  section { margin-top: 4.2mm; }
+  h2 {
+    font-family: "IBM Plex Mono", Consolas, monospace;
+    font-size: 7.2pt; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.09em;
+    color: #5A5F69;
+    border-bottom: 1px solid #DAD8CF;
+    padding-bottom: 1.1mm; margin-bottom: 1.9mm;
+  }
+
+  /* Education & certifications rows */
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 6mm; padding: 0.7mm 0; }
+  .row .what strong { font-weight: 600; }
+  .row .what .sub { color: #5A5F69; }
+  .row .meta { text-align: right; color: #5A5F69; white-space: nowrap; flex-shrink: 0; }
+  .row .grade { color: #16181D; font-weight: 500; }
+  .lead { border-left: 2px solid #1B6B4F; padding-left: 2.5mm; }
+  .lead .badge { font-family: "IBM Plex Mono", Consolas, monospace; color: #1B6B4F; font-size: 7.4pt; font-weight: 500; }
+
+  /* Skills groups */
+  .skill-row { display: flex; gap: 4mm; padding: 0.7mm 0; }
+  .skill-row .cat { width: 34mm; flex-shrink: 0; font-family: "IBM Plex Mono", Consolas, monospace; font-size: 7.6pt; color: #5A5F69; text-transform: uppercase; letter-spacing: 0.06em; padding-top: 0.4mm; }
+  .skill-row .items { flex: 1; }
+
+  /* Projects */
+  .proj { break-inside: avoid; margin-bottom: 2.6mm; }
+  .proj:last-child { margin-bottom: 0; }
+  .proj-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6mm; }
+  .proj-head strong { font-weight: 600; font-size: 9.8pt; }
+  .proj-head .flag { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 7pt; color: #1B6B4F; border: 1px solid rgba(27,107,79,0.4); padding: 0.2mm 1.2mm; letter-spacing: 0.04em; }
+  .proj .stack { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 7.4pt; color: #5A5F69; margin: 0.6mm 0 1.2mm 0; }
+  .proj ul { list-style: none; margin-top: 0.6mm; }
+  .proj li { padding-left: 4mm; text-indent: -4mm; color: #2A2D33; }
+  .proj li::before { content: "—"; color: #1B6B4F; font-family: "IBM Plex Mono", Consolas, monospace; font-size: 7.6pt; }
+  .proj .links { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 7.2pt; margin-top: 0.8mm; }
+
+  footer { margin-top: 5mm; border-top: 1px solid #DAD8CF; padding-top: 1.6mm; font-family: "IBM Plex Mono", Consolas, monospace; font-size: 7pt; color: #5A5F69; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header>
+    <h1>Kartik Koundal</h1>
+    <div class="head-meta mono">
+      <strong>koundal.k29@gmail.com</strong><br>
+      github.com/Kartikk-git &middot; leetcode.com/u/kartikk-git<br>
+      linkedin.com/in/kartik-koundal-a41574323<br>
+      New Delhi, India &middot; +91 78274 52567
+    </div>
+  </header>
+
+  <div class="accent-rule"></div>
+  <p class="positioning">
+    Computer Science undergraduate building web applications in Python and JavaScript and native Android apps in Kotlin. Seeking software and Android internships.
+  </p>
+  <p class="status mono">OPEN TO SOFTWARE AND ANDROID INTERNSHIPS</p>
+
+  <section>
+    <h2>Education</h2>
+    <div class="row">
+      <div class="what"><strong>B.Tech, Computer Science &amp; Engineering</strong>, Dronacharya College of Engineering</div>
+      <div class="meta mono">2024 &ndash; 2028 &middot; <span class="grade">CGPA 7.55/10</span></div>
+    </div>
+    <div class="row">
+      <div class="what"><strong>Senior Secondary (XII)</strong>, St. Martin's Diocesan School</div>
+      <div class="meta mono">2024 &middot; <span class="grade">77.4%</span></div>
+    </div>
+    <div class="row">
+      <div class="what"><strong>Secondary (X)</strong>, St. Martin's Diocesan School</div>
+      <div class="meta mono">2022 &middot; <span class="grade">77.2%</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Skills</h2>
+    <div class="skill-row"><div class="cat">Languages</div><div class="items">Java, Kotlin, Python, C++</div></div>
+    <div class="skill-row"><div class="cat">Web</div><div class="items">HTML, CSS, JavaScript</div></div>
+    <div class="skill-row"><div class="cat">Core</div><div class="items">Data Structures &amp; Algorithms, OOP, DBMS, SQL</div></div>
+    <div class="skill-row"><div class="cat">Tools</div><div class="items">Git, GitHub</div></div>
+    <div class="skill-row"><div class="cat">Frameworks</div><div class="items">Flask, Chart.js, Jetpack Compose, Room</div></div>
+  </section>
+
+  <section>
+    <h2>Projects</h2>
+    <div class="proj">
+      <div class="proj-head">
+        <span><strong>Student Organizer</strong> &mdash; Android app</span>
+        <span class="flag">KOTLIN</span>
+      </div>
+      <div class="stack">Kotlin / Jetpack Compose (Material 3) / Room / Coroutines / ViewBinding / ViewPager2</div>
+      <ul>
+        <li>Offline-first academic manager: dashboard, courses, assignments, searchable notes, exam and quiz events, onboarding and local login.</li>
+        <li>Compose calendar marking attendance Present or Absent with live percentage and low-attendance warnings.</li>
+        <li>MVVM-inspired structure; Room persistence keeps all data on the device.</li>
+      </ul>
+      <div class="links">github.com/Kartikk-git/Student_Organizer</div>
+    </div>
+    <div class="proj">
+      <div class="proj-head">
+        <span><strong>TEJOVIK</strong> &mdash; Student Performance &amp; Wellness Analysis Platform</span>
+        <span class="flag">FLASK</span>
+      </div>
+      <div class="stack">Python / Flask / JavaScript / Chart.js / HTML / CSS</div>
+      <ul>
+        <li>Weekly, monthly and all-time performance charts rendered with Chart.js.</li>
+        <li>CHETVIK module turns study hours, sleep hours and stress level into a cognitive score and burnout gauge.</li>
+        <li>Chat feature with backend responses and fallback replies; responsive on mobile.</li>
+      </ul>
+      <div class="links">github.com/Kartikk-git/TEJOVIK</div>
+    </div>
+    <div class="proj">
+      <div class="proj-head">
+        <span><strong>Hospital Management Website</strong></span>
+      </div>
+      <div class="stack">HTML / CSS</div>
+      <ul>
+        <li>Responsive healthcare-themed site with pages for services, appointments, doctors and patient information.</li>
+        <li>Focus on responsive layout and navigation.</li>
+      </ul>
+      <div class="links">github.com/Kartikk-git/Hospital-management</div>
+    </div>
+    <div class="proj">
+      <div class="proj-head">
+        <span><strong>Personal Portfolio Website</strong></span>
+      </div>
+      <div class="stack">HTML / CSS / JavaScript</div>
+      <ul>
+        <li>Responsive portfolio deployed on GitHub Pages presenting projects, skills and contact.</li>
+      </ul>
+      <div class="links">kartikk-git.github.io/my-portfolio</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Certifications &amp; Achievements</h2>
+    <div class="row lead">
+      <div class="what"><strong>Programming in Java</strong>, NPTEL (IIT Kharagpur) <span class="badge">&nbsp;ELITE, 95%</span></div>
+      <div class="meta mono">Jan &ndash; Apr 2026</div>
+    </div>
+    <div class="row">
+      <div class="what"><strong>CodeChef learning tracks</strong>: Git/GitHub; Learn HTML/CSS; CSS Intermediate; Projects using HTML/CSS. <span class="sub">600+ exercises, quizzes and practice tasks completed; Python Skill Assessment 90%.</span></div>
+      <div class="meta mono"></div>
+    </div>
+    <div class="row">
+      <div class="what"><strong>Google Cloud skill badges</strong>, 15 badges <span class="sub">&mdash; incl. Prompt Design in Vertex AI; Develop GenAI Apps with Gemini and Streamlit; Deploy and Manage Applications on Google App Engine</span></div>
+      <div class="meta mono">Oct &ndash; Nov 2024</div>
+    </div>
+    <div class="row">
+      <div class="what"><span class="sub">All badges verified on Credly: credly.com/users/kartik-koundal</span></div>
+      <div class="meta mono"></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Kartik Koundal &mdash; Curriculum Vitae</span>
+    <span>github.com/Kartikk-git</span>
+  </footer>
+
+</div>
+</body>
+</html>
