@@ -82,4 +82,31 @@ Keep everything in `AGENTS.md` §Motion. Do not add any motion outside that list
 - Small edits, many verifications. After each visual change, screenshot and compare at 375 and 1440.
 - Never "fix" contrast or layout by hard-coding hex — tokens in `globals.css` `@theme` only.
 - Do not introduce any new dependency (no GSAP, no animation lib beyond `motion`).
+- Content discipline amended for this pass only: you may **rephrase and expand presentation copy** (components and case-study sections) using only facts already in `/content/*.ts` and `AGENTS.md`. You may **not** add new facts, links, numbers, dates, features, or metrics. Never remove a fact.
 - The styleguide route (`/styleguide`, `/styleguide/motion`) stays as the token reference — update it when tokens change.
+
+---
+
+# ADDENDUM (owner requests after first review)
+
+## 10. Content depth and anti-duplication
+
+The current copy repeats itself across surfaces. Enforce a **one-fact-one-place** rule: a given fact appears in one place in full, and elsewhere only as a different-angle phrasing. Specific known duplications to fix:
+
+1. `project.description` is shown verbatim in both the home project row and the case-study "Overview" section. Rewrite the case-study overview as a short "In brief" paragraph (2 sentences max, own phrasing of the same facts) and let the home row keep the one-liner.
+2. The stack appears three times on a case-study page (header meta, sticky tag row, and the Stack & Architecture box). Show it once in the header as the mono line, once grouped in the Stack section with the one-line "why it is used" per technology derived from the architecture notes — not four copied strings.
+3. `whatIBuild` currently paraphrases the feature list directly below it. Write it instead as the narrative "what problem the app solves and how the build is organized" — orientation prose, not a feature list in prose clothing.
+4. Home section headings ("Projects", "Skills", "Education & Certifications", "Contact") and case-study copy re-use identical sentence stems ("A web platform that…"). Vary the openings.
+5. About sentences mention Flask/Compose/Room; Skills lists them again; project rows list them again. About keeps the two most load-bearing technologies; Skills lists the full picture; project stack lines stay with projects.
+
+No invented material: every sentence must still be traceable to an existing content fact or a faithful rephrasing of it. Draft all rewritten copy in the audit doc first for owner approval, then integrate.
+
+Depth requirement: case-study feature bullets must each get one short "how it works" continuation line where the architecture notes in `content/projects.ts` supply it (example allowed: Compose calendar taps → Room-backed attendance percentage → low-attendance warning). Zero new claims otherwise.
+
+## 11. Address-bar hygiene
+
+1. Section navigation must **never** write a hash to the URL. Header/hero/footer links scroll with the existing smooth + header-offset behavior and then call `history.replaceState(null, "", path)` so the address bar stays `/`. Keep the anchors in the DOM (accessibility, keyboard focus), just don't persist them. Same for the case-study sticky index links on deep-dive pages.
+2. Internal-only routes must not exist in production: `/styleguide` and `/styleguide/motion` must return `notFound()` when built for production so they are excluded from the static export in `out/` (dev only). This covers "users must not access internal pages by editing the URL".
+3. Canonical and `sitemap.xml` list only user-facing pages: `/`, `/projects/tejovik`, `/projects/student-organizer`. No internal routes, no fragment URLs.
+4. `/resume.pdf` and both case-study pages stay public and shareable — they are part of the recruiter flow. Do not try to hide them; just ensure no internal pages leak.
+5. The home page must be reachable at exactly `/` (plus trailing-slash handling) with no required query or hash.
