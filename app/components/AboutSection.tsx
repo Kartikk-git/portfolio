@@ -35,16 +35,16 @@ export function AboutSection({ isReviewMode = false }: AboutSectionProps) {
       intro={aboutContent.subline}
       headerExtra="Dronacharya College of Engineering · 2028"
     >
-      {/* Lead Statement (Restrained serif) */}
+      {/* Lead Statement (Standard body text matching global hierarchy) */}
       <m.div
         variants={revealVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-10% 0px" }}
         custom={0}
-        className="mb-8"
+        className="mb-5"
       >
-        <p className="font-serif text-xl sm:text-2xl text-[var(--ink)] font-normal leading-[1.4] max-w-[58ch]">
+        <p className="font-sans text-base text-[var(--ink)] font-normal leading-[1.65] max-w-[62ch]">
           {aboutContent.lead}
         </p>
       </m.div>

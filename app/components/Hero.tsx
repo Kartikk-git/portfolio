@@ -55,9 +55,9 @@ export function Hero() {
 
             {/* Name and Headline in Source Serif 4 */}
             <div className="hero-mask">
-              <h1 className="hero-line-1 font-serif text-[clamp(2.5rem,5vw,4rem)] font-normal tracking-tight text-[var(--ink)] leading-[1.08]">
-                <span className="block font-medium">{siteContent.hero.name}</span>
-                <span className="block font-normal text-xl sm:text-2xl md:text-3xl text-[var(--ink-muted)] mt-1.5">
+              <h1 className="hero-line-1 font-serif text-4xl sm:text-5xl font-medium tracking-tight text-[var(--ink)] leading-[1.1]">
+                <span className="block">{siteContent.hero.name}</span>
+                <span className="block font-normal text-xl sm:text-2xl text-[var(--ink-muted)] mt-2">
                   {siteContent.hero.headline}
                 </span>
               </h1>
@@ -69,7 +69,7 @@ export function Hero() {
             </div>
 
             {/* Bio Paragraphs */}
-            <div className="hero-fade-2 space-y-4 font-sans text-base sm:text-lg text-[var(--ink)] leading-[1.65]">
+            <div className="hero-fade-2 space-y-4 font-sans text-base text-[var(--ink)] leading-[1.65]">
               {siteContent.hero.intro.split("\n\n").map((para, i) => (
                 <p key={i}>
                   {para}
