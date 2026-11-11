@@ -224,3 +224,53 @@ html[data-hero-seen="true"] .hero-fade-3 {
     background-size: 100% 1px;
   }
 }
+
+/* ==========================================================================
+   Modern Minimal Custom Scrollbar (Auto-hiding / Subtle)
+   ========================================================================== */
+
+/* Modern W3C Standard Scrollbars (Firefox & Chrome 121+) */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+}
+
+html.is-scrolling {
+  scrollbar-color: var(--rule) transparent;
+}
+
+/* WebKit / Chromium Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 9999px;
+  transition: background-color 0.3s ease;
+}
+
+html.is-scrolling ::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb:hover {
+  background: var(--rule);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-muted);
+}
+
+::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
