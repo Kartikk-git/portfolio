@@ -251,11 +251,11 @@ export function CaseStudyTemplate({
         </header>
 
         {/* Main Content with Sticky Section Index */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-          {/* Sticky Section Index (Scroll-Spy) */}
-          <aside className="lg:col-span-3">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-start">
+          {/* Sticky Section Index (Scroll-Spy) in Sidebar */}
+          <aside className="md:col-span-4 lg:col-span-3 md:sticky md:top-24">
             <nav
-              className="lg:sticky lg:top-24 space-y-1 font-mono text-xs border border-[var(--rule)] p-4 rounded-[4px] bg-[var(--surface)]/30"
+              className="space-y-1 font-mono text-xs border border-[var(--rule)] p-4 rounded-[4px] bg-[var(--surface)]/40 backdrop-blur-xs"
               aria-label="Case Study Contents"
             >
               <div className="text-[11px] uppercase tracking-[0.06em] text-[var(--ink-muted)] font-semibold mb-3">
@@ -279,7 +279,7 @@ export function CaseStudyTemplate({
           </aside>
 
           {/* Content Body */}
-          <div className="lg:col-span-9 space-y-16">
+          <div className="md:col-span-8 lg:col-span-9 space-y-16">
             {/* Section 1: Overview - Replaced with In Brief synthesis per §10 */}
             <section id="overview" className="scroll-mt-24 space-y-4">
               <div className="flex items-baseline justify-between border-b border-[var(--rule)] pb-2">

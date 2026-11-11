@@ -58,3 +58,4 @@ export function resetSecretsState(): SecretState {
   } catch {}
   return { logcat: false, ultraTheme: false, konami: false };
 }
+
