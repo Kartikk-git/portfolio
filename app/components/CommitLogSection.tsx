@@ -39,7 +39,7 @@ const ghDays: ContributionDay[] = (rawGithub?.contributions as ContributionDay[]
 const lcCalendar: Record<string, number> = (rawLeetCode?.submissionCalendar as Record<string, number>) ?? {};
 
 export function CommitLogSection() {
-  const [platformView, setPlatformView] = useState<"github" | "leetcode" | "all">("github");
+  const [platformView, setPlatformView] = useState<"github" | "leetcode" | "all">("all");
   const [highlightedMonth, setHighlightedMonth] = useState<number | null>(null);
   const [hoveredLevel, setHoveredLevel] = useState<number | null>(null);
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
@@ -307,10 +307,17 @@ export function CommitLogSection() {
 
   // Current Replay Stat
   const activeReplayStat = replayMonthIndex !== null ? monthlyStats[replayMonthIndex] : null;
-  const targetTotal = platformView === "leetcode" ? lcTotalSubmissions : ghTotal;
+  const targetTotal =
+    platformView === "leetcode"
+      ? lcTotalSubmissions
+      : platformView === "all"
+      ? ghTotal + lcTotalSubmissions
+      : ghTotal;
   const currentReplayCount = activeReplayStat
     ? platformView === "leetcode"
       ? activeReplayStat.cumulativeLc
+      : platformView === "all"
+      ? activeReplayStat.cumulativeGh + activeReplayStat.cumulativeLc
       : activeReplayStat.cumulativeGh
     : targetTotal;
 
@@ -434,7 +441,7 @@ export function CommitLogSection() {
             )}
             {replayFinished && (
               <span className="text-[var(--accent)] font-medium flex items-center gap-1 animate-fadeIn">
-                <span>✓ Replay complete: {targetTotal} {platform === "github" ? "commits" : "submissions"}</span>
+                <span>✓ Replay complete: {platform === "github" ? ghTotal : lcTotalSubmissions} {platform === "github" ? "commits" : "submissions"}</span>
               </span>
             )}
           </div>
@@ -482,6 +489,29 @@ export function CommitLogSection() {
           <button
             type="button"
             onClick={() => {
+              setPlatformView("all");
+              resetReplay();
+            }}
+            className={`relative px-3 py-1.5 rounded-[4px] font-mono text-xs transition-colors cursor-pointer flex items-center gap-1.5 ${
+              platformView === "all"
+                ? "text-[var(--ink)] font-semibold"
+                : "text-[var(--ink-muted)] hover:text-[var(--ink)]"
+            }`}
+          >
+            {platformView === "all" && (
+              <m.div
+                layoutId="activePlatformPill"
+                className="absolute inset-0 bg-[var(--paper)] border border-[var(--rule)] shadow-xs rounded-[4px]"
+                transition={{ type: "spring", stiffness: 350, damping: 30 }}
+              />
+            )}
+            <Layers className="w-3.5 h-3.5 relative z-10" />
+            <span className="relative z-10">Both ({ghTotal + lcTotalSubmissions})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
               setPlatformView("github");
               resetReplay();
             }}
@@ -524,29 +554,6 @@ export function CommitLogSection() {
             <Code2 className="w-3.5 h-3.5 relative z-10" />
             <span className="relative z-10">LeetCode ({lcTotalSubmissions})</span>
           </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setPlatformView("all");
-              resetReplay();
-            }}
-            className={`relative px-3 py-1.5 rounded-[4px] font-mono text-xs transition-colors cursor-pointer flex items-center gap-1.5 ${
-              platformView === "all"
-                ? "text-[var(--ink)] font-semibold"
-                : "text-[var(--ink-muted)] hover:text-[var(--ink)]"
-            }`}
-          >
-            {platformView === "all" && (
-              <m.div
-                layoutId="activePlatformPill"
-                className="absolute inset-0 bg-[var(--paper)] border border-[var(--rule)] shadow-xs rounded-[4px]"
-                transition={{ type: "spring", stiffness: 350, damping: 30 }}
-              />
-            )}
-            <Layers className="w-3.5 h-3.5 relative z-10" />
-            <span className="relative z-10">Both</span>
-          </button>
         </div>
 
         {/* Replay My Year Button & Live Counter */}
@@ -554,7 +561,7 @@ export function CommitLogSection() {
           {/* Animated Counter Pill */}
           <div className="px-3 py-1 bg-[var(--surface-subtle)] border border-[var(--rule)] rounded-[4px] font-mono text-xs text-[var(--ink)] flex items-center gap-2">
             <span className="text-[var(--ink-muted)] text-[11px]">
-              {platformView === "leetcode" ? "Submissions:" : "Contributions:"}
+              {platformView === "leetcode" ? "Submissions:" : platformView === "all" ? "Total Activity:" : "Contributions:"}
             </span>
             <span className="font-semibold text-[var(--accent)] min-w-[2.5rem] text-right">
               {currentReplayCount}
