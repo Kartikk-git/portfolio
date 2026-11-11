@@ -85,6 +85,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdPerson) }}
         />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js" async />
       </head>
       <body className="font-sans antialiased bg-[var(--paper)] text-[var(--ink)] min-h-screen">
         <MotionProvider>

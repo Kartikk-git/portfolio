@@ -6,7 +6,7 @@
 
 import { contactContent } from "@/content/contact";
 
-export type EggId = "bugdroid" | "crash" | "tabreturn" | "konami" | "theme";
+export type EggId = "bugdroid" | "crash" | "tabreturn" | "konami" | "theme" | "physics";
 
 export interface EggDefinition {
   id: EggId;
@@ -40,6 +40,11 @@ export const ALL_EGGS: EggDefinition[] = [
     name: "Ultra Theme Escalation",
     hint: "Hold or rapidly tap the sun/moon button in the header.",
   },
+  {
+    id: "physics",
+    name: "Physics Playground",
+    hint: "Play with gravity below the hero section and throw an object.",
+  },
 ];
 
 const STORAGE_KEY = "kartik_portfolio_secrets_v2";
@@ -51,6 +56,7 @@ export function getStoredSecrets(): Record<EggId, boolean> {
     tabreturn: false,
     konami: false,
     theme: false,
+    physics: false,
   };
 
   if (typeof window === "undefined") return initial;
@@ -65,6 +71,7 @@ export function getStoredSecrets(): Record<EggId, boolean> {
       tabreturn: Boolean(parsed.tabreturn),
       konami: Boolean(parsed.konami),
       theme: Boolean(parsed.theme),
+      physics: Boolean(parsed.physics),
     };
   } catch {
     return initial;
@@ -134,7 +141,7 @@ export function markFound(id: EggId): void {
 
   if (foundCount === ALL_EGGS.length) {
     console.log(
-      `%cAll 5 found. You've earned a hire. ${contactContent.primary.email}`,
+      `%cAll ${ALL_EGGS.length} found. You've earned a hire. ${contactContent.primary.email}`,
       "color: #5FB38F; font-size: 14px; font-weight: bold; font-family: monospace; padding: 4px 0;"
     );
   }
@@ -166,7 +173,7 @@ export function initSecretsTracker(): void {
           "%cAll secrets already discovered! You've found them all.",
           "color: #5FB38F; font-family: monospace; font-weight: bold;"
         );
-        return "All 5 secrets unlocked.";
+        return `All ${ALL_EGGS.length} secrets unlocked.`;
       }
       const randomEgg = undiscovered[Math.floor(Math.random() * undiscovered.length)];
       console.log(
@@ -186,7 +193,7 @@ export function initSecretsTracker(): void {
         "color: #E9E8E3; font-family: monospace;"
       );
       printDevToolsSummary();
-      return "Progress reset to 0/5.";
+      return `Progress reset to 0/${ALL_EGGS.length}.`;
     },
     status() {
       printDevToolsSummary();

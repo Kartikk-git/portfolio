@@ -8,6 +8,7 @@ import { siteContent } from "@/content/site";
 import { contactContent } from "@/content/contact";
 import { mediaManifest } from "@/content/media";
 import { AndroidMockupDemo } from "./AndroidMockupDemo";
+import { PhysicsPlayground } from "./PhysicsPlayground";
 
 export function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -163,6 +164,9 @@ export function Hero() {
             <AndroidMockupDemo />
           </div>
         </div>
+
+        {/* Physics Playground Sandbox */}
+        <PhysicsPlayground />
 
         {/* Links Row Spanning Bottom */}
         <div className="hero-fade-3 flex flex-wrap items-center gap-x-4 gap-y-2 pt-4 border-t border-[var(--rule)] text-xs font-mono text-[var(--ink-muted)]">
