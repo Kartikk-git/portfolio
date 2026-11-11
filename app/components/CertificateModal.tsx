@@ -57,7 +57,10 @@ export function CertificateModal({ certId, onClose, onPrev, onNext }: Certificat
       aria-modal="true"
       aria-label={cert.title}
       ref={dialogRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#111315]/80 backdrop-blur-sm p-4 sm:p-6"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#111315]/85 backdrop-blur-md p-4 sm:p-6 transition-all duration-200"
     >
       <div className="relative w-full max-w-4xl bg-[var(--paper)] border border-[var(--rule)] rounded-[4px] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
         {/* Certificate Display Area */}
@@ -70,16 +73,16 @@ export function CertificateModal({ certId, onClose, onPrev, onNext }: Certificat
         {/* Metadata Sidebar */}
         <div className="w-full md:w-80 p-6 flex flex-col justify-between overflow-y-auto">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-[var(--rule)] mb-4">
-              <span className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
+            <div className="flex items-center justify-between pb-3 border-b border-[var(--rule)] mb-4 gap-2">
+              <span className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold shrink-0">
                 Credential Details
               </span>
               <button
                 onClick={onClose}
                 aria-label={credentialsContent.modal.close}
-                className="font-mono text-xs text-[var(--ink-muted)] hover:text-[var(--ink)] cursor-pointer"
+                className="font-mono text-xs px-3 py-1.5 bg-[var(--ink)] text-[var(--paper)] rounded-[4px] hover:opacity-90 cursor-pointer font-medium transition-opacity focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 shrink-0 shadow-sm"
               >
-                [Esc] {credentialsContent.modal.close}
+                Close [Esc]
               </button>
             </div>
 
