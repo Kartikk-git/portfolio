@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { sourceSerif4, ibmPlexSans, ibmPlexMono } from "./fonts";
 import { MotionProvider } from "./components/MotionProvider";
+import { AndroidEraEasterEgg } from "./components/AndroidEraEasterEgg";
 import { siteContent } from "@/content/site";
 import { contactContent } from "@/content/contact";
 import "./globals.css";
@@ -85,7 +86,10 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased bg-[var(--paper)] text-[var(--ink)] min-h-screen">
-        <MotionProvider>{children}</MotionProvider>
+        <MotionProvider>
+          {children}
+          <AndroidEraEasterEgg />
+        </MotionProvider>
       </body>
     </html>
   );
