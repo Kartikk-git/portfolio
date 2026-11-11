@@ -13,6 +13,31 @@ interface ProjectDetailProps {
   isReviewMode?: boolean;
 }
 
+function renderInlineFormatted(text: string): React.ReactNode {
+  // Parse inline markdown bold (**bold**) and code (`code`)
+  const parts = text.split(/(\*\*.*?\*\*|`.*?`)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**") && part.length >= 4) {
+      return (
+        <strong key={index} className="font-semibold text-[var(--ink)]">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    if (part.startsWith("`") && part.endsWith("`") && part.length >= 2) {
+      return (
+        <code
+          key={index}
+          className="font-mono text-xs px-1.5 py-0.5 bg-[var(--surface)] text-[var(--accent)] border border-[var(--rule)] rounded-[2px]"
+        >
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    return part;
+  });
+}
+
 export function ProjectDetail({
   project,
   onClose,
@@ -256,8 +281,10 @@ export function ProjectDetail({
               <h2 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
                 {projectsContent.detailLabels.overview}
               </h2>
-              <div className="font-sans text-base text-[var(--ink)] leading-relaxed whitespace-pre-line space-y-3">
-                {project.overview}
+              <div className="font-sans text-base text-[var(--ink)] leading-relaxed space-y-3">
+                {project.overview.split("\n\n").map((para, i) => (
+                  <p key={i}>{renderInlineFormatted(para)}</p>
+                ))}
               </div>
             </div>
           )}
@@ -269,7 +296,7 @@ export function ProjectDetail({
                 {projectsContent.detailLabels.problem}
               </h2>
               <p className="font-sans text-base text-[var(--ink)] leading-relaxed">
-                {project.problem}
+                {renderInlineFormatted(project.problem)}
               </p>
             </div>
           )}
@@ -291,7 +318,7 @@ export function ProjectDetail({
                 )}
               </div>
               <p className="font-sans text-base text-[var(--ink)] leading-relaxed">
-                {project.contribution}
+                {renderInlineFormatted(project.contribution)}
               </p>
             </div>
           )}
@@ -304,7 +331,7 @@ export function ProjectDetail({
               </h2>
               <div className="font-sans text-base text-[var(--ink)] leading-relaxed space-y-4">
                 {project.functionality.split("\n\n").map((para, i) => (
-                  <p key={i}>{para}</p>
+                  <p key={i}>{renderInlineFormatted(para)}</p>
                 ))}
               </div>
             </div>
@@ -322,7 +349,7 @@ export function ProjectDetail({
                   return clean ? (
                     <div key={i} className="flex items-start gap-2">
                       <span className="text-[var(--accent)] font-mono text-sm">&bull;</span>
-                      <span>{clean}</span>
+                      <span>{renderInlineFormatted(clean)}</span>
                     </div>
                   ) : null;
                 })}
@@ -338,7 +365,7 @@ export function ProjectDetail({
               </h2>
               <div className="font-sans text-base text-[var(--ink)] leading-relaxed space-y-4">
                 {project.decisions.split("\n\n").map((para, i) => (
-                  <p key={i}>{para}</p>
+                  <p key={i}>{renderInlineFormatted(para)}</p>
                 ))}
               </div>
             </div>
@@ -352,7 +379,7 @@ export function ProjectDetail({
               </h2>
               <div className="font-sans text-base text-[var(--ink)] leading-relaxed space-y-2">
                 {project.next.split("\n\n").map((para, i) => (
-                  <p key={i}>{para}</p>
+                  <p key={i}>{renderInlineFormatted(para)}</p>
                 ))}
               </div>
             </div>
