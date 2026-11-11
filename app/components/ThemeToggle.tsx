@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Sun, Moon, AlertTriangle, EyeOff } from "lucide-react";
 import { siteContent } from "@/content/site";
+import { markSecretUnlocked } from "@/lib/secrets";
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
@@ -90,6 +91,7 @@ export function ThemeToggle() {
 
     // Trigger Ultra Mode at 5+ taps
     if (tapCount >= 5) {
+      markSecretUnlocked("ultraTheme");
       const extraTaps = tapCount - 5;
       const intensity = 1 + extraTaps;
 
@@ -172,7 +174,7 @@ export function ThemeToggle() {
         onClick={handleToggleClick}
         className="inline-flex items-center justify-center w-11 h-11 border border-[var(--rule)] rounded-[4px] bg-[var(--surface)] text-[var(--ink)] hover:border-[var(--accent)] cursor-pointer transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 relative select-none"
         aria-label={label}
-        title={label}
+        title="Tap me. Maybe a lot."
       >
         {theme === "light" ? (
           <Moon size={18} strokeWidth={1.5} aria-hidden="true" />

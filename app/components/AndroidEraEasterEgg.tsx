@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Terminal, RotateCcw, Smartphone, Sparkles, X } from "lucide-react";
+import { markSecretUnlocked } from "@/lib/secrets";
 
 interface EraTheme {
   id: "holo" | "lollipop" | "material-you";
@@ -173,6 +174,7 @@ export function AndroidEraEasterEgg() {
           // Konami sequence complete!
           e.preventDefault();
           sequenceProgressRef.current = 0;
+          markSecretUnlocked("konami");
 
           // Cycle to next Android era
           const era = ANDROID_ERAS[nextEraIndexRef.current];
@@ -249,3 +251,4 @@ export function AndroidEraEasterEgg() {
     </div>
   );
 }
+

@@ -24,6 +24,7 @@ import {
 import { contactContent } from "@/content/contact";
 import { mediaManifest } from "@/content/media";
 import { projectsContent } from "@/content/projects";
+import { markSecretUnlocked } from "@/lib/secrets";
 
 type LogLevel = "V" | "D" | "I" | "W" | "E" | "A";
 
@@ -318,6 +319,7 @@ export function CommandPalette({
       description: "Superuser barista routine with RFC 2324 protocol",
       badge: "root",
       action: () => {
+        markSecretUnlocked("logcat");
         return [
           makeLog("D", "su", "Validating root superuser authentication for uid=0..."),
           makeLog("E", "Boredom", "not found in active process stack trace"),
@@ -337,6 +339,7 @@ export function CommandPalette({
       description: "Trigger the hidden Android developer easter egg",
       badge: "Android 15",
       action: () => {
+        markSecretUnlocked("logcat");
         return [
           makeLog("D", "AndroidRuntime", ">>>>>> ANDROID DEV EASTER EGG UNLOCKED <<<<<<"),
           makeLog("I", "Build.VERSION", "RELEASE=15 (VanillaIceCream) SDK_INT=35 CODENAME=VanillaIceCream"),
