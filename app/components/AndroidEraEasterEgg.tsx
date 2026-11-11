@@ -101,17 +101,11 @@ const KONAMI_SEQUENCE = [
 
 export function AndroidEraEasterEgg() {
   const [activeEra, setActiveEra] = useState<EraTheme | null>(null);
-  const [countdown, setCountdown] = useState<number>(10);
   const nextEraIndexRef = useRef<number>(0);
-  const resetTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const sequenceProgressRef = useRef<number>(0);
 
   // Revert all swapped CSS variables on <html> back to normal
   const revertToNormal = useCallback(() => {
-    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
-
     // Remove custom properties from documentElement style
     const allKeys = Object.keys(ANDROID_ERAS[0].variables);
     allKeys.forEach((key) => {
@@ -119,37 +113,17 @@ export function AndroidEraEasterEgg() {
     });
 
     setActiveEra(null);
-    setCountdown(10);
   }, []);
 
-  // Activate an era
+  // Activate an era (persists until user clicks revert)
   const flashAndroidEra = useCallback((era: EraTheme) => {
-    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
-
     // Swap CSS variables on documentElement
     Object.entries(era.variables).forEach(([key, value]) => {
       document.documentElement.style.setProperty(key, value);
     });
 
     setActiveEra(era);
-    setCountdown(10);
-
-    // 10-second countdown ticker
-    let timeLeft = 10;
-    countdownIntervalRef.current = setInterval(() => {
-      timeLeft -= 1;
-      setCountdown(timeLeft);
-      if (timeLeft <= 0) {
-        if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
-      }
-    }, 1000);
-
-    // 10-second auto-reset timer
-    resetTimerRef.current = setTimeout(() => {
-      revertToNormal();
-    }, 10000);
-  }, [revertToNormal]);
+  }, []);
 
   // Keyboard listener for Konami sequence: ↑ ↑ ↓ ↓ ← → ← →
   useEffect(() => {
@@ -193,13 +167,6 @@ export function AndroidEraEasterEgg() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [flashAndroidEra]);
 
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
-    };
-  }, []);
 
   if (!activeEra) return null;
 
@@ -234,19 +201,18 @@ export function AndroidEraEasterEgg() {
 
       {/* Toast Message */}
       <span className="font-medium">
-        {activeEra.toastText}{" "}
-        <span className="opacity-60 text-[11px]">({countdown}s)</span>
+        {activeEra.toastText}
       </span>
 
-      {/* Back to Normal Button */}
+      {/* Revert to Original Theme Button */}
       <button
         type="button"
         onClick={revertToNormal}
-        className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-[4px] text-[11px] font-medium transition-colors cursor-pointer border bg-[var(--paper)] hover:bg-[var(--surface-subtle)] text-[var(--ink)] border-[var(--rule)] hover:border-[var(--accent)]"
-        title="Revert back to normal portfolio theme"
+        className="ml-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] text-[11px] font-medium transition-colors cursor-pointer border bg-[var(--paper)] hover:bg-[var(--surface-subtle)] text-[var(--ink)] border-[var(--rule)] hover:border-[var(--accent)]"
+        title="Revert to original theme"
       >
         <RotateCcw size={11} strokeWidth={2} />
-        <span>Back to normal</span>
+        <span>Revert to original theme</span>
       </button>
     </div>
   );
