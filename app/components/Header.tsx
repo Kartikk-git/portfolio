@@ -33,9 +33,47 @@ export function Header() {
   const [activeSection, setActiveSection] = useState<string>("projects");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollYRef = useRef(0);
   const pathname = usePathname();
   const isHome = pathname === "/";
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Smart hide on scroll down, reveal on scroll up
+  useEffect(() => {
+    const threshold = 8;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (mobileMenuOpen) {
+        setIsVisible(true);
+        return;
+      }
+
+      // Always show near top
+      if (currentScrollY <= 60) {
+        setIsVisible(true);
+        lastScrollYRef.current = currentScrollY;
+        return;
+      }
+
+      const diff = currentScrollY - lastScrollYRef.current;
+
+      // Scroll down -> hide
+      if (diff > threshold) {
+        setIsVisible(false);
+      }
+      // Scroll up -> reveal
+      else if (diff < -threshold) {
+        setIsVisible(true);
+      }
+
+      lastScrollYRef.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [mobileMenuOpen]);
 
   // Resume status
   const resumeSlot = mediaManifest["resume-pdf"];
@@ -124,7 +162,12 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-40 w-full bg-[var(--paper)] border-b border-[var(--rule)]">
+      <header
+        onFocus={() => setIsVisible(true)}
+        className={`fixed top-0 left-0 right-0 z-40 w-full bg-[var(--paper)] border-b border-[var(--rule)] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          isVisible ? "translate-y-0" : "-translate-y-full"
+        }`}
+      >
         <div className="max-w-[1120px] mx-auto px-4 sm:px-8 h-16 flex items-center justify-between gap-4">
           {/* Wordmark */}
           <Link
