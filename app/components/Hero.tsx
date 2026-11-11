@@ -65,10 +65,12 @@ export function Hero() {
         </div>
 
         {/* Intro */}
-        <div className="hero-fade-2 max-w-[64ch] mb-6">
-          <p className="font-sans text-base sm:text-lg text-[var(--ink)] leading-[1.65]">
-            {siteContent.hero.intro}
-          </p>
+        <div className="hero-fade-2 max-w-[64ch] mb-6 space-y-3">
+          {siteContent.hero.intro.split("\n\n").map((para, i) => (
+            <p key={i} className="font-sans text-base sm:text-lg text-[var(--ink)] leading-[1.65]">
+              {para}
+            </p>
+          ))}
         </div>
 
         {/* Focus row */}

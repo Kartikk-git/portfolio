@@ -54,7 +54,11 @@ Canonical copy for kartik-koundal's portfolio. Every block has a stable key in b
 
 `hero.headline` I build native Android apps and data-driven web tools.
 
-`hero.intro` I'm a B.Tech Computer Science student at Dronacharya College of Engineering. My main project is Student Organizer, an offline-first Android app written in Kotlin with Jetpack Compose and Room. I also build web applications with Python, Flask and JavaScript, and I'm looking for an internship where I can work on a real codebase and learn from code review.
+`hero.intro`
+
+I'm a Computer Science undergraduate at Dronacharya College of Engineering, interested in building software that solves practical problems. I work primarily with Java and Kotlin for Android development, alongside Python, Flask and JavaScript for web applications.
+
+My work includes developing native Android applications and building data-driven systems, with an emphasis on writing structured, maintainable code. I'm currently looking for software development internship opportunities where I can contribute to real projects, learn from experienced developers and grow as an engineer.
 
 `hero.focus.label` Focus
 
