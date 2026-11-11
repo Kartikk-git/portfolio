@@ -51,12 +51,15 @@ export function Lightbox({ slots, initialIndex = 0, onClose }: LightboxProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose, goNext, goPrev]);
 
-  // Lock body scroll while open
+  // Lock background scroll while open (both documentElement and body)
   useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
+    const origHtml = document.documentElement.style.overflow;
+    const origBody = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = originalOverflow;
+      document.documentElement.style.overflow = origHtml;
+      document.body.style.overflow = origBody;
     };
   }, []);
 
@@ -70,7 +73,13 @@ export function Lightbox({ slots, initialIndex = 0, onClose }: LightboxProps) {
       aria-modal="true"
       aria-label="Image viewer"
       ref={dialogRef}
-      className="fixed inset-0 z-50 flex flex-col justify-between bg-[#111315]/90 backdrop-blur-sm p-4 sm:p-6 transition-opacity duration-200"
+      onWheel={(e) => {
+        if (e.target === e.currentTarget) e.preventDefault();
+      }}
+      onTouchMove={(e) => {
+        if (e.target === e.currentTarget) e.preventDefault();
+      }}
+      className="fixed inset-0 z-50 flex flex-col justify-between bg-[#111315]/90 backdrop-blur-sm p-4 sm:p-6 transition-opacity duration-200 overscroll-contain"
     >
       {/* Top bar */}
       <div className="flex items-center justify-between text-[var(--paper)] max-w-5xl w-full mx-auto pb-4 border-b border-white/10">

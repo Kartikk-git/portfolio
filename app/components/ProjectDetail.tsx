@@ -74,12 +74,15 @@ export function ProjectDetail({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose, lightboxSlotIndex]);
 
-  // Lock body scroll
+  // Lock background scroll (both documentElement and body)
   useEffect(() => {
-    const original = document.body.style.overflow;
+    const origHtml = document.documentElement.style.overflow;
+    const origBody = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = original;
+      document.documentElement.style.overflow = origHtml;
+      document.body.style.overflow = origBody;
     };
   }, []);
 
@@ -107,19 +110,21 @@ export function ProjectDetail({
       {/* Heavy Blurred Backdrop */}
       <div
         onClick={onClose}
+        onWheel={(e) => e.preventDefault()}
+        onTouchMove={(e) => e.preventDefault()}
         aria-hidden="true"
         className="fixed inset-0 z-50 bg-[#111315]/85 backdrop-blur-md transition-all duration-300"
       />
 
       {/* Centered Primary Detailed View Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-8 pointer-events-none">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-8 pointer-events-none overscroll-contain">
         <div
           role="dialog"
           aria-modal="true"
           aria-label={project.title}
           tabIndex={-1}
           ref={panelRef}
-          className="pointer-events-auto w-full max-w-4xl max-h-[90vh] bg-[var(--paper)] border border-[var(--rule)] rounded-[4px] shadow-2xl flex flex-col focus:outline-none overflow-hidden transition-all duration-200"
+          className="pointer-events-auto w-full max-w-4xl max-h-[90vh] bg-[var(--paper)] border border-[var(--rule)] rounded-[4px] shadow-2xl flex flex-col focus:outline-none overflow-hidden transition-all duration-200 overscroll-contain"
         >
           {/* Header Bar */}
           <div className="shrink-0 flex items-center justify-between p-4 sm:p-5 bg-[var(--paper)] border-b border-[var(--rule)]">
@@ -184,7 +189,7 @@ export function ProjectDetail({
           </nav>
 
           {/* Scrollable Body Content */}
-          <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-10">
+          <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-10 overscroll-contain">
             {/* Header Section */}
             <div>
               <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-[var(--ink)] tracking-tight mb-2.5">

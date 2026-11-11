@@ -42,10 +42,13 @@ export function CertificateModal({ certId, onClose, onPrev, onNext }: Certificat
   }, [onClose, onNext, onPrev]);
 
   useEffect(() => {
-    const orig = document.body.style.overflow;
+    const origHtml = document.documentElement.style.overflow;
+    const origBody = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = orig;
+      document.documentElement.style.overflow = origHtml;
+      document.body.style.overflow = origBody;
     };
   }, []);
 
@@ -57,12 +60,18 @@ export function CertificateModal({ certId, onClose, onPrev, onNext }: Certificat
       aria-modal="true"
       aria-label={cert.title}
       ref={dialogRef}
+      onWheel={(e) => {
+        if (e.target === e.currentTarget) e.preventDefault();
+      }}
+      onTouchMove={(e) => {
+        if (e.target === e.currentTarget) e.preventDefault();
+      }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#111315]/85 backdrop-blur-md p-4 sm:p-6 transition-all duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#111315]/85 backdrop-blur-md p-4 sm:p-6 transition-all duration-200 overscroll-contain"
     >
-      <div className="relative w-full max-w-4xl bg-[var(--paper)] border border-[var(--rule)] rounded-[4px] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
+      <div className="relative w-full max-w-4xl bg-[var(--paper)] border border-[var(--rule)] rounded-[4px] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] overscroll-contain">
         {/* Certificate Display Area */}
         <div className="flex-1 bg-[var(--surface)] p-6 sm:p-8 flex items-center justify-center border-b md:border-b-0 md:border-r border-[var(--rule)]">
           <div className="w-full max-w-lg">
@@ -71,7 +80,7 @@ export function CertificateModal({ certId, onClose, onPrev, onNext }: Certificat
         </div>
 
         {/* Metadata Sidebar */}
-        <div className="w-full md:w-80 p-6 flex flex-col justify-between overflow-y-auto">
+        <div className="w-full md:w-80 p-6 flex flex-col justify-between overflow-y-auto overscroll-contain">
           <div>
             <div className="flex items-center justify-between pb-3 border-b border-[var(--rule)] mb-4 gap-2">
               <span className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold shrink-0">
