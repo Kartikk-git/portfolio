@@ -207,7 +207,7 @@ export function SecretsHintSystem() {
                 <p className="text-[11px] mt-1 text-[var(--ink-muted)] leading-relaxed">
                   {secrets.ultraTheme
                     ? "Unlocked! Deployed Flashbang and AMOLED Void."
-                    : "Hint: The sun/moon toggle button in the header likes being tapped 5+ times in a row..."}
+                    : "Hint: The sun/moon toggle button in the header likes being held down for 3 seconds..."}
                 </p>
               </div>
 
