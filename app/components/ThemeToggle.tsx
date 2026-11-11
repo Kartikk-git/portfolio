@@ -182,7 +182,7 @@ export function ThemeToggle() {
     document.documentElement.setAttribute("data-theme", nextTheme);
     try {
       localStorage.setItem("theme", nextTheme);
-    } catch {}
+    } catch { }
 
     // Rapid tap tracker fallback
     const now = Date.now();
@@ -229,11 +229,10 @@ export function ThemeToggle() {
         onKeyUp={(e) => {
           if (e.key === " " || e.key === "Enter") cancelHold();
         }}
-        className={`inline-flex items-center justify-center w-11 h-11 border rounded-[4px] bg-[var(--surface)] text-[var(--ink)] cursor-pointer transition-all duration-150 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 relative select-none ${
-          isHolding
+        className={`inline-flex items-center justify-center w-11 h-11 border rounded-[4px] bg-[var(--surface)] text-[var(--ink)] cursor-pointer transition-all duration-150 focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 relative select-none ${isHolding
             ? "border-[var(--accent)] scale-95 shadow-md shadow-[var(--accent)]/20"
             : "border-[var(--rule)] hover:border-[var(--accent)]"
-        }`}
+          }`}
         aria-label={label}
         title="Tap to switch theme, or hold for 3 seconds..."
       >
@@ -270,11 +269,10 @@ export function ThemeToggle() {
         <div
           role="status"
           aria-live="polite"
-          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] px-4 py-2.5 rounded-[6px] font-mono text-xs shadow-2xl flex items-center gap-3 border transition-all duration-300 ${
-            ultraType === "flashbang"
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] px-4 py-2.5 rounded-[6px] font-mono text-xs shadow-2xl flex items-center gap-3 border transition-all duration-300 ${ultraType === "flashbang"
               ? "bg-white text-black border-neutral-300 shadow-white/40 ring-2 ring-black"
               : "bg-[#0A0D0B] text-[#5FB38F] border-[#1B6B4F] shadow-emerald-900/50 ring-1 ring-[#5FB38F]/50"
-          }`}
+            }`}
         >
           {ultraType === "flashbang" ? (
             <AlertTriangle size={15} strokeWidth={2} className="text-amber-500 shrink-0" />
@@ -287,11 +285,10 @@ export function ThemeToggle() {
           <button
             type="button"
             onClick={easeBackToNormal}
-            className={`ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-[3px] text-[10px] font-semibold uppercase tracking-wider cursor-pointer border transition-colors ${
-              ultraType === "flashbang"
+            className={`ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-[3px] text-[10px] font-semibold uppercase tracking-wider cursor-pointer border transition-colors ${ultraType === "flashbang"
                 ? "bg-neutral-100 hover:bg-neutral-200 text-black border-neutral-300"
                 : "bg-black/60 hover:bg-black text-[#5FB38F] border-[#5FB38F]/40 hover:border-[#5FB38F]"
-            }`}
+              }`}
             title="Revert back to normal theme"
           >
             <RotateCcw size={10} strokeWidth={2} />
