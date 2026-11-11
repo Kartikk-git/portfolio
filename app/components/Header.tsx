@@ -5,7 +5,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { m, useScroll, useSpring } from "motion/react";
-import { Menu, X, Search, FileText } from "lucide-react";
+import { Menu, X, Search, FileText, Terminal } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { siteContent } from "@/content/site";
 import { contactContent } from "@/content/contact";
@@ -217,16 +217,16 @@ export function Header() {
 
           {/* Right Controls: Command palette, Theme Toggle, Resume */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Command Palette Button */}
+            {/* Command Palette Button: Android Studio Logcat */}
             <button
               type="button"
               onClick={() => setPaletteOpen(true)}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-muted)] hover:text-[var(--ink)] hover:border-[var(--ink)] rounded-[4px] text-xs font-mono cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
-              aria-label="Open command palette (Ctrl+K)"
-              title="Search and Jump (Ctrl+K)"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-muted)] hover:text-[var(--ink)] hover:border-[var(--accent)] rounded-[4px] text-xs font-mono cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+              aria-label="Open Android Logcat command palette (Ctrl+K)"
+              title="Android Studio Logcat (Ctrl+K)"
             >
-              <Search size={14} strokeWidth={1.5} />
-              <span className="hidden sm:inline">{siteContent.nav.searchLabel}</span>
+              <Terminal size={14} strokeWidth={1.75} className="text-[var(--accent)]" />
+              <span className="hidden sm:inline">Logcat</span>
               <kbd className="hidden lg:inline text-[10px] text-[var(--ink-muted)] border border-[var(--rule)] px-1 rounded bg-[var(--paper)]">
                 ⌘K
               </kbd>
