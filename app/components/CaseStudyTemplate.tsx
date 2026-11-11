@@ -166,30 +166,33 @@ export function CaseStudyTemplate({
   );
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      {
-        rootMargin: "-20% 0px -70% 0px",
-        threshold: 0,
+    const handleScroll = () => {
+      // Check if near bottom of page -> activate last section
+      const isAtBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
+      if (isAtBottom && sections.length > 0) {
+        setActiveSection(sections[sections.length - 1].id);
+        return;
       }
-    );
 
-    sections.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
+      // Check which section is nearest / under the sticky header (offset 112px)
+      let current = sections[0]?.id || "overview";
+      for (const sec of sections) {
+        const el = document.getElementById(sec.id);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= 112) {
+          current = sec.id;
+        }
+      }
+      setActiveSection(current);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
 
     return () => {
-      sections.forEach(({ id }) => {
-        const el = document.getElementById(id);
-        if (el) observer.unobserve(el);
-      });
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [sections]);
 
@@ -253,7 +256,7 @@ export function CaseStudyTemplate({
         {/* Main Content with Sticky Section Index */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-start">
           {/* Sticky Section Index (Scroll-Spy) in Sidebar */}
-          <aside className="md:col-span-4 lg:col-span-3 md:sticky md:top-24">
+          <aside className="md:col-span-4 lg:col-span-3 md:sticky md:top-20">
             <nav
               className="space-y-1 font-mono text-xs border border-[var(--rule)] p-4 rounded-[4px] bg-[var(--surface)]/40 backdrop-blur-xs"
               aria-label="Case Study Contents"
