@@ -162,6 +162,17 @@ export function ProjectsSection({ isReviewMode = false }: ProjectsSectionProps) 
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   )}
+                  {project.links.apk && (
+                    <a
+                      href={project.links.apk}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[var(--accent)] hover:underline underline-offset-4 inline-flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-[var(--accent)] rounded-[2px] p-0.5 font-medium"
+                    >
+                      <span>Download APK</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
                 </div>
               </div>
             </m.article>

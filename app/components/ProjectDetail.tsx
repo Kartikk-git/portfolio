@@ -237,11 +237,15 @@ export function ProjectDetail({
                 </a>
               )}
               {project.links.apk && (
-                isReviewMode ? (
-                  <span className="font-mono text-xs px-2.5 py-1 border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400 rounded-[4px]">
-                    APK: unconfirmed ({project.links.apk})
-                  </span>
-                ) : null
+                <a
+                  href={project.links.apk}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-xs px-3.5 py-1.5 border border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--paper)] transition-colors inline-flex items-center gap-1.5 rounded-[4px] font-medium"
+                >
+                  Download APK &rarr;
+                  <span className="sr-only">({siteContent.ui.linkExternal})</span>
+                </a>
               )}
             </div>
           </div>
