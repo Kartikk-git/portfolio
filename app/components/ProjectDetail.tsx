@@ -45,7 +45,11 @@ export function ProjectDetail({
   isReviewMode = false,
 }: ProjectDetailProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLElement>(null);
   const prevActiveRef = useRef<HTMLElement | null>(null);
+  const isClickingRef = useRef(false);
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [activeSection, setActiveSection] = useState("overview");
   const [lightboxSlotIndex, setLightboxSlotIndex] = useState<number | null>(null);
 
@@ -104,6 +108,91 @@ export function ProjectDetail({
     { id: "next", label: projectsContent.detailLabels.next, exists: !!project.next },
     { id: "gallery", label: projectsContent.detailLabels.gallery, exists: project.gallerySlots && project.gallerySlots.length > 0 },
   ].filter((s) => s.exists);
+
+  // Reset scroll and active tab when switching project
+  useEffect(() => {
+    setActiveSection("overview");
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, [project.id]);
+
+  // Sync scroll position with top mini-nav bar
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      if (isClickingRef.current) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const containerTop = containerRect.top;
+
+      // Bottom threshold check: if scrolled near the bottom, activate last section
+      const isAtBottom =
+        container.scrollHeight - container.scrollTop <= container.clientHeight + 48;
+      if (isAtBottom && sections.length > 0) {
+        setActiveSection(sections[sections.length - 1].id);
+        return;
+      }
+
+      let current = sections[0]?.id || "overview";
+
+      for (const sec of sections) {
+        const el = document.getElementById(`detail-${sec.id}`);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        // Section is active when its top has reached within 72px of container top
+        if (rect.top - containerTop <= 72) {
+          current = sec.id;
+        }
+      }
+
+      setActiveSection(current);
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+    };
+  }, [sections]);
+
+  // Auto-scroll the active tab into view in the mini-nav sub-bar
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    const activeLink = nav.querySelector(`a[data-section="${activeSection}"]`) as HTMLElement | null;
+    if (activeLink) {
+      const navRect = nav.getBoundingClientRect();
+      const linkRect = activeLink.getBoundingClientRect();
+      if (linkRect.left < navRect.left || linkRect.right > navRect.right) {
+        activeLink.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
+      }
+    }
+  }, [activeSection]);
+
+  const handleTabClick = (e: React.MouseEvent, secId: string) => {
+    e.preventDefault();
+    const container = scrollContainerRef.current;
+    const target = document.getElementById(`detail-${secId}`);
+    if (container && target) {
+      isClickingRef.current = true;
+      if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = setTimeout(() => {
+        isClickingRef.current = false;
+      }, 600);
+
+      const containerTop = container.getBoundingClientRect().top;
+      const targetTop = target.getBoundingClientRect().top;
+      container.scrollTo({
+        top: container.scrollTop + (targetTop - containerTop) - 8,
+        behavior: "smooth",
+      });
+      setActiveSection(secId);
+    }
+  };
 
   return (
     <>
@@ -165,6 +254,7 @@ export function ProjectDetail({
 
           {/* Mini-Nav Sub-Bar */}
           <nav
+            ref={navRef}
             aria-label="Project detail navigation"
             className="shrink-0 flex items-center gap-4 px-4 sm:px-6 py-2.5 bg-[var(--surface)] border-b border-[var(--rule)] overflow-x-auto text-xs font-mono scrollbar-none"
           >
@@ -172,11 +262,8 @@ export function ProjectDetail({
               <a
                 key={sec.id}
                 href={`#${sec.id}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById(`detail-${sec.id}`)?.scrollIntoView({ behavior: "smooth" });
-                  setActiveSection(sec.id);
-                }}
+                data-section={sec.id}
+                onClick={(e) => handleTabClick(e, sec.id)}
                 className={`whitespace-nowrap py-1 transition-colors ${
                   activeSection === sec.id
                     ? "text-[var(--accent)] font-semibold border-b-2 border-[var(--accent)]"
@@ -189,7 +276,10 @@ export function ProjectDetail({
           </nav>
 
           {/* Scrollable Body Content */}
-          <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-10 overscroll-contain">
+          <div
+            ref={scrollContainerRef}
+            className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-10 overscroll-contain"
+          >
             {/* Header Section */}
             <div>
               <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-[var(--ink)] tracking-tight mb-2.5">
