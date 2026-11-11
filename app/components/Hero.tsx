@@ -93,7 +93,7 @@ export function Hero() {
         {/* Currently Building Row: Quiet Clickable Link */}
         <div className="hero-fade-2 mb-8 font-mono text-xs">
           <a
-            href="#project/student-organizer"
+            href="#projects"
             className="inline-flex flex-wrap items-baseline gap-2 text-[var(--ink-muted)] hover:text-[var(--accent)] transition-colors group"
           >
             <span className="text-[var(--accent)] font-semibold uppercase tracking-wider">

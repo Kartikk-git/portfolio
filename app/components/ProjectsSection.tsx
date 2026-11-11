@@ -15,35 +15,26 @@ interface ProjectsSectionProps {
 export function ProjectsSection({ isReviewMode = false }: ProjectsSectionProps) {
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
 
-  // Check URL hash on load and popstate
+  // Keep address bar strictly clean (e.g. localhost:3000) without adding hash
   useEffect(() => {
-    const checkHash = () => {
-      const hash = window.location.hash;
-      if (hash.startsWith("#project/")) {
-        const slug = hash.replace("#project/", "");
-        const matched = projectsContent.items.find((p) => p.slug === slug);
-        if (matched) {
-          setSelectedProject(matched);
-        }
-      } else {
-        setSelectedProject(null);
+    if (typeof window !== "undefined" && window.location.hash.startsWith("#project/")) {
+      const slug = window.location.hash.replace("#project/", "");
+      const matched = projectsContent.items.find((p) => p.slug === slug);
+      if (matched) {
+        setSelectedProject(matched);
       }
-    };
-
-    checkHash();
-    window.addEventListener("hashchange", checkHash);
-    return () => window.removeEventListener("hashchange", checkHash);
+      window.history.replaceState(null, "", window.location.pathname);
+    }
   }, []);
 
   const openProject = (project: ProjectItem) => {
     setSelectedProject(project);
-    window.location.hash = `#project/${project.slug}`;
   };
 
   const closeProject = () => {
     setSelectedProject(null);
-    if (window.location.hash.startsWith("#project/")) {
-      window.history.pushState(null, "", window.location.pathname + window.location.search);
+    if (typeof window !== "undefined" && window.location.hash.startsWith("#project/")) {
+      window.history.replaceState(null, "", window.location.pathname);
     }
   };
 

@@ -179,7 +179,11 @@ export function CommandPalette({
       detail: `${p.badge} — ${p.tags.slice(0, 3).join(", ")}`,
       icon: FolderGit2,
       onSelect: () => {
-        window.location.hash = `#project/${p.slug}`;
+        if (p.slug === "tejovik" || p.slug === "student-organizer") {
+          window.location.href = `/projects/${p.slug}`;
+        } else {
+          document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
+        }
         onClose();
       },
     })),

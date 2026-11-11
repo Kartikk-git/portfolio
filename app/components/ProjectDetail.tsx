@@ -83,24 +83,12 @@ export function ProjectDetail({
     };
   }, []);
 
-  // Update hash
+  // Clean address bar: ensure no hash is pushed or retained
   useEffect(() => {
-    if (window.location.hash !== `#project/${project.slug}`) {
-      window.history.pushState(null, "", `#project/${project.slug}`);
+    if (typeof window !== "undefined" && window.location.hash.startsWith("#project/")) {
+      window.history.replaceState(null, "", window.location.pathname);
     }
-    const handleHashChange = () => {
-      if (!window.location.hash.startsWith("#project/")) {
-        onClose();
-      }
-    };
-    window.addEventListener("hashchange", handleHashChange);
-    return () => {
-      window.removeEventListener("hashchange", handleHashChange);
-      if (window.location.hash.startsWith("#project/")) {
-        window.history.pushState(null, "", window.location.pathname);
-      }
-    };
-  }, [project.slug, onClose]);
+  }, []);
 
   // Sections available for this project
   const sections = [
