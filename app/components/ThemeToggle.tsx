@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Sun, Moon, AlertTriangle, EyeOff, RotateCcw } from "lucide-react";
 import { siteContent } from "@/content/site";
-import { markSecretUnlocked } from "@/lib/secrets";
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
@@ -85,8 +84,6 @@ export function ThemeToggle() {
   // Deploy Ultra Flash mode (lasts 10 seconds)
   const deployUltraMode = useCallback(
     (forcedMode?: "flashbang" | "amoled") => {
-      markSecretUnlocked("ultraTheme");
-
       const prefersReducedMotion =
         typeof window !== "undefined" &&
         window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -234,7 +231,7 @@ export function ThemeToggle() {
             : "border-[var(--rule)] hover:border-[var(--accent)]"
           }`}
         aria-label={label}
-        title="Tap to switch theme, or hold for 3 seconds..."
+        title={label}
       >
         {/* Subtle Radial Progress Ring while Holding */}
         {isHolding && (

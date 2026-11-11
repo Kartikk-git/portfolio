@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { sourceSerif4, ibmPlexSans, ibmPlexMono } from "./fonts";
 import { MotionProvider } from "./components/MotionProvider";
 import { AndroidEraEasterEgg } from "./components/AndroidEraEasterEgg";
-import { SecretsHintSystem } from "./components/SecretsHintSystem";
 import { siteContent } from "@/content/site";
 import { contactContent } from "@/content/contact";
 import "./globals.css";
@@ -90,7 +89,6 @@ export default function RootLayout({
         <MotionProvider>
           {children}
           <AndroidEraEasterEgg />
-          <SecretsHintSystem />
         </MotionProvider>
       </body>
     </html>

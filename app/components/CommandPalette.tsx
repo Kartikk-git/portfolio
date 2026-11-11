@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { contactContent } from "@/content/contact";
 import { mediaManifest } from "@/content/media";
-import { markSecretUnlocked } from "@/lib/secrets";
 
 type LogLevel = "V" | "D" | "I" | "W" | "E" | "A";
 
@@ -352,7 +351,6 @@ export function CommandPalette({
       badge: "root",
       closeOnExec: false,
       action: () => {
-        markSecretUnlocked("logcat");
         return [
           makeLog("D", "su", "Validating root superuser authentication for uid=0..."),
           makeLog("E", "Boredom", "not found in active process stack trace"),
@@ -373,7 +371,6 @@ export function CommandPalette({
       badge: "Android 15",
       closeOnExec: false,
       action: () => {
-        markSecretUnlocked("logcat");
         return [
           makeLog("D", "AndroidRuntime", ">>>>>> ANDROID DEV EASTER EGG UNLOCKED <<<<<<"),
           makeLog("I", "Build.VERSION", "RELEASE=15 (VanillaIceCream) SDK_INT=35 CODENAME=VanillaIceCream"),
