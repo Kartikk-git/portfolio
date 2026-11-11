@@ -51,9 +51,9 @@ export function Hero() {
 
         {/* Name and Headline in Source Serif 4 */}
         <div className="hero-mask mb-4">
-          <h1 className="hero-line-1 font-serif text-4xl sm:text-5xl font-semibold tracking-tight text-[var(--ink)] leading-[1.1]">
+          <h1 className="hero-line-1 font-serif text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-[var(--ink)] leading-[1.15]">
             <span className="block">{siteContent.hero.name}</span>
-            <span className="block font-normal text-xl sm:text-2xl text-[var(--ink-muted)] mt-2">
+            <span className="block font-normal text-lg sm:text-xl text-[var(--ink-muted)] mt-2 leading-snug">
               {siteContent.hero.headline}
             </span>
           </h1>
@@ -65,7 +65,7 @@ export function Hero() {
         </div>
 
         {/* Bio Paragraphs */}
-        <div className="hero-fade-2 max-w-[72ch] space-y-4 font-sans text-base text-[var(--ink)] leading-[1.65] my-6">
+        <div className="hero-fade-2 max-w-[72ch] space-y-4 font-sans text-[15px] sm:text-base text-[var(--ink)] leading-[1.65] my-6">
           {siteContent.hero.intro.split("\n\n").map((para, i) => (
             <p key={i}>
               {para}
@@ -99,7 +99,7 @@ export function Hero() {
             <span className="text-[var(--accent)] font-semibold uppercase tracking-wider">
               {siteContent.hero.currentlyLabel}:
             </span>
-            <span className="font-sans text-base text-[var(--ink)] group-hover:text-[var(--accent)] group-hover:underline underline-offset-4 transition-colors">
+            <span className="font-sans text-sm text-[var(--ink)] group-hover:text-[var(--accent)] group-hover:underline underline-offset-4 transition-colors">
               {siteContent.hero.currentlyValue} &rarr;
             </span>
           </a>

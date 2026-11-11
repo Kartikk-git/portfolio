@@ -84,7 +84,7 @@ export function ProjectsSection({ isReviewMode = false }: ProjectsSectionProps) 
                     0{index + 1}
                   </span>
 
-                  <h3 className="font-serif text-xl sm:text-2xl font-semibold text-[var(--ink)] group-hover:text-[var(--accent)] group-hover:translate-x-0.5 transition-all duration-160">
+                  <h3 className="font-serif text-lg sm:text-xl font-semibold text-[var(--ink)] group-hover:text-[var(--accent)] group-hover:translate-x-0.5 transition-all duration-160">
                     {project.title}
                   </h3>
 
@@ -106,7 +106,7 @@ export function ProjectsSection({ isReviewMode = false }: ProjectsSectionProps) 
               </div>
 
               {/* Description */}
-              <p className="mt-4 font-sans text-base leading-[1.65] text-[var(--ink-muted)] max-w-[72ch]">
+              <p className="mt-3 font-sans text-sm leading-relaxed text-[var(--ink-muted)] max-w-[72ch]">
                 {project.cardText}
               </p>
 

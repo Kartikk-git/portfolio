@@ -237,11 +237,11 @@ export function CaseStudyTemplate({
             )}
           </div>
 
-          <h1 className="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[var(--ink)] leading-[1.15] mb-4">
+          <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight text-[var(--ink)] leading-[1.2] mb-3">
             {project.title}
           </h1>
 
-          <p className="font-sans text-base text-[var(--ink-muted)] max-w-[62ch] leading-[1.65]">
+          <p className="font-sans text-sm sm:text-base text-[var(--ink-muted)] max-w-[62ch] leading-relaxed">
             {project.subtitle}
           </p>
 
@@ -283,25 +283,25 @@ export function CaseStudyTemplate({
             {/* Section 1: Overview - Replaced with In Brief synthesis per §10 */}
             <section id="overview" className="scroll-mt-24 space-y-4">
               <div className="flex items-baseline justify-between border-b border-[var(--rule)] pb-2">
-                <h2 className="font-serif text-2xl font-semibold text-[var(--ink)]">
+                <h2 className="font-serif text-xl sm:text-2xl font-semibold text-[var(--ink)]">
                   Overview
                 </h2>
                 <span className="font-mono text-xs text-[var(--ink-muted)] uppercase tracking-wider">
                   In brief
                 </span>
               </div>
-              <p className="font-sans text-base text-[var(--ink)] leading-[1.65] max-w-[62ch]">
+              <p className="font-sans text-sm sm:text-[15px] text-[var(--ink)] leading-relaxed max-w-[62ch]">
                 {enriched?.inBrief || project.description}
               </p>
             </section>
 
             {/* Section 2: What I Built - Orientation prose per §10 */}
             <section id="built" className="scroll-mt-24 space-y-6">
-              <h2 className="font-serif text-2xl font-semibold text-[var(--ink)] border-b border-[var(--rule)] pb-2">
+              <h2 className="font-serif text-xl sm:text-2xl font-semibold text-[var(--ink)] border-b border-[var(--rule)] pb-2">
                 What I Built
               </h2>
 
-              <p className="font-sans text-base text-[var(--ink-muted)] leading-[1.65] max-w-[62ch]">
+              <p className="font-sans text-sm sm:text-[15px] text-[var(--ink-muted)] leading-relaxed max-w-[62ch]">
                 {enriched?.narrativeBuilt || project.whatIBuild}
               </p>
 

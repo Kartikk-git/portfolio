@@ -69,13 +69,13 @@ export function ContactSection({ isReviewMode = false }: ContactSectionProps) {
             <div>
               <a
                 href={`mailto:${contactContent.primary.email}?subject=${encodeURIComponent(contactContent.mailtoSubject)}`}
-                className="font-serif text-2xl sm:text-3xl font-semibold text-[var(--ink)] hover:text-[var(--accent)] transition-colors break-all leading-tight focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
+                className="font-serif text-xl sm:text-2xl font-semibold text-[var(--ink)] hover:text-[var(--accent)] transition-colors break-all leading-tight focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
               >
                 {contactContent.primary.email}
               </a>
             </div>
 
-            <p className="font-sans text-base text-[var(--ink-muted)] leading-[1.65] max-w-[48ch]">
+            <p className="font-sans text-sm sm:text-[15px] text-[var(--ink-muted)] leading-relaxed max-w-[48ch]">
               {contactContent.primary.note}
             </p>
           </div>

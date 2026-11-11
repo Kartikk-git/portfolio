@@ -52,11 +52,11 @@ export function Section({
             ) : null}
           </div>
 
-          <h2 className="font-serif text-3xl font-semibold tracking-tight text-[var(--ink)]">
+          <h2 className="font-serif text-2xl sm:text-3xl font-semibold tracking-tight text-[var(--ink)] leading-tight">
             {heading}
           </h2>
 
-          <p className="mt-2 text-base text-[var(--ink-muted)] max-w-[62ch] leading-[1.65]">
+          <p className="mt-2 text-sm sm:text-[15px] text-[var(--ink-muted)] max-w-[62ch] leading-relaxed">
             {intro}
           </p>
 

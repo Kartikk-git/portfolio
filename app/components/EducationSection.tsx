@@ -70,7 +70,7 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
 
               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-[var(--rule)]/50 pb-3">
                 <div className="flex flex-wrap items-baseline gap-2.5">
-                  <h4 className="font-serif text-xl font-semibold text-[var(--ink)]">
+                  <h4 className="font-serif text-lg sm:text-xl font-semibold text-[var(--ink)]">
                     {credentialsContent.education[0].title}
                   </h4>
                   <span className="font-mono text-xs uppercase tracking-wider text-[var(--accent)] px-2 py-0.5 border border-[var(--accent)]/40 rounded-[2px] font-medium bg-[var(--paper)]">
@@ -93,7 +93,7 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
                 Dronacharya College of Engineering, Gurugram
               </div>
 
-              <p className="font-sans text-base text-[var(--ink-muted)] leading-[1.65] max-w-[72ch]">
+              <p className="font-sans text-sm text-[var(--ink-muted)] leading-relaxed max-w-[72ch]">
                 {credentialsContent.education[0].body}
               </p>
 
@@ -209,7 +209,7 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
 
                 <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
                   <div className="flex flex-wrap items-baseline gap-2">
-                    <h4 className="font-serif text-xl font-semibold text-[var(--ink)]">
+                    <h4 className="font-serif text-base sm:text-lg font-semibold text-[var(--ink)]">
                       {cert.title}
                     </h4>
                     {cert.badge && (
@@ -229,7 +229,7 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
                   </div>
                 </div>
 
-                <p className="font-sans text-base text-[var(--ink-muted)] leading-[1.65] max-w-[72ch]">
+                <p className="font-sans text-sm text-[var(--ink-muted)] leading-relaxed max-w-[72ch]">
                   {cert.body}
                 </p>
 

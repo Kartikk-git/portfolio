@@ -199,10 +199,10 @@ export function ProjectDetail({
           <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-10">
             {/* Header Section */}
             <div>
-              <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-[var(--ink)] tracking-tight mb-3">
+              <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-[var(--ink)] tracking-tight mb-2.5">
                 {project.title}
               </h1>
-              <p className="font-sans text-base text-[var(--ink-muted)] leading-[1.65] mb-6">
+              <p className="font-sans text-sm sm:text-[15px] text-[var(--ink-muted)] leading-relaxed mb-5">
                 {project.cardText}
               </p>
 
@@ -281,7 +281,7 @@ export function ProjectDetail({
               <h2 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
                 {projectsContent.detailLabels.overview}
               </h2>
-              <div className="font-sans text-base text-[var(--ink)] leading-relaxed space-y-3">
+              <div className="font-sans text-sm sm:text-[15px] text-[var(--ink)] leading-relaxed space-y-3">
                 {project.overview.split("\n\n").map((para, i) => (
                   <p key={i}>{renderInlineFormatted(para)}</p>
                 ))}
@@ -295,7 +295,7 @@ export function ProjectDetail({
               <h2 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
                 {projectsContent.detailLabels.problem}
               </h2>
-              <p className="font-sans text-base text-[var(--ink)] leading-relaxed">
+              <p className="font-sans text-sm sm:text-[15px] text-[var(--ink)] leading-relaxed">
                 {renderInlineFormatted(project.problem)}
               </p>
             </div>
@@ -317,7 +317,7 @@ export function ProjectDetail({
                   <span className="font-mono text-[10px] text-amber-600 dark:text-amber-400">⚠ confirm</span>
                 )}
               </div>
-              <p className="font-sans text-base text-[var(--ink)] leading-relaxed">
+              <p className="font-sans text-sm sm:text-[15px] text-[var(--ink)] leading-relaxed">
                 {renderInlineFormatted(project.contribution)}
               </p>
             </div>
@@ -329,7 +329,7 @@ export function ProjectDetail({
               <h2 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
                 {projectsContent.detailLabels.functionality}
               </h2>
-              <div className="font-sans text-base text-[var(--ink)] leading-relaxed space-y-4">
+              <div className="font-sans text-sm sm:text-[15px] text-[var(--ink)] leading-relaxed space-y-3.5">
                 {project.functionality.split("\n\n").map((para, i) => (
                   <p key={i}>{renderInlineFormatted(para)}</p>
                 ))}
@@ -343,7 +343,7 @@ export function ProjectDetail({
               <h2 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
                 {projectsContent.detailLabels.implementation}
               </h2>
-              <div className="font-sans text-base text-[var(--ink)] leading-relaxed space-y-2">
+              <div className="font-sans text-sm sm:text-[15px] text-[var(--ink)] leading-relaxed space-y-2">
                 {project.implementation.split("\n").map((line, i) => {
                   const clean = line.replace(/^-\s*/, "");
                   return clean ? (
@@ -363,7 +363,7 @@ export function ProjectDetail({
               <h2 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
                 {projectsContent.detailLabels.decisions}
               </h2>
-              <div className="font-sans text-base text-[var(--ink)] leading-relaxed space-y-4">
+              <div className="font-sans text-sm sm:text-[15px] text-[var(--ink)] leading-relaxed space-y-3.5">
                 {project.decisions.split("\n\n").map((para, i) => (
                   <p key={i}>{renderInlineFormatted(para)}</p>
                 ))}
@@ -377,7 +377,7 @@ export function ProjectDetail({
               <h2 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
                 {projectsContent.detailLabels.next}
               </h2>
-              <div className="font-sans text-base text-[var(--ink)] leading-relaxed space-y-2">
+              <div className="font-sans text-sm sm:text-[15px] text-[var(--ink)] leading-relaxed space-y-2">
                 {project.next.split("\n\n").map((para, i) => (
                   <p key={i}>{renderInlineFormatted(para)}</p>
                 ))}
