@@ -1,10 +1,35 @@
 import fs from 'fs';
 
-const rawEntries = JSON.parse(fs.readFileSync('scripts/extracted-keys.json', 'utf8'));
+const markdown = fs.readFileSync('content/website-content.md', 'utf8');
+const lines = markdown.split('\n');
+const keyMap = new Map();
+
+for (let i = 0; i < lines.length; i++) {
+  const line = lines[i];
+  const m = line.match(/^`([a-zA-Z0-9_.]+)`(\s*⚠)?(?:\s+(.*))?$/);
+  if (m) {
+    const key = m[1];
+    let val = m[3] ? m[3].trim() : '';
+    if (!val) {
+      const blockLines = [];
+      let j = i + 1;
+      while (j < lines.length) {
+        if (lines[j].match(/^`[a-zA-Z0-9_.]+`/) || lines[j].startsWith('---') || lines[j].match(/^#{1,3}\s/)) {
+          break;
+        }
+        blockLines.push(lines[j]);
+        j++;
+      }
+      val = blockLines.join('\n').trim();
+    }
+    keyMap.set(key, val);
+  }
+}
+
 const get = (key) => {
-  const e = rawEntries.find(x => x.key === key);
-  if (!e) throw new Error(`Missing key: ${key}`);
-  return e.val;
+  const val = keyMap.get(key);
+  if (val === undefined) throw new Error(`Missing key: ${key}`);
+  return val;
 };
 
 // 1. media.json
@@ -43,7 +68,7 @@ const mediaManifest = {
   "cred-gcloud-2": { type: "certificate", src: null, ratio: "4/3", label: "Develop GenAI Apps with Gemini and Streamlit", caption: "Google Cloud Skill Badge", title: "Develop GenAI Apps with Gemini and Streamlit" },
   "cred-gcloud-3": { type: "certificate", src: null, ratio: "4/3", label: "Deploy and Manage Applications on Google App Engine", caption: "Google Cloud Skill Badge", title: "Deploy and Manage Applications on Google App Engine" },
 
-  "resume-pdf": { type: "file", src: null, label: "Résumé", title: "Kartik-Koundal-Resume.pdf" }
+  "resume-pdf": { type: "file", src: "/resume.pdf", label: "Résumé", title: "Kartik-Koundal-Resume.pdf" }
 };
 
 fs.writeFileSync('content/media.json', JSON.stringify(mediaManifest, null, 2) + '\n');

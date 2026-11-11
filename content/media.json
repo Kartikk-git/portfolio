@@ -225,7 +225,7 @@
   },
   "resume-pdf": {
     "type": "file",
-    "src": null,
+    "src": "/resume.pdf",
     "label": "Résumé",
     "title": "Kartik-Koundal-Resume.pdf"
   }

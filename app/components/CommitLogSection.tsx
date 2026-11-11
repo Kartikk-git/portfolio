@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useRef, useMemo } from "react";
-import { m, useInView } from "motion/react";
+import React, { useState, useMemo } from "react";
+import { m } from "motion/react";
 import { ExternalLink, GitCommit, Code2 } from "lucide-react";
-import { ruleDrawVariants, revealVariants } from "@/lib/motion";
+import { revealVariants } from "@/lib/motion";
 import { activityContent } from "@/content/activity";
 import rawGithub from "@/content/github-contributions.json";
 import rawLeetCode from "@/content/leetcode-contributions.json";
+import { Section } from "./Section";
 
 interface ContributionDay {
   date: string;
@@ -15,8 +16,6 @@ interface ContributionDay {
 }
 
 export function CommitLogSection() {
-  const containerRef = useRef<HTMLElement>(null);
-  const isInView = useInView(containerRef, { once: true, margin: "-10% 0px" });
   const [platformView, setPlatformView] = useState<"all" | "github" | "leetcode">("all");
   const [highlightedMonth, setHighlightedMonth] = useState<number | null>(null);
   const [hoveredLevel, setHoveredLevel] = useState<number | null>(null);
@@ -38,9 +37,9 @@ export function CommitLogSection() {
   const lcActiveDays = rawLeetCode?.totalActiveDays ?? 18;
 
   // Build calendar weeks and month labels
-  const { ghWeeks, lcWeeks, monthLabels, busiestGh, busiestLc } = useMemo(() => {
+  const { ghWeeks, lcWeeks, monthLabels, busiestGh } = useMemo(() => {
     if (!ghDays || ghDays.length === 0) {
-      return { ghWeeks: [], lcWeeks: [], monthLabels: [], busiestGh: null, busiestLc: null };
+      return { ghWeeks: [], lcWeeks: [], monthLabels: [], busiestGh: null };
     }
 
     const lcDateMap = new Map<string, number>();
@@ -66,7 +65,6 @@ export function CommitLogSection() {
     const months: { label: string; monthIndex: number; colIndex: number }[] = [];
     let lastMonth = -1;
     let bGh = { date: "", count: 0 };
-    let bLc = { date: "", count: 0 };
 
     ghDays.forEach((day) => {
       const d = new Date(day.date + "T00:00:00Z");
@@ -88,10 +86,6 @@ export function CommitLogSection() {
       currentGhWeek.push(day);
 
       const lcCount = lcDateMap.get(day.date) || 0;
-      if (lcCount > bLc.count) {
-        bLc = { date: day.date, count: lcCount };
-      }
-
       currentLcWeek.push({
         date: day.date,
         count: lcCount,
@@ -116,7 +110,6 @@ export function CommitLogSection() {
       lcWeeks: lcWeeksArr,
       monthLabels: months,
       busiestGh: bGh,
-      busiestLc: bLc
     };
   }, [ghDays, lcCalendar]);
 
@@ -278,163 +271,134 @@ export function CommitLogSection() {
   );
 
   return (
-    <section
+    <Section
       id="activity"
-      ref={containerRef}
-      className="py-20 md:py-28 border-b border-[var(--rule)] scroll-mt-16"
+      eyebrow={activityContent.eyebrow}
+      heading={activityContent.heading}
+      intro={activityContent.intro}
+      headerExtra={`${ghTotal} Commits · ${lcTotalSubmissions} Submissions`}
     >
-      <div className="max-w-[1120px] mx-auto px-4 sm:px-8">
-        {/* Section Header */}
-        <div className="mb-12">
-          <div className="flex items-baseline justify-between mb-2">
-            <div className="font-mono text-xs uppercase tracking-[0.06em]">
-              <span className="text-[var(--accent)] font-semibold">{activityContent.eyebrow}</span>
+      {/* Screen Reader Accessible Summary */}
+      <div className="sr-only">
+        {activityContent.summarySrOnly
+          .replace("{n}", String(ghTotal + lcTotalSubmissions))
+          .replace("{busiestDate}", busiestGh?.date || "")
+          .replace("{busiestCount}", String(busiestGh?.count || 0))}
+      </div>
+
+      {/* Tab Filters */}
+      <div className="flex items-center gap-2 mb-8 border-b border-[var(--rule)] pb-4">
+        <button
+          onClick={() => setPlatformView("all")}
+          className={`font-mono text-xs px-3 py-1.5 rounded-[4px] transition-colors cursor-pointer ${
+            platformView === "all"
+              ? "bg-[var(--accent)] text-white font-semibold"
+              : "text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--surface)]"
+          }`}
+        >
+          All activity
+        </button>
+        <button
+          onClick={() => setPlatformView("github")}
+          className={`font-mono text-xs px-3 py-1.5 rounded-[4px] transition-colors cursor-pointer flex items-center gap-1.5 ${
+            platformView === "github"
+              ? "bg-[var(--accent)] text-white font-semibold"
+              : "text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--surface)]"
+          }`}
+        >
+          <GitCommit className="w-3.5 h-3.5" />
+          GitHub ({ghTotal})
+        </button>
+        <button
+          onClick={() => setPlatformView("leetcode")}
+          className={`font-mono text-xs px-3 py-1.5 rounded-[4px] transition-colors cursor-pointer flex items-center gap-1.5 ${
+            platformView === "leetcode"
+              ? "bg-[var(--accent)] text-white font-semibold"
+              : "text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--surface)]"
+          }`}
+        >
+          <Code2 className="w-3.5 h-3.5" />
+          LeetCode ({lcTotalSubmissions})
+        </button>
+      </div>
+
+      {/* Activity Panels */}
+      <div className="space-y-8">
+        {/* GitHub Panel */}
+        {(platformView === "all" || platformView === "github") && (
+          <m.div
+            variants={revealVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-10% 0px" }}
+            className="border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/30 p-5 sm:p-6"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-6 border-b border-[var(--rule)]">
+              <div>
+                <h3 className="font-serif text-lg sm:text-xl font-semibold text-[var(--ink)]">
+                  {activityContent.github.title.replace("{n}", String(ghTotal))}
+                </h3>
+                <p className="font-sans text-xs sm:text-sm text-[var(--ink-muted)] mt-0.5">
+                  {activityContent.github.description}
+                </p>
+              </div>
+              <a
+                href="https://github.com/Kartikk-git"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-xs text-[var(--accent)] hover:underline inline-flex items-center gap-1 shrink-0"
+              >
+                {activityContent.github.source}
+                <ExternalLink className="w-3 h-3" />
+              </a>
             </div>
-            <span className="font-mono text-xs text-[var(--ink-muted)]">
-              {ghTotal} Commits · {lcTotalSubmissions} Submissions
-            </span>
-          </div>
 
-          <h2 className="font-serif text-3xl font-semibold tracking-tight text-[var(--ink)]">
-            {activityContent.heading}
-          </h2>
+            {renderHeatmap(ghWeeks, "github")}
 
-          <p className="mt-2 text-sm text-[var(--ink-muted)] max-w-[62ch] leading-[1.6]">
-            {activityContent.intro}
-          </p>
+            <div className="mt-4 pt-3 border-t border-[var(--rule)]/40 font-mono text-[11px] text-[var(--ink-muted)]">
+              {activityContent.github.footer}
+            </div>
+          </m.div>
+        )}
 
-          {/* Section Divider Line with Classic Editorial Accent Rule */}
-          <div className="pt-6 relative">
-            <m.div
-              variants={ruleDrawVariants}
-              initial="hidden"
-              animate={isInView ? "visible" : "hidden"}
-              className="h-[1px] w-full bg-[var(--rule)]"
-            />
-            <div className="absolute left-0 bottom-0 h-[2px] w-12 bg-[var(--accent)] z-10" />
-          </div>
-        </div>
-
-        {/* Screen Reader Accessible Summary */}
-        <div className="sr-only">
-          {activityContent.summarySrOnly
-            .replace("{n}", String(ghTotal + lcTotalSubmissions))
-            .replace("{busiestDate}", busiestGh?.date || "")
-            .replace("{busiestCount}", String(busiestGh?.count || 0))}
-        </div>
-
-        {/* Tab Filters */}
-        <div className="flex items-center gap-2 mb-8 border-b border-[var(--rule)] pb-4">
-          <button
-            onClick={() => setPlatformView("all")}
-            className={`font-mono text-xs px-3 py-1.5 rounded-[4px] transition-colors cursor-pointer ${
-              platformView === "all"
-                ? "bg-[var(--accent)] text-white font-semibold"
-                : "text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--surface)]"
-            }`}
+        {/* LeetCode Panel */}
+        {(platformView === "all" || platformView === "leetcode") && (
+          <m.div
+            variants={revealVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-10% 0px" }}
+            className="border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/30 p-5 sm:p-6"
           >
-            All activity
-          </button>
-          <button
-            onClick={() => setPlatformView("github")}
-            className={`font-mono text-xs px-3 py-1.5 rounded-[4px] transition-colors cursor-pointer flex items-center gap-1.5 ${
-              platformView === "github"
-                ? "bg-[var(--accent)] text-white font-semibold"
-                : "text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--surface)]"
-            }`}
-          >
-            <GitCommit className="w-3.5 h-3.5" />
-            GitHub ({ghTotal})
-          </button>
-          <button
-            onClick={() => setPlatformView("leetcode")}
-            className={`font-mono text-xs px-3 py-1.5 rounded-[4px] transition-colors cursor-pointer flex items-center gap-1.5 ${
-              platformView === "leetcode"
-                ? "bg-[var(--accent)] text-white font-semibold"
-                : "text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--surface)]"
-            }`}
-          >
-            <Code2 className="w-3.5 h-3.5" />
-            LeetCode ({lcTotalSubmissions})
-          </button>
-        </div>
-
-        {/* Activity Panels */}
-        <div className="space-y-8">
-          {/* GitHub Panel */}
-          {(platformView === "all" || platformView === "github") && (
-            <m.div
-              variants={revealVariants}
-              initial="hidden"
-              animate={isInView ? "visible" : "hidden"}
-              className="border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/30 p-5 sm:p-6"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-6 border-b border-[var(--rule)]">
-                <div>
-                  <h3 className="font-serif text-lg sm:text-xl font-semibold text-[var(--ink)]">
-                    {activityContent.github.title.replace("{n}", String(ghTotal))}
-                  </h3>
-                  <p className="font-sans text-xs sm:text-sm text-[var(--ink-muted)] mt-0.5">
-                    {activityContent.github.description}
-                  </p>
-                </div>
-                <a
-                  href="https://github.com/Kartikk-git"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-mono text-xs text-[var(--accent)] hover:underline inline-flex items-center gap-1 shrink-0"
-                >
-                  {activityContent.github.source}
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-6 border-b border-[var(--rule)]">
+              <div>
+                <h3 className="font-serif text-lg sm:text-xl font-semibold text-[var(--ink)]">
+                  {activityContent.leetcode.title
+                    .replace("{n}", String(lcTotalSubmissions))
+                    .replace("{d}", String(lcActiveDays))}
+                </h3>
+                <p className="font-sans text-xs sm:text-sm text-[var(--ink-muted)] mt-0.5">
+                  {activityContent.leetcode.description}
+                </p>
               </div>
+              <a
+                href="https://leetcode.com/u/kartikk-git/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-xs text-[var(--accent)] hover:underline inline-flex items-center gap-1 shrink-0"
+              >
+                {activityContent.leetcode.source}
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
 
-              {renderHeatmap(ghWeeks, "github")}
+            {renderHeatmap(lcWeeks, "leetcode")}
 
-              <div className="mt-4 pt-3 border-t border-[var(--rule)]/40 font-mono text-[11px] text-[var(--ink-muted)]">
-                {activityContent.github.footer}
-              </div>
-            </m.div>
-          )}
-
-          {/* LeetCode Panel */}
-          {(platformView === "all" || platformView === "leetcode") && (
-            <m.div
-              variants={revealVariants}
-              initial="hidden"
-              animate={isInView ? "visible" : "hidden"}
-              className="border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/30 p-5 sm:p-6"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-6 border-b border-[var(--rule)]">
-                <div>
-                  <h3 className="font-serif text-lg sm:text-xl font-semibold text-[var(--ink)]">
-                    {activityContent.leetcode.title
-                      .replace("{n}", String(lcTotalSubmissions))
-                      .replace("{d}", String(lcActiveDays))}
-                  </h3>
-                  <p className="font-sans text-xs sm:text-sm text-[var(--ink-muted)] mt-0.5">
-                    {activityContent.leetcode.description}
-                  </p>
-                </div>
-                <a
-                  href="https://leetcode.com/u/kartikk-git/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-mono text-xs text-[var(--accent)] hover:underline inline-flex items-center gap-1 shrink-0"
-                >
-                  {activityContent.leetcode.source}
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-
-              {renderHeatmap(lcWeeks, "leetcode")}
-
-              <div className="mt-4 pt-3 border-t border-[var(--rule)]/40 font-mono text-[11px] text-[var(--ink-muted)]">
-                {activityContent.leetcode.footer}
-              </div>
-            </m.div>
-          )}
-        </div>
+            <div className="mt-4 pt-3 border-t border-[var(--rule)]/40 font-mono text-[11px] text-[var(--ink-muted)]">
+              {activityContent.leetcode.footer}
+            </div>
+          </m.div>
+        )}
       </div>
 
       {/* Floating Tooltip */}
@@ -451,6 +415,6 @@ export function CommitLogSection() {
           {tooltip.text}
         </div>
       )}
-    </section>
+    </Section>
   );
 }
