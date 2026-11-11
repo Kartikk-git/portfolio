@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { sourceSerif4, ibmPlexSans, ibmPlexMono } from "./fonts";
 import { MotionProvider } from "./components/MotionProvider";
 import { AndroidEraEasterEgg } from "./components/AndroidEraEasterEgg";
+import { EasterEggsManager } from "./components/EasterEggsManager";
 import { siteContent } from "@/content/site";
 import { contactContent } from "@/content/contact";
 import "./globals.css";
@@ -89,6 +90,7 @@ export default function RootLayout({
         <MotionProvider>
           {children}
           <AndroidEraEasterEgg />
+          <EasterEggsManager />
         </MotionProvider>
       </body>
     </html>

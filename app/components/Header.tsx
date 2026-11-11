@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { m, useScroll, useSpring } from "motion/react";
 import { Menu, X, Search, FileText, Terminal } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
+import { CrashDialog } from "./CrashDialog";
 import { siteContent } from "@/content/site";
 import { contactContent } from "@/content/contact";
 import { mediaManifest } from "@/content/media";
@@ -34,6 +35,9 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const [crashOpen, setCrashOpen] = useState(false);
+  const [isGlitching, setIsGlitching] = useState(false);
+  const nameClickHistoryRef = useRef<number[]>([]);
   const lastScrollYRef = useRef(0);
   const pathname = usePathname();
   const isHome = pathname === "/";
@@ -160,6 +164,44 @@ export function Header() {
     }
   };
 
+  const handleNameClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const target = e.target as HTMLElement | null;
+    if (
+      target &&
+      (target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable ||
+        target.getAttribute("role") === "textbox")
+    ) {
+      return;
+    }
+
+    const now = Date.now();
+    const recent = nameClickHistoryRef.current.filter((t) => now - t <= 3000);
+    recent.push(now);
+    nameClickHistoryRef.current = recent;
+
+    if (recent.length >= 5) {
+      e.preventDefault();
+      nameClickHistoryRef.current = [];
+      setIsGlitching(true);
+
+      const prefersReducedMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (prefersReducedMotion) {
+        setIsGlitching(false);
+        setCrashOpen(true);
+      } else {
+        setTimeout(() => {
+          setIsGlitching(false);
+          setCrashOpen(true);
+        }, 350);
+      }
+    }
+  };
+
   return (
     <>
       <header
@@ -172,7 +214,10 @@ export function Header() {
           {/* Wordmark */}
           <Link
             href="/"
-            className="font-serif text-lg sm:text-xl font-bold tracking-tight text-[var(--ink)] hover:text-[var(--accent)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 shrink-0"
+            onClick={handleNameClick}
+            className={`font-serif text-lg sm:text-xl font-bold tracking-tight text-[var(--ink)] hover:text-[var(--accent)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 shrink-0 select-none ${
+              isGlitching ? "animate-name-glitch text-rose-500" : ""
+            }`}
           >
             {siteContent.hero.name}
           </Link>
@@ -334,6 +379,9 @@ export function Header() {
       {paletteOpen && (
         <CommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} />
       )}
+
+      {/* Fake Crash Dialog Easter Egg */}
+      <CrashDialog isOpen={crashOpen} onClose={() => setCrashOpen(false)} />
     </>
   );
 }

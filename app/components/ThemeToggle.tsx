@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Sun, Moon, AlertTriangle, EyeOff, RotateCcw } from "lucide-react";
 import { siteContent } from "@/content/site";
+import { markFound } from "@/lib/secrets";
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
@@ -84,6 +85,8 @@ export function ThemeToggle() {
   // Deploy Ultra Flash mode (lasts 10 seconds)
   const deployUltraMode = useCallback(
     (forcedMode?: "flashbang" | "amoled") => {
+      markFound("theme");
+
       const prefersReducedMotion =
         typeof window !== "undefined" &&
         window.matchMedia("(prefers-reduced-motion: reduce)").matches;
