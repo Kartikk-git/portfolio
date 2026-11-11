@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ExternalLink, Layers, CheckCircle2, Download } from "lucide-react";
 import { Github } from "./Icons";
@@ -153,14 +153,17 @@ export function CaseStudyTemplate({
 
   const enriched = caseStudyCopy[project.slug];
 
-  const sections = [
-    { id: "overview", label: "Overview" },
-    { id: "built", label: "What I Built" },
-    { id: "stack", label: "Stack & Architecture" },
-    ...(roomEntities ? [{ id: "entities", label: "Room Entities" }] : []),
-    ...(project.whatILearned ? [{ id: "learned", label: "What I Learned" }] : []),
-    { id: "links", label: "Repository & Links" },
-  ];
+  const sections = useMemo(
+    () => [
+      { id: "overview", label: "Overview" },
+      { id: "built", label: "What I Built" },
+      { id: "stack", label: "Stack & Architecture" },
+      ...(roomEntities ? [{ id: "entities", label: "Room Entities" }] : []),
+      ...(project.whatILearned ? [{ id: "learned", label: "What I Learned" }] : []),
+      { id: "links", label: "Repository & Links" },
+    ],
+    [roomEntities, project.whatILearned]
+  );
 
   useEffect(() => {
     const observer = new IntersectionObserver(

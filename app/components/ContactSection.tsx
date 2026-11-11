@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { m } from "motion/react";
 import { Copy, Check, Mail, ExternalLink, Download } from "lucide-react";
 import { contactContent } from "@/content/contact";
@@ -16,19 +16,27 @@ interface ContactSectionProps {
 export function ContactSection({ isReviewMode = false }: ContactSectionProps) {
   const [copied, setCopied] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   const copyEmail = async () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
     try {
       await navigator.clipboard.writeText(contactContent.primary.email);
       setCopied(true);
       setToastMessage(siteContent.toast.emailCopied);
-      setTimeout(() => {
+      timerRef.current = setTimeout(() => {
         setCopied(false);
         setToastMessage(null);
       }, 1500);
     } catch {
       setToastMessage(siteContent.toast.copyFailed);
-      setTimeout(() => setToastMessage(null), 3000);
+      timerRef.current = setTimeout(() => setToastMessage(null), 3000);
     }
   };
 

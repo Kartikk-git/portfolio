@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
 import { ProjectsSection } from "./components/ProjectsSection";
@@ -36,9 +37,9 @@ export default function HomePage() {
       {isReviewMode && (
         <div className="bg-amber-500 text-black px-4 py-1.5 font-mono text-xs flex items-center justify-between z-50">
           <span>Review Mode Active (?review=1) — Outlining items requiring owner verification</span>
-          <a href="/" className="underline font-bold">
+          <Link href="/" className="underline font-bold">
             Exit review mode
-          </a>
+          </Link>
         </div>
       )}
 

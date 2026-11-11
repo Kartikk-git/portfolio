@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { m } from "motion/react";
 import { ExternalLink, GitCommit, Code2 } from "lucide-react";
 import { revealVariants } from "@/lib/motion";
@@ -15,6 +15,9 @@ interface ContributionDay {
   level: number;
 }
 
+const ghDays: ContributionDay[] = (rawGithub?.contributions as ContributionDay[]) ?? [];
+const lcCalendar: Record<string, number> = (rawLeetCode?.submissionCalendar as Record<string, number>) ?? {};
+
 export function CommitLogSection() {
   const [platformView, setPlatformView] = useState<"all" | "github" | "leetcode">("all");
   const [highlightedMonth, setHighlightedMonth] = useState<number | null>(null);
@@ -24,16 +27,21 @@ export function CommitLogSection() {
     x: number;
     y: number;
   } | null>(null);
+  const monthTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (monthTimerRef.current) clearTimeout(monthTimerRef.current);
+    };
+  }, []);
 
   // GitHub contributions
   const ghTotal = rawGithub?.total?.lastYear ?? 0;
-  const ghDays: ContributionDay[] = (rawGithub?.contributions as ContributionDay[]) ?? [];
 
   // LeetCode contributions
-  const lcCalendar = (rawLeetCode?.submissionCalendar as Record<string, number>) ?? {};
   const lcTotalSubmissions = useMemo(() => {
     return Object.values(lcCalendar).reduce((acc, curr) => acc + curr, 0);
-  }, [lcCalendar]);
+  }, []);
   const lcActiveDays = rawLeetCode?.totalActiveDays ?? 18;
 
   // Build calendar weeks and month labels
@@ -111,11 +119,12 @@ export function CommitLogSection() {
       monthLabels: months,
       busiestGh: bGh,
     };
-  }, [ghDays, lcCalendar]);
+  }, []);
 
   const handleMonthClick = (monthIndex: number) => {
+    if (monthTimerRef.current) clearTimeout(monthTimerRef.current);
     setHighlightedMonth(monthIndex);
-    setTimeout(() => {
+    monthTimerRef.current = setTimeout(() => {
       setHighlightedMonth(null);
     }, 2000);
   };
