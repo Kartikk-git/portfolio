@@ -60,7 +60,7 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
               whileInView="visible"
               viewport={{ once: true, margin: "-10% 0px" }}
               custom={0}
-              className="relative group border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/30 p-5 sm:p-6 space-y-4 hover:border-[var(--accent)]/50 transition-colors"
+              className="relative group border border-[var(--rule)] rounded-[4px] bg-[var(--surface-subtle)] p-5 sm:p-6 space-y-4 hover:border-[var(--accent-soft)] transition-colors"
             >
               {/* Timeline Node */}
               <div
@@ -68,17 +68,17 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
                 aria-hidden="true"
               />
 
-              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-[var(--rule)]/50 pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-[var(--rule-subtle)] pb-3">
                 <div className="flex flex-wrap items-baseline gap-2.5">
                   <h4 className="font-serif text-lg sm:text-xl font-semibold text-[var(--ink)]">
                     {credentialsContent.education[0].title}
                   </h4>
-                  <span className="font-mono text-xs uppercase tracking-wider text-[var(--accent)] px-2 py-0.5 border border-[var(--accent)]/40 rounded-[2px] font-medium bg-[var(--paper)]">
+                  <span className="font-mono text-xs uppercase tracking-wider text-[var(--accent-soft)] px-2 py-0.5 border border-[var(--accent-border)] bg-[var(--accent-tint)] rounded-[2px] font-medium">
                     2024 &ndash; 2028 &middot; In Progress
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="font-mono text-xs font-semibold px-2.5 py-1 rounded-[2px] bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/30">
+                  <div className="font-mono text-xs font-semibold px-2.5 py-1 rounded-[2px] bg-[var(--accent-tint)] text-[var(--accent)] border border-[var(--accent-border)]">
                     CGPA: 7.55 / 10
                   </div>
                   {isReviewMode && credentialsContent.education[0].confirm && (
@@ -113,7 +113,7 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
                   ].map((course) => (
                     <span
                       key={course}
-                      className="px-2.5 py-1 border border-[var(--rule)] bg-[var(--paper)] text-[var(--ink-muted)] rounded-[2px]"
+                      className="px-2.5 py-1 border border-[var(--rule-subtle)] bg-[var(--paper)] text-[var(--ink-muted)] hover:border-[var(--accent-border)] hover:text-[var(--accent)] hover:bg-[var(--accent-tint)] transition-colors rounded-[2px]"
                     >
                       {course}
                     </span>
@@ -131,21 +131,21 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
                 whileInView="visible"
                 viewport={{ once: true, margin: "-10% 0px" }}
                 custom={1}
-                className="relative group border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/20 p-5 space-y-2.5 hover:border-[var(--accent)]/40 transition-colors"
+                className="relative group border border-[var(--rule-subtle)] rounded-[4px] bg-[var(--surface-subtle)]/60 p-5 space-y-2.5 hover:border-[var(--accent-soft)]/50 transition-colors"
               >
                 <div
                   className="absolute -left-[31px] sm:-left-[39px] top-6 w-[5px] h-[5px] rounded-none z-20 bg-[var(--rule)] group-hover:bg-[var(--accent)] transition-colors"
                   aria-hidden="true"
                 />
-                <div className="flex items-center justify-between gap-2 border-b border-[var(--rule)]/40 pb-2">
-                  <h4 className="font-serif text-lg font-semibold text-[var(--ink)]">
+                <div className="flex items-center justify-between gap-2 border-b border-[var(--rule-subtle)] pb-2">
+                  <h4 className="font-serif text-base sm:text-lg font-semibold text-[var(--ink)]">
                     {credentialsContent.education[1].title}
                   </h4>
-                  <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-[2px] bg-[var(--surface)] text-[var(--ink)] border border-[var(--rule)]">
+                  <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-[2px] bg-[var(--surface)] text-[var(--ink)] border border-[var(--rule-subtle)]">
                     77.4%
                   </span>
                 </div>
-                <div className="font-mono text-xs text-[var(--accent)] font-medium">
+                <div className="font-mono text-xs text-[var(--accent-soft)] font-medium">
                   St. Martin&apos;s Diocesan School &middot; 2024
                 </div>
                 <p className="font-sans text-sm text-[var(--ink-muted)] leading-relaxed">
@@ -160,17 +160,17 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
                 whileInView="visible"
                 viewport={{ once: true, margin: "-10% 0px" }}
                 custom={2}
-                className="relative group border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/20 p-5 space-y-2.5 hover:border-[var(--accent)]/40 transition-colors"
+                className="relative group border border-[var(--rule-subtle)] rounded-[4px] bg-[var(--surface-subtle)]/60 p-5 space-y-2.5 hover:border-[var(--accent-soft)]/50 transition-colors"
               >
-                <div className="flex items-center justify-between gap-2 border-b border-[var(--rule)]/40 pb-2">
-                  <h4 className="font-serif text-lg font-semibold text-[var(--ink)]">
+                <div className="flex items-center justify-between gap-2 border-b border-[var(--rule-subtle)] pb-2">
+                  <h4 className="font-serif text-base sm:text-lg font-semibold text-[var(--ink)]">
                     {credentialsContent.education[2].title}
                   </h4>
-                  <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-[2px] bg-[var(--surface)] text-[var(--ink)] border border-[var(--rule)]">
+                  <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-[2px] bg-[var(--surface)] text-[var(--ink)] border border-[var(--rule-subtle)]">
                     77.2%
                   </span>
                 </div>
-                <div className="font-mono text-xs text-[var(--accent)] font-medium">
+                <div className="font-mono text-xs text-[var(--accent-soft)] font-medium">
                   St. Martin&apos;s Diocesan School &middot; 2022
                 </div>
                 <p className="font-sans text-sm text-[var(--ink-muted)] leading-relaxed">
@@ -184,8 +184,8 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
         {/* Group 2: Verified Credentials & Certifications */}
         <div className="space-y-8 pt-4 border-t border-[var(--rule)]/40">
           <div className="flex items-center gap-2">
-            <Award size={16} strokeWidth={1.5} className="text-[var(--accent)]" />
-            <h3 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
+            <Award size={16} strokeWidth={1.5} className="text-[var(--accent-soft)]" />
+            <h3 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent-soft)] font-semibold">
               {credentialsContent.groupCert}
             </h3>
           </div>
@@ -203,7 +203,7 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
               >
                 {/* Node: 5px square on the vertical rule line */}
                 <div
-                  className="absolute -left-[27px] sm:-left-[35px] top-1.5 w-[5px] h-[5px] rounded-none z-20 bg-[var(--accent)]"
+                  className="absolute -left-[27px] sm:-left-[35px] top-1.5 w-[5px] h-[5px] rounded-none z-20 bg-[var(--accent-soft)]"
                   aria-hidden="true"
                 />
 
@@ -213,7 +213,7 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
                       {cert.title}
                     </h4>
                     {cert.badge && (
-                      <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--accent)] px-2 py-0.5 border border-[var(--accent)]/40 rounded-[2px] font-medium bg-[var(--surface)]">
+                      <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--accent-soft)] px-2 py-0.5 border border-[var(--accent-border)] bg-[var(--accent-tint)] rounded-[2px] font-medium">
                         {cert.badge}
                       </span>
                     )}

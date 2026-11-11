@@ -34,10 +34,10 @@ export function SkillsSection() {
             whileInView="visible"
             viewport={{ once: true, margin: "-10% 0px" }}
             custom={index}
-            className="border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/30 p-6 flex flex-col justify-between"
+            className="border border-[var(--rule)] rounded-[4px] bg-[var(--surface-subtle)]/70 hover:border-[var(--accent-soft)]/50 p-6 flex flex-col justify-between transition-colors"
           >
             <div>
-              <h3 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold mb-2">
+              <h3 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent-soft)] font-semibold mb-2">
                 {cat.title}
               </h3>
               <p className="font-sans text-sm text-[var(--ink-muted)] leading-relaxed mb-5">
@@ -46,7 +46,7 @@ export function SkillsSection() {
             </div>
 
             {/* Skill chips */}
-            <div className="flex flex-wrap gap-2 pt-4 border-t border-[var(--rule)]/40">
+            <div className="flex flex-wrap gap-2 pt-4 border-t border-[var(--rule-subtle)]">
               {cat.skills.map((skill) => {
                 const tip = tooltipsMap[skill] || tooltipsMap[skill.replace("&", "and")] || "";
                 return (
@@ -77,7 +77,7 @@ export function SkillsSection() {
                       });
                     }}
                     onBlur={() => setActiveTooltip(null)}
-                    className="font-mono text-xs px-2.5 py-1 border border-[var(--rule)] bg-[var(--paper)] text-[var(--ink)] rounded-[2px] cursor-help hover:border-[var(--accent)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] transition-colors duration-120"
+                    className="font-mono text-xs px-2.5 py-1 border border-[var(--rule-subtle)] bg-[var(--paper)] text-[var(--ink)] rounded-[2px] cursor-help hover:border-[var(--accent-border)] hover:bg-[var(--accent-tint)] hover:text-[var(--accent)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] transition-colors duration-120"
                   >
                     {skill}
                   </div>

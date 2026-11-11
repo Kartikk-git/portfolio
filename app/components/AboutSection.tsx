@@ -106,14 +106,14 @@ export function AboutSection({ isReviewMode = false }: AboutSectionProps) {
             whileInView="visible"
             viewport={{ once: true, margin: "-10% 0px" }}
             custom={5}
-            className="p-5 sm:p-6 border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/30 space-y-3.5"
+            className="p-5 sm:p-6 border border-[var(--rule)] rounded-[4px] bg-[var(--surface-subtle)] space-y-3.5"
           >
-            <h3 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold border-b border-[var(--rule)] pb-2">
+            <h3 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent-soft)] font-semibold border-b border-[var(--rule-subtle)] pb-2">
               {aboutContent.factsLabel}
             </h3>
             <div className="space-y-2 font-sans text-sm leading-normal">
               {facts.map((f, i) => (
-                <div key={i} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 py-1 border-b border-[var(--rule)]/20 last:border-0">
+                <div key={i} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 py-1 border-b border-[var(--rule-subtle)]/60 last:border-0">
                   <span className="font-mono text-xs text-[var(--ink-muted)] w-24 shrink-0">
                     {f.label}:
                   </span>
@@ -132,18 +132,18 @@ export function AboutSection({ isReviewMode = false }: AboutSectionProps) {
             whileInView="visible"
             viewport={{ once: true, margin: "-10% 0px" }}
             custom={6}
-            className="p-5 sm:p-6 border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/30 space-y-3.5"
+            className="p-5 sm:p-6 border border-[var(--rule)] rounded-[4px] bg-[var(--surface-subtle)] space-y-3.5"
           >
-            <div className="flex items-center justify-between border-b border-[var(--rule)] pb-2">
-              <h3 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
+            <div className="flex items-center justify-between border-b border-[var(--rule-subtle)] pb-2">
+              <h3 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent-soft)] font-semibold">
                 {aboutContent.strengthsLabel}
               </h3>
               {isReviewMode && <span className="font-mono text-[10px] text-amber-500">⚠ confirm</span>}
             </div>
             <div className="space-y-2 font-sans text-sm leading-relaxed">
               {strengths.map((s, i) => (
-                <div key={i} className="py-1 border-b border-[var(--rule)]/20 last:border-0">
-                  <span className="font-mono text-xs text-[var(--ink)] font-medium">
+                <div key={i} className="py-1 border-b border-[var(--rule-subtle)]/60 last:border-0">
+                  <span className="font-mono text-xs text-[var(--accent-soft)] font-medium">
                     {s.label}:{" "}
                   </span>
                   <span className="text-[var(--ink-muted)] text-sm">

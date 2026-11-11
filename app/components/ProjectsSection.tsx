@@ -66,12 +66,12 @@ export function ProjectsSection({ isReviewMode = false }: ProjectsSectionProps) 
                   openProject(project);
                 }
               }}
-              className="group relative border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/30 hover:border-[var(--accent)]/60 hover:bg-[var(--surface)]/60 p-5 sm:p-6 transition-all duration-160 cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+              className="group relative border border-[var(--rule)] rounded-[4px] bg-[var(--surface-subtle)]/70 hover:border-[var(--accent-soft)] hover:bg-[var(--surface)] p-5 sm:p-6 transition-all duration-200 cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
             >
               {/* Top Row: Index + Title + Badges (Left) vs Detail CTA (Right) */}
               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 pb-3 border-b border-[var(--rule)]/50">
                 <div className="flex flex-wrap items-baseline gap-3">
-                  <span className="font-mono text-xs text-[var(--accent)] font-semibold tabular-nums">
+                  <span className="font-mono text-xs text-[var(--accent-soft)] font-semibold tabular-nums">
                     0{index + 1}
                   </span>
 
@@ -79,7 +79,7 @@ export function ProjectsSection({ isReviewMode = false }: ProjectsSectionProps) 
                     {project.title}
                   </h3>
 
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--accent)] px-2 py-0.5 border border-[var(--rule)] rounded-[2px] font-medium bg-[var(--surface)]">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--accent-soft)] px-2 py-0.5 border border-[var(--accent-border)] bg-[var(--accent-tint)] rounded-[2px] font-medium">
                     {project.badge}
                   </span>
 
@@ -108,7 +108,7 @@ export function ProjectsSection({ isReviewMode = false }: ProjectsSectionProps) 
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="font-mono text-[11px] px-2 py-0.5 border border-[var(--rule)] bg-[var(--paper)] text-[var(--ink-muted)] rounded-[2px]"
+                      className="font-mono text-[11px] px-2 py-0.5 border border-[var(--rule-subtle)] bg-[var(--paper)] text-[var(--ink-muted)] hover:border-[var(--accent-border)] hover:text-[var(--accent)] hover:bg-[var(--accent-tint)] transition-colors rounded-[2px]"
                     >
                       {tag}
                     </span>

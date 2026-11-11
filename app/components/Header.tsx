@@ -207,7 +207,7 @@ export function Header() {
                         damping: 32,
                         mass: 1,
                       }}
-                      className="absolute inset-0 bg-[var(--surface)] border border-[var(--rule)] rounded-[4px] z-0"
+                      className="absolute inset-0 bg-[var(--accent-tint)] border border-[var(--accent-border)] rounded-[4px] z-0"
                     />
                   )}
                 </a>

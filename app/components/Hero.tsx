@@ -40,9 +40,9 @@ export function Hero() {
       <m.div style={{ y, opacity }} className="max-w-[1120px] mx-auto px-4 sm:px-8 w-full">
         {/* Eyebrow: Status Line */}
         <div className="hero-fade-1 mb-5">
-          <div className="inline-flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
+          <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold px-2.5 py-1 bg-[var(--accent-tint)] border border-[var(--accent-border)] rounded-[2px]">
             <span
-              className="inline-block w-2 h-[2px] bg-[var(--accent)] shrink-0"
+              className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0 animate-pulse"
               aria-hidden="true"
             />
             <span>{siteContent.hero.eyebrow}</span>
@@ -75,14 +75,14 @@ export function Hero() {
 
         {/* Focus Row: Clean Typographic Line */}
         <div className="hero-fade-2 flex flex-wrap items-center gap-2 mb-3 font-mono text-xs text-[var(--ink-muted)]">
-          <span className="text-[var(--accent)] font-semibold uppercase tracking-wider">
+          <span className="text-[var(--accent-soft)] font-semibold uppercase tracking-wider">
             {siteContent.hero.focusLabel}:
           </span>
           <div className="flex flex-wrap items-center gap-1.5">
             {siteContent.hero.focusItems.map((item) => (
               <span
                 key={item}
-                className="px-2 py-0.5 border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink)] rounded-[2px]"
+                className="px-2 py-0.5 border border-[var(--rule-subtle)] bg-[var(--surface-subtle)] text-[var(--ink)] hover:border-[var(--accent-border)] hover:bg-[var(--surface)] transition-colors rounded-[2px]"
               >
                 {item}
               </span>
@@ -96,7 +96,7 @@ export function Hero() {
             href="#projects"
             className="inline-flex flex-wrap items-baseline gap-2 text-[var(--ink-muted)] hover:text-[var(--accent)] transition-colors group"
           >
-            <span className="text-[var(--accent)] font-semibold uppercase tracking-wider">
+            <span className="text-[var(--accent-soft)] font-semibold uppercase tracking-wider">
               {siteContent.hero.currentlyLabel}:
             </span>
             <span className="font-sans text-sm text-[var(--ink)] group-hover:text-[var(--accent)] group-hover:underline underline-offset-4 transition-colors">
