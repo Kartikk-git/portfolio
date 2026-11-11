@@ -110,7 +110,7 @@ export function AboutSection({ isReviewMode = false }: AboutSectionProps) {
           <h3 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
             {aboutContent.factsLabel}
           </h3>
-          <div className="space-y-2.5 font-sans text-sm">
+          <div className="space-y-2.5 font-sans text-base leading-[1.65]">
             {facts.map((f, i) => (
               <div key={i} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 py-1 border-b border-[var(--rule)]/30">
                 <span className="font-mono text-xs text-[var(--ink-muted)] w-28 shrink-0">
@@ -132,7 +132,7 @@ export function AboutSection({ isReviewMode = false }: AboutSectionProps) {
             </h3>
             {isReviewMode && <span className="font-mono text-[10px] text-amber-500">⚠ confirm</span>}
           </div>
-          <div className="space-y-2.5 font-sans text-sm">
+          <div className="space-y-2.5 font-sans text-base leading-[1.65]">
             {strengths.map((s, i) => (
               <div key={i} className="py-1 border-b border-[var(--rule)]/30">
                 <span className="font-mono text-xs text-[var(--ink)] font-medium">

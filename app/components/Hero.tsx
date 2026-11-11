@@ -129,24 +129,24 @@ export function Hero() {
           <div className="lg:col-span-5 space-y-4 lg:pt-6">
             {/* Currently Building Card */}
             <div className="hero-fade-2 border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/40 p-5 hover:border-[var(--accent)] transition-colors group">
-              <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--accent)] font-semibold block mb-2">
+              <span className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold block mb-2">
                 {siteContent.hero.currentlyLabel}
               </span>
               <a
                 href="#project/student-organizer"
-                className="font-serif text-lg font-medium text-[var(--ink)] group-hover:text-[var(--accent)] transition-colors flex items-center justify-between mb-2"
+                className="font-serif text-xl font-semibold text-[var(--ink)] group-hover:text-[var(--accent)] transition-colors flex items-center justify-between mb-2"
               >
                 <span>Student Organizer</span>
                 <ArrowUpRight className="w-4 h-4 text-[var(--accent)] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </a>
-              <p className="font-sans text-xs sm:text-sm text-[var(--ink-muted)] leading-relaxed">
+              <p className="font-sans text-base text-[var(--ink-muted)] leading-[1.65]">
                 Offline-first Android application consolidating courses, assignments, attendance and notes with Jetpack Compose &amp; Room.
               </p>
             </div>
 
             {/* Technical Focus Card */}
             <div className="hero-fade-2 border border-[var(--rule)] rounded-[4px] bg-[var(--surface)]/20 p-5">
-              <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--ink-muted)] font-semibold block mb-3">
+              <span className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--ink-muted)] font-semibold block mb-3">
                 {siteContent.hero.focusLabel} Stack
               </span>
               <div className="flex flex-wrap gap-1.5">

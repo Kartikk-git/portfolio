@@ -83,11 +83,11 @@ export function CertificateModal({ certId, onClose, onPrev, onNext }: Certificat
               </button>
             </div>
 
-            <h3 className="font-serif text-xl text-[var(--ink)] font-normal mb-1">
+            <h3 className="font-serif text-xl text-[var(--ink)] font-semibold mb-1">
               {cert.title}
             </h3>
             {cert.badge && (
-              <span className="inline-block font-mono text-[11px] uppercase tracking-wider px-2 py-0.5 border border-[var(--rule)] text-[var(--accent)] rounded-[2px] mb-4">
+              <span className="inline-block font-mono text-xs uppercase tracking-wider px-2 py-0.5 border border-[var(--rule)] text-[var(--accent)] rounded-[2px] mb-4">
                 {cert.badge}
               </span>
             )}
@@ -95,35 +95,35 @@ export function CertificateModal({ certId, onClose, onPrev, onNext }: Certificat
             {/* Labels defined in cred.modal.labels */}
             <div className="space-y-3 font-mono text-xs mt-4 text-[var(--ink-muted)]">
               <div>
-                <span className="block text-[10px] uppercase tracking-wider opacity-75">Issuer</span>
-                <span className="text-[var(--ink)] font-sans text-sm">{cert.issuer}</span>
+                <span className="block text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold mb-0.5">Issuer</span>
+                <span className="text-[var(--ink)] font-sans text-base">{cert.issuer}</span>
               </div>
               <div>
-                <span className="block text-[10px] uppercase tracking-wider opacity-75">Issued</span>
-                <span className="text-[var(--ink)] font-sans text-sm">{cert.issued}</span>
+                <span className="block text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold mb-0.5">Issued</span>
+                <span className="text-[var(--ink)] font-sans text-base">{cert.issued}</span>
               </div>
               {cert.score && (
                 <div>
-                  <span className="block text-[10px] uppercase tracking-wider opacity-75">Score</span>
-                  <span className="text-[var(--ink)] font-sans text-sm font-semibold">{cert.score}</span>
+                  <span className="block text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold mb-0.5">Score</span>
+                  <span className="text-[var(--ink)] font-sans text-base font-semibold">{cert.score}</span>
                 </div>
               )}
               {cert.verifyUrl ? (
                 <div>
-                  <span className="block text-[10px] uppercase tracking-wider opacity-75">Verify</span>
+                  <span className="block text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold mb-0.5">Verify</span>
                   <a
                     href={cert.verifyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[var(--accent)] underline hover:opacity-80 font-sans text-sm inline-flex items-center gap-1"
+                    className="text-[var(--accent)] underline hover:opacity-80 font-sans text-base inline-flex items-center gap-1"
                   >
                     {cert.verifyLabel} &rarr;
                   </a>
                 </div>
               ) : (
                 <div>
-                  <span className="block text-[10px] uppercase tracking-wider opacity-75">Verify</span>
-                  <span className="font-sans text-xs italic opacity-75">Verification link pending confirmation</span>
+                  <span className="block text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold mb-0.5">Verify</span>
+                  <span className="font-sans text-base italic opacity-75">Verification link pending confirmation</span>
                 </div>
               )}
             </div>
@@ -131,10 +131,10 @@ export function CertificateModal({ certId, onClose, onPrev, onNext }: Certificat
             {/* Sub-items for CodeChef or GCloud */}
             {cert.items && (
               <div className="mt-4 pt-4 border-t border-[var(--rule)]">
-                <span className="block font-mono text-[10px] uppercase tracking-wider text-[var(--ink-muted)] mb-2">
+                <span className="block font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold mb-2">
                   Completed Tracks
                 </span>
-                <ul className="space-y-1 font-sans text-xs text-[var(--ink)] list-disc list-inside">
+                <ul className="space-y-1 font-sans text-base text-[var(--ink)] list-disc list-inside">
                   {cert.items.map((it, idx) => (
                     <li key={idx}>
                       {it.title} {it.score ? `(${it.score})` : ""}

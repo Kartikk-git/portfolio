@@ -56,7 +56,7 @@ export function Section({
             {heading}
           </h2>
 
-          <p className="mt-2 text-sm text-[var(--ink-muted)] max-w-[62ch] leading-[1.6]">
+          <p className="mt-2 text-base text-[var(--ink-muted)] max-w-[62ch] leading-[1.65]">
             {intro}
           </p>
 

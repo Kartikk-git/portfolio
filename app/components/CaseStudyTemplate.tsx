@@ -234,11 +234,11 @@ export function CaseStudyTemplate({
             )}
           </div>
 
-          <h1 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-[var(--ink)] leading-[1.15] mb-4">
+          <h1 className="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[var(--ink)] leading-[1.15] mb-4">
             {project.title}
           </h1>
 
-          <p className="font-sans text-lg sm:text-xl text-[var(--ink-muted)] max-w-[62ch] leading-[1.6]">
+          <p className="font-sans text-base text-[var(--ink-muted)] max-w-[62ch] leading-[1.65]">
             {project.subtitle}
           </p>
 
@@ -287,7 +287,7 @@ export function CaseStudyTemplate({
                   In brief
                 </span>
               </div>
-              <p className="font-serif text-lg sm:text-xl text-[var(--ink)] leading-[1.65] max-w-[62ch]">
+              <p className="font-sans text-base text-[var(--ink)] leading-[1.65] max-w-[62ch]">
                 {enriched?.inBrief || project.description}
               </p>
             </section>
@@ -298,7 +298,7 @@ export function CaseStudyTemplate({
                 What I Built
               </h2>
 
-              <p className="text-base text-[var(--ink-muted)] leading-[1.65] max-w-[62ch]">
+              <p className="font-sans text-base text-[var(--ink-muted)] leading-[1.65] max-w-[62ch]">
                 {enriched?.narrativeBuilt || project.whatIBuild}
               </p>
 
@@ -307,7 +307,7 @@ export function CaseStudyTemplate({
                 <h3 className="font-mono text-xs uppercase tracking-wider text-[var(--accent)] font-semibold">
                   Core Functionality &amp; Architectural Flow
                 </h3>
-                <ul className="space-y-4 font-sans text-sm text-[var(--ink)]">
+                <ul className="space-y-4 font-sans text-base leading-[1.65] text-[var(--ink)]">
                   {enriched?.detailedFeatures ? (
                     enriched.detailedFeatures.map((item, idx) => (
                       <li key={idx} className="space-y-1">
@@ -317,7 +317,7 @@ export function CaseStudyTemplate({
                           </span>
                           <span>{item.title}</span>
                         </div>
-                        <p className="text-xs sm:text-sm text-[var(--ink-muted)] pl-4 leading-relaxed max-w-[60ch]">
+                        <p className="font-sans text-base text-[var(--ink-muted)] pl-4 leading-[1.65] max-w-[60ch]">
                           {item.detail}
                         </p>
                       </li>
@@ -328,7 +328,7 @@ export function CaseStudyTemplate({
                         <span className="font-mono text-xs text-[var(--accent)] mt-0.5 select-none font-bold">
                           &mdash;
                         </span>
-                        <span className="leading-[1.6]">{feature}</span>
+                        <span className="leading-[1.65]">{feature}</span>
                       </li>
                     ))
                   )}
@@ -347,20 +347,20 @@ export function CaseStudyTemplate({
                   <div className="font-mono text-xs uppercase text-[var(--accent)] font-semibold">
                     Technologies &amp; Engineering Rationale
                   </div>
-                  <div className="divide-y divide-[var(--rule)] font-sans text-sm">
+                  <div className="divide-y divide-[var(--rule)] font-sans text-base leading-[1.65]">
                     {enriched?.stackRationale ? (
                       enriched.stackRationale.map((tech, idx) => (
                         <div key={idx} className="py-2.5 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4">
                           <span className="font-mono text-xs font-semibold text-[var(--ink)] min-w-[180px]">
                             {tech.name}
                           </span>
-                          <span className="text-xs sm:text-sm text-[var(--ink-muted)]">
+                          <span className="text-base text-[var(--ink-muted)] leading-[1.65]">
                             {tech.rationale}
                           </span>
                         </div>
                       ))
                     ) : (
-                      <div className="font-mono text-sm text-[var(--ink)]">
+                      <div className="font-mono text-xs text-[var(--ink)]">
                         {(project.stack || project.tags || []).join(" / ")}
                       </div>
                     )}
@@ -372,7 +372,7 @@ export function CaseStudyTemplate({
                     <div className="font-mono text-xs uppercase text-[var(--accent)] font-semibold">
                       Architectural Decisions
                     </div>
-                    <ul className="space-y-2 font-sans text-sm text-[var(--ink)]">
+                    <ul className="space-y-2 font-sans text-base leading-[1.65] text-[var(--ink)]">
                       {project.architecture.map((arch: string, idx: number) => (
                         <li key={idx} className="flex items-start gap-2">
                           <span className="font-mono text-xs text-[var(--accent)] select-none">
@@ -393,7 +393,7 @@ export function CaseStudyTemplate({
                 <h2 className="font-serif text-2xl font-semibold text-[var(--ink)] border-b border-[var(--rule)] pb-2">
                   Room Persistence Entities
                 </h2>
-                <p className="text-sm text-[var(--ink-muted)]">
+                <p className="text-base text-[var(--ink-muted)] leading-[1.65]">
                   The application enforces an offline-first architecture where 100% of student data stays locally on the physical Android device. Structured schema entities:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -422,13 +422,13 @@ export function CaseStudyTemplate({
                 <h2 className="font-serif text-2xl font-semibold text-[var(--ink)] border-b border-[var(--rule)] pb-2">
                   What I Learned
                 </h2>
-                <ul className="space-y-3 font-sans text-sm text-[var(--ink)] max-w-[62ch]">
+                <ul className="space-y-3 font-sans text-base leading-[1.65] text-[var(--ink)] max-w-[62ch]">
                   {project.whatILearned.map((lesson: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2.5">
                       <span className="font-mono text-xs text-[var(--accent)] mt-0.5 select-none font-bold">
                         &mdash;
                       </span>
-                      <span className="leading-[1.6]">{lesson}</span>
+                      <span className="leading-[1.65]">{lesson}</span>
                     </li>
                   ))}
                 </ul>

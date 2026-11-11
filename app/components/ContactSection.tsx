@@ -67,7 +67,7 @@ export function ContactSection({ isReviewMode = false }: ContactSectionProps) {
               </a>
             </div>
 
-            <p className="text-sm text-[var(--ink-muted)] leading-relaxed max-w-[48ch]">
+            <p className="font-sans text-base text-[var(--ink-muted)] leading-[1.65] max-w-[48ch]">
               {contactContent.primary.note}
             </p>
           </div>
@@ -144,7 +144,7 @@ export function ContactSection({ isReviewMode = false }: ContactSectionProps) {
             {contactContent.profilesLabel}
           </span>
 
-          <div className="space-y-4 font-sans text-sm">
+          <div className="space-y-4 font-sans text-base leading-[1.65]">
             {contactContent.profiles.map((p, idx) => (
               <div key={idx} className="pb-3 border-b border-[var(--rule)]/40 last:border-b-0">
                 <div className="flex items-center justify-between">

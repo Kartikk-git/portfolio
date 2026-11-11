@@ -335,10 +335,10 @@ export function CommitLogSection() {
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-6 border-b border-[var(--rule)]">
               <div>
-                <h3 className="font-serif text-lg sm:text-xl font-semibold text-[var(--ink)]">
+                <h3 className="font-serif text-xl font-semibold text-[var(--ink)]">
                   {activityContent.github.title.replace("{n}", String(ghTotal))}
                 </h3>
-                <p className="font-sans text-xs sm:text-sm text-[var(--ink-muted)] mt-0.5">
+                <p className="font-sans text-base text-[var(--ink-muted)] leading-[1.65] mt-1">
                   {activityContent.github.description}
                 </p>
               </div>
@@ -372,12 +372,12 @@ export function CommitLogSection() {
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-6 border-b border-[var(--rule)]">
               <div>
-                <h3 className="font-serif text-lg sm:text-xl font-semibold text-[var(--ink)]">
+                <h3 className="font-serif text-xl font-semibold text-[var(--ink)]">
                   {activityContent.leetcode.title
                     .replace("{n}", String(lcTotalSubmissions))
                     .replace("{d}", String(lcActiveDays))}
                 </h3>
-                <p className="font-sans text-xs sm:text-sm text-[var(--ink-muted)] mt-0.5">
+                <p className="font-sans text-base text-[var(--ink-muted)] leading-[1.65] mt-1">
                   {activityContent.leetcode.description}
                 </p>
               </div>

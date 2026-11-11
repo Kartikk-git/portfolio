@@ -40,7 +40,7 @@ export function SkillsSection() {
               <h3 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold mb-2">
                 {cat.title}
               </h3>
-              <p className="font-sans text-xs sm:text-sm text-[var(--ink-muted)] leading-relaxed mb-6">
+              <p className="font-sans text-base text-[var(--ink-muted)] leading-[1.65] mb-6">
                 {cat.description}
               </p>
             </div>
@@ -100,7 +100,7 @@ export function SkillsSection() {
         <span className="text-[var(--accent)] font-semibold uppercase tracking-wider">
           {skillsContent.next.label}:
         </span>
-        <span className="font-sans text-sm text-[var(--ink)]">
+        <span className="font-sans text-base text-[var(--ink)]">
           {skillsContent.next.value}
         </span>
       </m.div>

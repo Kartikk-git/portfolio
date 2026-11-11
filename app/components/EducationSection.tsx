@@ -71,7 +71,7 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
 
                 <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
                   <div className="flex flex-wrap items-baseline gap-2">
-                    <h4 className="font-serif text-lg font-semibold text-[var(--ink)]">
+                    <h4 className="font-serif text-xl font-semibold text-[var(--ink)]">
                       {cert.title}
                     </h4>
                     {cert.badge && (
@@ -91,7 +91,7 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
                   </div>
                 </div>
 
-                <p className="font-sans text-sm text-[var(--ink-muted)] leading-relaxed max-w-[72ch]">
+                <p className="font-sans text-base text-[var(--ink-muted)] leading-[1.65] max-w-[72ch]">
                   {cert.body}
                 </p>
 
@@ -155,7 +155,7 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
 
                 <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
                   <div className="flex items-baseline gap-2">
-                    <h4 className="font-serif text-lg font-semibold text-[var(--ink)]">
+                    <h4 className="font-serif text-xl font-semibold text-[var(--ink)]">
                       {edu.title}
                     </h4>
                     {isReviewMode && edu.confirm && (
@@ -170,7 +170,7 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
                 </div>
 
                 {edu.body && (
-                  <p className="font-sans text-sm text-[var(--ink-muted)] leading-relaxed max-w-[72ch]">
+                  <p className="font-sans text-base text-[var(--ink-muted)] leading-[1.65] max-w-[72ch]">
                     {edu.body}
                   </p>
                 )}
