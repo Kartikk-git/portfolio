@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { m, AnimatePresence } from "motion/react";
 import {
   Terminal,
@@ -8,22 +8,12 @@ import {
   Play,
   Pause,
   X,
-  Coffee,
-  Sparkles,
   Smartphone,
-  Sun,
-  Moon,
-  FolderGit2,
-  Code,
-  Mail,
-  FileText,
-  Search,
-  ExternalLink,
   Check,
+  Search,
 } from "lucide-react";
 import { contactContent } from "@/content/contact";
 import { mediaManifest } from "@/content/media";
-import { projectsContent } from "@/content/projects";
 import { markSecretUnlocked } from "@/lib/secrets";
 
 type LogLevel = "V" | "D" | "I" | "W" | "E" | "A";
@@ -44,6 +34,7 @@ interface CommandDef {
   category: "Core" | "Android" | "Fun" | "Nav";
   description: string;
   badge?: string;
+  closeOnExec?: boolean;
   action: () => LogEntry[] | Promise<LogEntry[]>;
 }
 
@@ -78,6 +69,8 @@ export function CommandPalette({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const logConsoleRef = useRef<HTMLDivElement>(null);
+  const suggestionListRef = useRef<HTMLDivElement>(null);
+  const suggestionItemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const initialLogs: LogEntry[] = useMemo(
     () => [
@@ -188,110 +181,95 @@ export function CommandPalette({
   const commandList: CommandDef[] = useMemo(() => [
     {
       cmd: "projects",
-      alias: ["repo", "work", "apps"],
-      category: "Core",
-      description: "List portfolio works & scroll to #projects",
-      badge: "4 apps",
+      alias: ["repo", "work", "apps", "#projects", "selected works"],
+      category: "Nav",
+      description: "Navigate to Selected Works (#projects)",
+      badge: "Section",
+      closeOnExec: true,
       action: () => {
-        const output: LogEntry[] = [
-          makeLog("D", "Portfolio", "Querying catalog of selected projects..."),
-          makeLog("I", "Projects", "[1] TEJOVIK — Student Performance & Wellness Platform (Python/Flask/Chart.js)"),
-          makeLog("I", "Projects", "[2] Student Organizer — Native Android MVVM offline-first (Kotlin/Compose/Room)"),
-          makeLog("I", "Projects", "[3] Hospital Management — Responsive healthcare web portal (HTML/CSS)"),
-          makeLog("I", "Projects", "[4] Personal Portfolio — Earlier deployed version (HTML/CSS/JS)"),
-          makeLog("D", "Navigation", "Scrolling viewport to #projects..."),
-        ];
         setTimeout(() => {
           document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
-        }, 150);
-        return output;
+        }, 80);
+        return [
+          makeLog("I", "Navigation", "Navigating to #projects..."),
+          makeLog("D", "Projects", "Loaded catalog: TEJOVIK, Student Organizer, Hospital Management, Portfolio"),
+        ];
       },
     },
     {
       cmd: "skills",
-      alias: ["stack", "tech", "languages"],
-      category: "Core",
-      description: "Query system capability graph & scroll to #skills",
-      badge: "verified",
+      alias: ["stack", "tech", "languages", "#skills", "technical skills"],
+      category: "Nav",
+      description: "Navigate to Technical Skills (#skills)",
+      badge: "Section",
+      closeOnExec: true,
       action: () => {
-        const output: LogEntry[] = [
-          makeLog("I", "Skills", "System capabilities query returned 4 core categories:"),
-          makeLog("D", "Skills.Languages", "Java (95% NPTEL Elite score), Kotlin, Python, C++"),
-          makeLog("D", "Skills.Android", "Jetpack Compose, Room SQLite, MVVM architecture, Kotlin Coroutines"),
-          makeLog("D", "Skills.Web", "HTML, CSS, JavaScript, Flask, Chart.js"),
-          makeLog("D", "Skills.Core", "Data Structures & Algorithms, OOP, DBMS, SQL, Git & GitHub"),
-          makeLog("D", "Navigation", "Scrolling viewport to #skills..."),
-        ];
         setTimeout(() => {
           document.getElementById("skills")?.scrollIntoView({ behavior: "smooth" });
-        }, 150);
-        return output;
-      },
-    },
-    {
-      cmd: "open student-organizer",
-      alias: ["student-organizer", "organizer", "open organizer"],
-      category: "Android",
-      description: "Launch Student Organizer case study view",
-      badge: "Kotlin/Compose",
-      action: () => {
-        const output: LogEntry[] = [
-          makeLog(
-            "D",
-            "AndroidRuntime",
-            "Starting Intent { act=android.intent.action.VIEW cmp=com.kartik.studentorganizer/.ui.MainActivity }"
-          ),
-          makeLog(
-            "I",
-            "ActivityManager",
-            "Displayed com.kartik.studentorganizer/.ui.MainActivity: +118ms (total +142ms)"
-          ),
-          makeLog(
-            "D",
-            "RoomSQLite",
-            "Local SQLite db 'student_organizer.db' verified (WAL mode enabled, zero cloud leakage)"
-          ),
-          makeLog(
-            "I",
-            "StudentOrganizer",
-            "Launching native Android case study view in browser..."
-          ),
-        ];
-        setTimeout(() => {
-          window.location.href = "/projects/student-organizer";
-        }, 300);
-        return output;
-      },
-    },
-    {
-      cmd: "theme",
-      alias: ["dark", "light", "toggle-theme", "mode"],
-      category: "Core",
-      description: "Toggle theme mode (Day / Night)",
-      badge: "UI Mode",
-      action: () => {
-        const next = toggleThemeMode();
+        }, 80);
         return [
-          makeLog("D", "UiModeManager", "Dispatching Configuration.UI_MODE_NIGHT change request..."),
-          makeLog(
-            "I",
-            "Theme",
-            `Theme successfully switched to ${next === "dark" ? "NIGHT (Dark)" : "DAY (Paper)"}.`
-          ),
-          makeLog(
-            "D",
-            "ViewRootImpl",
-            `Surface repainted with paper=${next === "dark" ? "#111315" : "#F9F9F6"}, accent=${next === "dark" ? "#5FB38F" : "#1B6B4F"}.`
-          ),
+          makeLog("I", "Navigation", "Navigating to #skills..."),
+          makeLog("D", "Skills", "Core: Java (95% NPTEL), Kotlin, Python, C++, Compose, Room SQLite"),
+        ];
+      },
+    },
+    {
+      cmd: "about",
+      alias: ["bio", "intro", "#about", "who is kartik"],
+      category: "Nav",
+      description: "Navigate to About Kartik (#about)",
+      badge: "Section",
+      closeOnExec: true,
+      action: () => {
+        setTimeout(() => {
+          document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
+        }, 80);
+        return [
+          makeLog("I", "Navigation", "Navigating to #about..."),
+        ];
+      },
+    },
+    {
+      cmd: "education",
+      alias: ["college", "certifications", "credentials", "#education", "nptel"],
+      category: "Nav",
+      description: "Navigate to Education & Credentials (#education)",
+      badge: "Section",
+      closeOnExec: true,
+      action: () => {
+        setTimeout(() => {
+          document.getElementById("education")?.scrollIntoView({ behavior: "smooth" });
+        }, 80);
+        return [
+          makeLog("I", "Navigation", "Navigating to #education..."),
+          makeLog("D", "Education", "B.Tech CSE (DCE), NPTEL 95% Elite, CodeChef, Google Cloud"),
+        ];
+      },
+    },
+    {
+      cmd: "activity",
+      alias: ["commit", "heatmap", "github", "leetcode", "#activity"],
+      category: "Nav",
+      description: "Navigate to Commit & Submission Activity (#activity)",
+      badge: "Section",
+      closeOnExec: true,
+      action: () => {
+        setTimeout(() => {
+          document.getElementById("activity")?.scrollIntoView({ behavior: "smooth" });
+        }, 80);
+        return [
+          makeLog("I", "Navigation", "Navigating to #activity..."),
+          makeLog("D", "Activity", "GitHub (315) + LeetCode (144) = 459 total activity records"),
         ];
       },
     },
     {
       cmd: "hire-me",
-      alias: ["contact", "hire", "email", "internship"],
-      category: "Core",
-      description: "Copy direct email to clipboard & jump to contact",
-      badge: "open to hire",
+      alias: ["contact", "hire", "email", "internship", "#contact"],
+      category: "Nav",
+      description: "Copy direct email & navigate to Contact (#contact)",
+      badge: "Section",
+      closeOnExec: true,
       action: () => {
         try {
           navigator.clipboard.writeText(contactContent.primary.email);
@@ -301,14 +279,68 @@ export function CommandPalette({
 
         setTimeout(() => {
           document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-        }, 150);
+        }, 80);
 
         return [
           makeLog("I", "RecruiterService", "Inbound candidate query received for: Kartik Koundal"),
-          makeLog("D", "Candidate", "Status: Open to software and Android internships (New Delhi, India)"),
-          makeLog("D", "Candidate", "Education: B.Tech CSE, Dronacharya College of Engg (2024 - 2028, CGPA 7.55)"),
           makeLog("I", "Contact", `Email copied to clipboard: ${contactContent.primary.email} 📋`),
           makeLog("D", "Navigation", "Scrolling viewport to #contact..."),
+        ];
+      },
+    },
+    {
+      cmd: "open student-organizer",
+      alias: ["student-organizer", "organizer", "open organizer"],
+      category: "Android",
+      description: "Launch Student Organizer case study page",
+      badge: "Case Study",
+      closeOnExec: true,
+      action: () => {
+        setTimeout(() => {
+          window.location.href = "/projects/student-organizer";
+        }, 150);
+        return [
+          makeLog(
+            "D",
+            "AndroidRuntime",
+            "Starting Intent { act=android.intent.action.VIEW cmp=com.kartik.studentorganizer/.ui.MainActivity }"
+          ),
+          makeLog("I", "StudentOrganizer", "Opening /projects/student-organizer..."),
+        ];
+      },
+    },
+    {
+      cmd: "open tejovik",
+      alias: ["tejovik", "open tejovik"],
+      category: "Core",
+      description: "Launch TEJOVIK case study page",
+      badge: "Case Study",
+      closeOnExec: true,
+      action: () => {
+        setTimeout(() => {
+          window.location.href = "/projects/tejovik";
+        }, 150);
+        return [
+          makeLog("I", "Navigation", "Opening /projects/tejovik..."),
+        ];
+      },
+    },
+    {
+      cmd: "theme",
+      alias: ["dark", "light", "toggle-theme", "mode"],
+      category: "Core",
+      description: "Toggle theme mode (Day / Night)",
+      badge: "UI Mode",
+      closeOnExec: false,
+      action: () => {
+        const next = toggleThemeMode();
+        return [
+          makeLog("D", "UiModeManager", "Dispatching Configuration.UI_MODE_NIGHT change request..."),
+          makeLog(
+            "I",
+            "Theme",
+            `Theme successfully switched to ${next === "dark" ? "NIGHT (Dark)" : "DAY (Light)"}.`
+          ),
         ];
       },
     },
@@ -318,6 +350,7 @@ export function CommandPalette({
       category: "Fun",
       description: "Superuser barista routine with RFC 2324 protocol",
       badge: "root",
+      closeOnExec: false,
       action: () => {
         markSecretUnlocked("logcat");
         return [
@@ -338,21 +371,22 @@ export function CommandPalette({
       category: "Fun",
       description: "Trigger the hidden Android developer easter egg",
       badge: "Android 15",
+      closeOnExec: false,
       action: () => {
         markSecretUnlocked("logcat");
         return [
           makeLog("D", "AndroidRuntime", ">>>>>> ANDROID DEV EASTER EGG UNLOCKED <<<<<<"),
           makeLog("I", "Build.VERSION", "RELEASE=15 (VanillaIceCream) SDK_INT=35 CODENAME=VanillaIceCream"),
-          makeLog("I", "SystemServer", "╔════════════════════════════════════════════════════════════╗"),
-          makeLog("I", "SystemServer", "║   _  __           _   _ _      _  __                       ║"),
-          makeLog("I", "SystemServer", "║  | |/ /__ _ _ __ | |_(_) | __ | |/ /___  _   _ _ __      ║"),
-          makeLog("I", "SystemServer", "║  | ' // _' | '__|| __| | |/ / | ' // _ \\| | | | '_ \\     ║"),
-          makeLog("I", "SystemServer", "║  | . \\ (_| | |   | |_| |   <  | . \\ (_) | |_| | | | |    ║"),
-          makeLog("I", "SystemServer", "║  |_|\\_\\__,_|_|    \\__|_|_|\\_\\ |_|\\_\\___/ \\__,_|_| |_|    ║"),
-          makeLog("I", "SystemServer", "║                                                            ║"),
-          makeLog("I", "SystemServer", "║  \"I like building things that keep working when            ║"),
-          makeLog("I", "SystemServer", "║   conditions aren't ideal.\"                                ║"),
-          makeLog("I", "SystemServer", "╚════════════════════════════════════════════════════════════╝"),
+          makeLog("I", "SystemServer", "╔═══════════════════════════════════════════════════════╗"),
+          makeLog("I", "SystemServer", "║   _  __           _   _ _      _  __                  ║"),
+          makeLog("I", "SystemServer", "║  | |/ /__ _ _ __ | |_(_) | __ | |/ /___  _   _ _ __   ║"),
+          makeLog("I", "SystemServer", "║  | ' // _' | '__|| __| | |/ / | ' // _ \\| | | | '_ \\  ║"),
+          makeLog("I", "SystemServer", "║  | . \\ (_| | |   | |_| |   <  | . \\ (_) | |_| | | | | ║"),
+          makeLog("I", "SystemServer", "║  |_|\\_\\__,_|_|    \\__|_|_|\\_\\ |_|\\_\\___/ \\__,_|_| |_| ║"),
+          makeLog("I", "SystemServer", "║                                                       ║"),
+          makeLog("I", "SystemServer", "║  \"I like building things that keep working when       ║"),
+          makeLog("I", "SystemServer", "║   conditions aren't ideal.\"                           ║"),
+          makeLog("I", "SystemServer", "╚═══════════════════════════════════════════════════════╝"),
           makeLog("D", "PackageManager", "Feature enabled: ANDROID_DEVELOPER_PRO_MAX"),
           makeLog("I", "Toast", 'Showing system toast: "Ready to build world-class Android apps! 🚀"'),
         ];
@@ -364,6 +398,7 @@ export function CommandPalette({
       category: "Nav",
       description: "Download Kartik's verified PDF résumé",
       badge: "PDF",
+      closeOnExec: false,
       action: () => {
         if (resumeSlot?.src) {
           const a = document.createElement("a");
@@ -387,10 +422,14 @@ export function CommandPalette({
       category: "Core",
       description: "List all executable Logcat commands and usage",
       badge: "docs",
+      closeOnExec: false,
       action: () => [
         makeLog("I", "Logcat", "Command reference:"),
-        makeLog("D", "Commands", "• projects              : Inspect catalog & navigate to #projects"),
-        makeLog("D", "Commands", "• skills                : Query tech stack & navigate to #skills"),
+        makeLog("D", "Commands", "• projects              : Navigate to #projects"),
+        makeLog("D", "Commands", "• skills                : Navigate to #skills"),
+        makeLog("D", "Commands", "• about                 : Navigate to #about"),
+        makeLog("D", "Commands", "• education             : Navigate to #education"),
+        makeLog("D", "Commands", "• activity              : Navigate to #activity"),
         makeLog("D", "Commands", "• open student-organizer: Launch native Android case study"),
         makeLog("D", "Commands", "• theme                 : Toggle between Day (Paper) and Night (Dark) mode"),
         makeLog("D", "Commands", "• hire-me               : Copy contact email & navigate to #contact"),
@@ -405,6 +444,7 @@ export function CommandPalette({
       alias: ["cls", "reset"],
       category: "Core",
       description: "Clear Logcat console stream (Ctrl+L)",
+      closeOnExec: false,
       action: () => {
         setLogs([]);
         return [];
@@ -428,53 +468,67 @@ export function CommandPalette({
     setSelectedSuggestionIndex(0);
   }, [query]);
 
+  // Scroll active suggestion into view
+  const updateSelectedSuggestion = useCallback((newIndex: number) => {
+    setSelectedSuggestionIndex(newIndex);
+    const itemEl = suggestionItemRefs.current[newIndex];
+    if (itemEl) {
+      itemEl.scrollIntoView({ block: "nearest" });
+    }
+  }, []);
+
   // Execute a command
   const executeCommand = async (commandName: string) => {
     const trimmed = commandName.trim().toLowerCase();
     if (!trimmed) return;
 
-    // Echo input line
-    const userLog = makeLog("D", "Input", `> ${commandName}`);
-    setLogs((prev) => [...prev, userLog]);
-    setQuery("");
-
-    // Find matching command
+    // Find matching command definition
     const matched = commandList.find(
       (c) =>
         c.cmd.toLowerCase() === trimmed ||
         c.alias?.some((a) => a.toLowerCase() === trimmed)
     );
 
+    // Echo input line
+    const userLog = makeLog("D", "Input", `> ${commandName}`);
+    setLogs((prev) => [...prev, userLog]);
+    setQuery("");
+
     if (matched) {
       const result = await matched.action();
       if (result.length > 0) {
         setLogs((prev) => [...prev, ...result]);
       }
+
+      // If this was a navigation / section search command, hide palette so user sees the section!
+      if (matched.closeOnExec) {
+        setTimeout(() => {
+          onClose();
+        }, 180);
+      }
     } else {
-      // Unknown command
       setLogs((prev) => [
         ...prev,
-        makeLog("W", "Logcat", `Unknown command '${commandName}'.`),
+        makeLog("E", "CommandNotFound", `Unknown command or action: '${commandName}'`),
         makeLog(
           "I",
           "Help",
-          "Try: projects, skills, open student-organizer, theme, hire-me, sudo make-coffee, easter-egg, help"
+          "Try: projects, skills, about, education, activity, open student-organizer, theme, hire-me, sudo make-coffee, easter-egg, help"
         ),
       ]);
     }
   };
 
+  // Keyboard navigation: Up/Down moves vertically through suggestions
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setSelectedSuggestionIndex((prev) =>
-        prev < suggestions.length - 1 ? prev + 1 : 0
-      );
+      const nextIdx = selectedSuggestionIndex < suggestions.length - 1 ? selectedSuggestionIndex + 1 : 0;
+      updateSelectedSuggestion(nextIdx);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setSelectedSuggestionIndex((prev) =>
-        prev > 0 ? prev - 1 : suggestions.length - 1
-      );
+      const nextIdx = selectedSuggestionIndex > 0 ? selectedSuggestionIndex - 1 : suggestions.length - 1;
+      updateSelectedSuggestion(nextIdx);
     } else if (e.key === "Tab") {
       e.preventDefault();
       if (suggestions[selectedSuggestionIndex]) {
@@ -482,12 +536,10 @@ export function CommandPalette({
       }
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (suggestions.length > 0 && cleanQuery && suggestions[selectedSuggestionIndex]) {
+      if (suggestions.length > 0 && suggestions[selectedSuggestionIndex]) {
         executeCommand(suggestions[selectedSuggestionIndex].cmd);
       } else if (query.trim()) {
         executeCommand(query);
-      } else if (suggestions[selectedSuggestionIndex]) {
-        executeCommand(suggestions[selectedSuggestionIndex].cmd);
       }
     }
   };
@@ -530,19 +582,19 @@ export function CommandPalette({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-8 sm:pt-16 px-3 sm:px-4 bg-[#111315]/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-6 sm:pt-12 px-3 sm:px-6 bg-[#111315]/85 backdrop-blur-sm">
           <m.div
             initial={{ opacity: 0, scale: 0.98, y: -6 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, y: -6 }}
             transition={{ duration: 0.2 }}
-            className="w-full max-w-3xl bg-[var(--paper)] border border-[var(--rule)] rounded-[6px] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] font-mono text-xs"
+            className="w-full max-w-4xl bg-[var(--paper)] border border-[var(--rule)] rounded-[8px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] font-mono text-xs"
             role="dialog"
             aria-modal="true"
             aria-label="Android Studio Logcat Command Palette"
           >
             {/* Top Bar: Android Studio IDE Window Chrome */}
-            <div className="flex items-center justify-between px-3 py-2 bg-[var(--surface)] border-b border-[var(--rule)] select-none">
+            <div className="flex items-center justify-between px-3.5 py-2.5 bg-[var(--surface)] border-b border-[var(--rule)] select-none">
               {/* Left: IDE Tabs */}
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[var(--paper)] border border-[var(--rule)] rounded-[4px] text-[11px] font-medium text-[var(--ink)] shadow-xs">
@@ -594,7 +646,7 @@ export function CommandPalette({
             </div>
 
             {/* Sub-bar: Log Level Filter & Filter Query */}
-            <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 bg-[var(--surface-subtle)] border-b border-[var(--rule)]/60 text-[11px]">
+            <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-1.5 bg-[var(--surface-subtle)] border-b border-[var(--rule)]/60 text-[11px]">
               {/* Level Filter Chips */}
               <div className="flex items-center gap-1">
                 <span className="text-[var(--ink-muted)] text-[10px] uppercase tracking-wider mr-1">
@@ -637,7 +689,7 @@ export function CommandPalette({
             </div>
 
             {/* Android Studio Filter / Command Input Prompt */}
-            <div className="flex items-center px-3 py-2 bg-[var(--paper)] border-b border-[var(--rule)]">
+            <div className="flex items-center px-3.5 py-2.5 bg-[var(--paper)] border-b border-[var(--rule)]">
               <span className="text-[var(--accent)] font-bold mr-2 select-none">&gt;</span>
               <span className="text-[var(--ink-muted)] text-[11px] mr-2 select-none hidden sm:inline opacity-70">
                 package:mine
@@ -648,8 +700,8 @@ export function CommandPalette({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleInputKeyDown}
-                placeholder="Enter command: projects, skills, open student-organizer, theme, hire-me, sudo make-coffee..."
-                className="w-full bg-transparent font-mono text-xs text-[var(--ink)] placeholder:text-[var(--ink-muted)] outline-none"
+                placeholder="Search section or command: projects, skills, about, education, theme, hire-me, sudo make-coffee, easter-egg..."
+                className="w-full bg-transparent font-mono text-xs sm:text-sm text-[var(--ink)] placeholder:text-[var(--ink-muted)] outline-none"
                 aria-label="Logcat command input"
               />
               {query && (
@@ -664,46 +716,69 @@ export function CommandPalette({
               )}
             </div>
 
-            {/* Quick Command Suggestions Row */}
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--surface)]/40 border-b border-[var(--rule)]/60 overflow-x-auto whitespace-nowrap scrollbar-none">
-              <span className="text-[10px] uppercase text-[var(--ink-muted)] tracking-wider mr-1 shrink-0">
-                Cmds:
-              </span>
-              {suggestions.map((item, idx) => {
-                const isSelected = idx === selectedSuggestionIndex;
-                return (
-                  <button
-                    key={item.cmd}
-                    type="button"
-                    onClick={() => executeCommand(item.cmd)}
-                    onMouseEnter={() => setSelectedSuggestionIndex(idx)}
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[3px] text-[11px] font-mono cursor-pointer transition-colors shrink-0 ${
-                      isSelected
-                        ? "bg-[var(--accent)] text-white font-medium"
-                        : "bg-[var(--surface)] text-[var(--ink)] hover:border-[var(--accent)] border border-[var(--rule)]"
-                    }`}
-                  >
-                    <span>{item.cmd}</span>
-                    {item.badge && (
-                      <span
-                        className={`text-[9px] px-1 rounded-[2px] ${
-                          isSelected
-                            ? "bg-white/20 text-white"
-                            : "bg-[var(--accent-tint)] text-[var(--accent)]"
-                        }`}
-                      >
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+            {/* VERTICAL Command Suggestions Dropdown (Up/Down arrow key navigable) */}
+            {suggestions.length > 0 && (
+              <div
+                ref={suggestionListRef}
+                className="max-h-[190px] overflow-y-auto divide-y divide-[var(--rule)]/40 border-b border-[var(--rule)] bg-[var(--surface-subtle)]"
+              >
+                {suggestions.map((item, idx) => {
+                  const isSelected = idx === selectedSuggestionIndex;
+                  return (
+                    <div
+                      key={item.cmd}
+                      ref={(el) => {
+                        suggestionItemRefs.current[idx] = el;
+                      }}
+                      onClick={() => executeCommand(item.cmd)}
+                      onMouseEnter={() => setSelectedSuggestionIndex(idx)}
+                      className={`px-3.5 py-2 flex items-center justify-between gap-3 cursor-pointer transition-colors ${
+                        isSelected
+                          ? "bg-[var(--accent)] text-white font-medium shadow-xs"
+                          : "hover:bg-[var(--surface)] text-[var(--ink)]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 truncate">
+                        <span className="font-mono font-bold tracking-tight">{item.cmd}</span>
+                        <span
+                          className={`text-[11px] truncate ${
+                            isSelected ? "text-white/85" : "text-[var(--ink-muted)]"
+                          }`}
+                        >
+                          {item.description}
+                        </span>
+                      </div>
 
-            {/* Main Logcat Console Output Area */}
+                      <div className="flex items-center gap-2 shrink-0">
+                        {item.badge && (
+                          <span
+                            className={`text-[9.5px] px-1.5 py-0.5 rounded-[2px] font-mono ${
+                              isSelected
+                                ? "bg-white/20 text-white"
+                                : "bg-[var(--surface)] text-[var(--ink-muted)] border border-[var(--rule)]"
+                            }`}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                        <span
+                          className={`text-[10px] font-mono opacity-60 ${
+                            isSelected ? "text-white" : "text-[var(--ink-muted)]"
+                          }`}
+                        >
+                          ↵ run
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Main Logcat Console Output Area (Spacious & Clean Monospace) */}
             <div
               ref={logConsoleRef}
-              className="flex-1 overflow-y-auto p-3 bg-[var(--paper)] max-h-[360px] min-h-[220px] divide-y divide-[var(--rule)]/20 leading-relaxed font-mono select-text"
+              className="flex-1 overflow-y-auto p-3.5 bg-[var(--paper)] max-h-[380px] min-h-[240px] divide-y divide-[var(--rule)]/20 leading-relaxed font-mono select-text"
               tabIndex={0}
             >
               {displayedLogs.length === 0 ? (
@@ -714,7 +789,7 @@ export function CommandPalette({
                 displayedLogs.map((log) => (
                   <div
                     key={log.id}
-                    className="py-1 px-1 flex flex-wrap items-baseline gap-x-2 text-[11.5px] hover:bg-[var(--surface)]/40 transition-colors rounded-[2px]"
+                    className="py-1 px-1 flex items-baseline gap-x-2 text-[11px] sm:text-[11.5px] hover:bg-[var(--surface)]/40 transition-colors rounded-[2px]"
                   >
                     {/* Timestamp */}
                     <span className="text-[var(--ink-muted)] text-[10.5px] shrink-0 select-none opacity-70">
@@ -731,8 +806,8 @@ export function CommandPalette({
                       {log.level}/{log.tag}:
                     </span>
 
-                    {/* Message Body */}
-                    <span className="text-[var(--ink)] break-all whitespace-pre-wrap flex-1">
+                    {/* Message Body: No break-all, preserves ASCII art & formatting cleanly */}
+                    <span className="text-[var(--ink)] whitespace-pre font-mono overflow-x-auto scrollbar-none flex-1">
                       {log.message}
                     </span>
                   </div>
@@ -741,7 +816,7 @@ export function CommandPalette({
             </div>
 
             {/* Android Studio Status Bar */}
-            <div className="px-3 py-1.5 bg-[var(--surface)] border-t border-[var(--rule)] flex flex-wrap items-center justify-between text-[10.5px] text-[var(--ink-muted)] select-none">
+            <div className="px-3.5 py-1.5 bg-[var(--surface)] border-t border-[var(--rule)] flex flex-wrap items-center justify-between text-[10.5px] text-[var(--ink-muted)] select-none">
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
@@ -752,7 +827,7 @@ export function CommandPalette({
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span>↑↓ navigate</span>
+                <span>↑↓ navigate vertical list</span>
                 <span>·</span>
                 <span>Tab complete</span>
                 <span>·</span>
