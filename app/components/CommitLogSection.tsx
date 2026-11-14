@@ -4,10 +4,8 @@ import React, { useState, useMemo, useRef, useEffect, useCallback } from "react"
 import { m, useReducedMotion } from "motion/react";
 import {
   ExternalLink,
-  Play,
   Pause,
   RotateCcw,
-  Box,
 } from "lucide-react";
 import { activityContent } from "@/content/activity";
 import rawGithub from "@/content/github-contributions.json";
@@ -379,84 +377,6 @@ export function CommitLogSection() {
           .replace("{busiestCount}", String(busiestGh?.count || 0))}
       </div>
 
-      {/* Top 3D Source Box & Replay Action Bar */}
-      {!prefersReducedMotion && (
-        <div className="mb-6 p-4 sm:p-5 border border-[var(--rule)] rounded-[4px] bg-[var(--surface-subtle)]/70 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          {/* 3D Dispenser Box at Top */}
-          <div className="flex items-center gap-3">
-            <div
-              className={`relative w-10 h-10 rounded-[3px] bg-[var(--surface)] border border-[var(--rule)] flex items-center justify-center transition-all duration-300 ${
-                isReplaying
-                  ? "border-[var(--accent)] scale-110 shadow-[0_4px_0_var(--accent),0_6px_10px_rgba(0,0,0,0.25)]"
-                  : "shadow-[0_3px_0_var(--rule),0_4px_6px_rgba(0,0,0,0.12)]"
-              }`}
-            >
-              <Box
-                size={18}
-                className={`transition-colors ${
-                  isReplaying
-                    ? "text-[var(--accent)] animate-pulse"
-                    : "text-[var(--ink-muted)]"
-                }`}
-              />
-            </div>
-            <div className="font-mono text-xs">
-              <span className="font-semibold text-[var(--ink)] flex items-center gap-2">
-                <span>Commit Dispenser Crate</span>
-                {isReplaying && (
-                  <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent)] animate-ping" />
-                )}
-              </span>
-              <span className="text-[10px] text-[var(--ink-muted)] block mt-0.5">
-                {isReplaying
-                  ? `Dispensing 3D blocks left-to-right (Week ${replayWeekIndex ? replayWeekIndex + 1 : 1}/${totalWeeks})`
-                  : replayFinished
-                  ? "All 3D blocks successfully landed in calendar"
-                  : "Click 'Replay my year' to drop 3D tiles from the top"}
-              </span>
-            </div>
-          </div>
-
-          {/* Replay Controls */}
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={toggleReplay}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-[var(--rule)] bg-[var(--paper)] hover:border-[var(--accent)] text-[var(--ink)] rounded-[4px] text-xs font-mono font-medium transition-colors cursor-pointer shadow-xs focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
-              title="Animate 3D boxes dropping from top into calendar"
-            >
-              {isReplaying ? (
-                <>
-                  <Pause size={13} className="text-amber-600 dark:text-amber-400" />
-                  <span>Pause</span>
-                </>
-              ) : replayFinished ? (
-                <>
-                  <RotateCcw size={13} className="text-[var(--accent)]" />
-                  <span>Replay again</span>
-                </>
-              ) : (
-                <>
-                  <Play size={13} className="text-[var(--accent)] fill-[var(--accent)]/20" />
-                  <span>Replay my year</span>
-                </>
-              )}
-            </button>
-
-            {replayWeekIndex !== null && (
-              <button
-                type="button"
-                onClick={resetReplay}
-                className="text-xs font-mono text-[var(--ink-muted)] hover:text-[var(--ink)] px-2 py-1"
-                title="Reset replay animation"
-              >
-                Reset
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* Heatmap Panel: Zooms slightly bigger when replaying */}
       <div>
         <m.div
@@ -467,7 +387,7 @@ export function CommitLogSection() {
             isReplaying ? "scale-[1.03] shadow-lg" : "scale-100"
           }`}
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-5 border-b border-[var(--rule)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-5 border-b border-[var(--rule)]">
             <div>
               <h3 className="font-serif text-xl font-semibold text-[var(--ink)]">
                 {activityContent.github.title.replace("{n}", String(ghTotal))}
@@ -476,15 +396,44 @@ export function CommitLogSection() {
                 {activityContent.github.description}
               </p>
             </div>
-            <a
-              href="https://github.com/Kartikk-git"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-mono text-xs text-[var(--accent)] hover:underline inline-flex items-center gap-1 shrink-0"
-            >
-              {activityContent.github.source}
-              <ExternalLink className="w-3 h-3" />
-            </a>
+
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Simple Replay Button */}
+              {!prefersReducedMotion && (
+                <button
+                  type="button"
+                  onClick={toggleReplay}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] border font-mono text-xs font-medium transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[var(--accent)] ${
+                    isReplaying
+                      ? "border-[var(--accent)] bg-[var(--accent-tint)] text-[var(--accent)] shadow-xs"
+                      : "border-[var(--rule)] bg-[var(--paper)] hover:border-[var(--accent)] text-[var(--ink)]"
+                  }`}
+                  title="Replay activity heatmap animation"
+                >
+                  {isReplaying ? (
+                    <>
+                      <Pause size={12} className="text-[var(--accent)]" />
+                      <span>Pause</span>
+                    </>
+                  ) : (
+                    <>
+                      <RotateCcw size={12} className="text-[var(--accent)]" />
+                      <span>{replayFinished ? "Replay again" : "Replay"}</span>
+                    </>
+                  )}
+                </button>
+              )}
+
+              <a
+                href="https://github.com/Kartikk-git"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-xs text-[var(--accent)] hover:underline inline-flex items-center gap-1"
+              >
+                {activityContent.github.source}
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
           </div>
 
           {renderHeatmap()}

@@ -400,7 +400,7 @@ The sign-out control in the navigation bar is currently a placeholder with no lo
 
 `about.lead`
 
-I'm Kartik, a third-year B.Tech Computer Science student at Dronacharya College of Engineering, Gurugram, graduating in 2028. I'm someone who enjoys figuring out how things work, breaking them, fixing them, and occasionally spending way too much time making them work better.
+I'm Kartik, a third-year B.Tech Computer Science student at Dronacharya College of Engineering, Gurugram, graduating in 2028.
 
 `about.intro.2`
 

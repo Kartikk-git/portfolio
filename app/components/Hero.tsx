@@ -22,40 +22,44 @@ export function Hero() {
   // 1. Initial Title Slide:
   // "till the user scrolls only my name is there"
   // Fades out promptly as soon as scroll begins (progress 0.0 to 0.08)
-  const titleSlideOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
-  const titleSlideScale = useTransform(scrollYProgress, [0, 0.08], [1, 0.94]);
-  const titleSlideY = useTransform(scrollYProgress, [0, 0.08], [0, -26]);
-  const titleSlidePointer = useTransform(scrollYProgress, (p) => (p > 0.06 ? "none" : "auto"));
+  const titleSlideOpacity = useTransform(scrollYProgress, [0, 0.08, 1], [1, 0, 0]);
+  const titleSlideScale = useTransform(scrollYProgress, [0, 0.08, 1], [1, 0.94, 0.94]);
+  const titleSlideY = useTransform(scrollYProgress, [0, 0.08, 1], [0, -26, -26]);
+  const titleSlideDisplay = useTransform(scrollYProgress, (p) => (p >= 0.08 ? "none" : "flex"));
 
   // 2. Full Presentation Profile ("and then like ppt presentation rest comes smooth transitions"):
-  // Staged PPT reveals from progress 0.06 to 0.22, stays fully visible & interactive until 0.80, then exits cleanly.
-  const profileOpacity = useTransform(scrollYProgress, [0.06, 0.22, 0.80, 1.0], [0, 1, 1, 0]);
-  const profileY = useTransform(scrollYProgress, [0.06, 0.22, 0.80, 1.0], [32, 0, 0, -28]);
+  // Staged PPT reveals from progress 0.06 to 0.22, stays fully visible & interactive until 0.80.
+  const profileOpacity = useTransform(scrollYProgress, [0, 0.06, 0.20, 1.0], [0, 0, 1, 1]);
+  const profileY = useTransform(scrollYProgress, [0, 0.06, 0.20, 1.0], [32, 32, 0, 0]);
   const profilePointer = useTransform(scrollYProgress, (p) => (p >= 0.08 && p < 0.95 ? "auto" : "none"));
+
+  // 3. Overall Hero Exit: as #projects scrolls into 50% of viewport, entire sticky hero container fades out to 0
+  const containerOpacity = useTransform(scrollYProgress, [0, 0.80, 1.0], [1, 1, 0]);
+  const containerY = useTransform(scrollYProgress, [0, 0.80, 1.0], [0, 0, -28]);
 
   // Staggered PPT presentation builds inside the profile:
   // Eyebrow & Headline build:
-  const headlineOpacity = useTransform(scrollYProgress, [0.07, 0.17], [0, 1]);
-  const headlineY = useTransform(scrollYProgress, [0.07, 0.17], [18, 0]);
+  const headlineOpacity = useTransform(scrollYProgress, [0, 0.06, 0.16, 1], [0, 0, 1, 1]);
+  const headlineY = useTransform(scrollYProgress, [0, 0.06, 0.16, 1], [18, 18, 0, 0]);
 
   // Accent rule draw build:
-  const ruleScaleX = useTransform(scrollYProgress, [0.09, 0.19], [0, 1]);
+  const ruleScaleX = useTransform(scrollYProgress, [0, 0.08, 0.18, 1], [0, 0, 1, 1]);
 
   // Bio narrative paragraphs build:
-  const bioOpacity = useTransform(scrollYProgress, [0.11, 0.21], [0, 1]);
-  const bioY = useTransform(scrollYProgress, [0.11, 0.21], [16, 0]);
+  const bioOpacity = useTransform(scrollYProgress, [0, 0.10, 0.20, 1], [0, 0, 1, 1]);
+  const bioY = useTransform(scrollYProgress, [0, 0.10, 0.20, 1], [16, 16, 0, 0]);
 
   // 3-Tier CTAs build:
-  const ctaOpacity = useTransform(scrollYProgress, [0.13, 0.23], [0, 1]);
-  const ctaY = useTransform(scrollYProgress, [0.13, 0.23], [14, 0]);
+  const ctaOpacity = useTransform(scrollYProgress, [0, 0.12, 0.22, 1], [0, 0, 1, 1]);
+  const ctaY = useTransform(scrollYProgress, [0, 0.12, 0.22, 1], [14, 14, 0, 0]);
 
   // Right column: Circular Portrait & Candidate Snapshot Card slide in from right:
-  const rightColOpacity = useTransform(scrollYProgress, [0.09, 0.21], [0, 1]);
-  const rightColX = useTransform(scrollYProgress, [0.09, 0.21], [26, 0]);
-  const photoScale = useTransform(scrollYProgress, [0.09, 0.21], [0.92, 1]);
+  const rightColOpacity = useTransform(scrollYProgress, [0, 0.08, 0.19, 1], [0, 0, 1, 1]);
+  const rightColX = useTransform(scrollYProgress, [0, 0.08, 0.19, 1], [26, 26, 0, 0]);
+  const photoScale = useTransform(scrollYProgress, [0, 0.08, 0.19, 1], [0.92, 0.92, 1, 1]);
 
   // Links row build:
-  const linksOpacity = useTransform(scrollYProgress, [0.15, 0.25], [0, 1]);
+  const linksOpacity = useTransform(scrollYProgress, [0, 0.14, 0.24, 1], [0, 0, 1, 1]);
 
   const resumeSlot = mediaManifest["resume-pdf"];
   const isResumeAvailable = Boolean(resumeSlot?.src);
@@ -74,17 +78,20 @@ export function Hero() {
       className="relative min-h-[175vh] md:min-h-[185vh] border-b border-[var(--rule)]"
     >
       {/* Sticky Presentation Viewport */}
-      <div className="sticky top-16 min-h-[calc(100vh-4rem)] flex flex-col justify-center overflow-hidden py-8 md:py-12">
+      <m.div
+        style={prefersReducedMotion ? undefined : { opacity: containerOpacity, y: containerY }}
+        className="sticky top-16 min-h-[calc(100vh-4rem)] flex flex-col justify-center overflow-hidden py-8 md:py-12"
+      >
         {/* Title Slide: Active before scroll - ONLY Kartik Koundal is there */}
         <m.div
           style={
             prefersReducedMotion
               ? { display: "none" }
               : {
+                  display: titleSlideDisplay,
                   opacity: titleSlideOpacity,
                   scale: titleSlideScale,
                   y: titleSlideY,
-                  pointerEvents: titleSlidePointer,
                 }
           }
           onClick={advancePresentation}
@@ -224,12 +231,28 @@ export function Hero() {
               }
               className="lg:col-span-5 flex flex-col items-center sm:items-stretch gap-6 pt-2 lg:pt-0"
             >
-              {/* Prominent Circular Portrait: strictly NO borders */}
+              {/* Prominent Circular Portrait: strictly NO borders + subtle green wave/flame aura behind */}
               <m.div
                 style={prefersReducedMotion ? undefined : { scale: photoScale }}
-                className="flex flex-col items-center"
+                className="relative flex flex-col items-center justify-center p-2"
               >
-                <div className="w-36 h-36 sm:w-44 sm:h-44 lg:w-48 lg:h-48 rounded-full overflow-hidden border-0 ring-0 shadow-2xl bg-[var(--surface)] select-none">
+                {/* Subtle Organic Green Wave / Flame Aura behind the picture */}
+                <div
+                  className="absolute inset-0 pointer-events-none select-none z-0 flex items-center justify-center"
+                  aria-hidden="true"
+                >
+                  {/* Layer 1: Soft breathing ambient aura glow */}
+                  <div className="w-40 h-40 sm:w-48 sm:h-48 lg:w-52 lg:h-52 rounded-full bg-[var(--accent)]/25 dark:bg-[var(--accent)]/35 green-aura-pulse" />
+
+                  {/* Layer 2: Organic morphing fluid wave 1 */}
+                  <div className="absolute w-40 h-40 sm:w-48 sm:h-48 lg:w-52 lg:h-52 bg-gradient-to-tr from-[var(--accent)]/30 via-emerald-400/20 to-[var(--accent-hover)]/30 blur-md green-aura-wave-1 opacity-75 dark:opacity-90" />
+
+                  {/* Layer 3: Organic counter-rotating fluid flame wave 2 */}
+                  <div className="absolute w-38 h-38 sm:w-46 sm:h-46 lg:w-50 lg:h-50 bg-gradient-to-bl from-[var(--accent-hover)]/25 via-teal-400/15 to-[var(--accent)]/20 blur-sm green-aura-wave-2 opacity-65 dark:opacity-85" />
+                </div>
+
+                {/* The Circular Portrait */}
+                <div className="relative z-10 w-36 h-36 sm:w-44 sm:h-44 lg:w-48 lg:h-48 rounded-full overflow-hidden border-0 ring-0 shadow-2xl bg-[var(--surface)] select-none">
                   <img
                     src="/kartik-portrait-hero.webp"
                     alt="Kartik Koundal"
@@ -390,7 +413,7 @@ export function Hero() {
             <span>New Delhi, India</span>
           </m.div>
         </m.div>
-      </div>
+      </m.div>
     </section>
   );
 }

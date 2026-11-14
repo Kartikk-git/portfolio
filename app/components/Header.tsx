@@ -112,7 +112,7 @@ export function Header() {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [mobileMenuOpen, paletteOpen, crashOpen]);
+  }, [mobileMenuOpen, paletteOpen, crashOpen, isHome]);
 
   // Global Ctrl/Cmd+K listener
   useEffect(() => {

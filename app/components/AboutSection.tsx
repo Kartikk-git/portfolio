@@ -46,12 +46,12 @@ export function AboutSection({ isReviewMode = false }: AboutSectionProps) {
             whileInView="visible"
             viewport={{ once: true, margin: "-10% 0px" }}
             custom={0}
-            className="space-y-4 border-b border-[var(--rule-subtle)] pb-6"
+            className="space-y-3.5 border-b border-[var(--rule-subtle)] pb-5"
           >
-            <p className="font-serif text-xl sm:text-2xl text-[var(--ink)] leading-snug font-normal">
+            <p className="font-serif text-base sm:text-lg text-[var(--ink)] leading-relaxed font-normal">
               {aboutContent.lead}
             </p>
-            <p className="text-[15px] sm:text-base text-[var(--ink-muted)] leading-[1.7]">
+            <p className="text-[14.5px] sm:text-[15.5px] text-[var(--ink-muted)] leading-[1.65]">
               {aboutContent.intro2}
             </p>
           </m.div>
