@@ -18,6 +18,8 @@ export function ThemeToggle() {
   const holdIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const holdStartRef = useRef<number>(0);
   const didTriggerHoldRef = useRef<boolean>(false);
+  const activeThemeTransitionRef = useRef<any>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Rapid tap fallback (5+ taps within 3s)
   const tapHistoryRef = useRef<number[]>([]);
@@ -93,14 +95,19 @@ export function ThemeToggle() {
 
       if (easeBackTimerRef.current) clearTimeout(easeBackTimerRef.current);
 
-      // In dark mode, flash blinding white; in light mode, drop to pure pitch black AMOLED
-      const mode = forcedMode || (theme === "dark" ? "flashbang" : "amoled");
+      // When in dark mode -> super dark mode (AMOLED Void)
+      // When in light mode -> super light mode (Ultra Flashbang)
+      const currentTheme =
+        (typeof document !== "undefined"
+          ? (document.documentElement.getAttribute("data-theme") as "light" | "dark" | null)
+          : null) || theme;
+      const mode = forcedMode || (currentTheme === "dark" ? "amoled" : "flashbang");
 
       if (mode === "flashbang") {
         setUltraType("flashbang");
         document.documentElement.classList.remove("ultra-amoled");
         document.documentElement.classList.add("ultra-flashbang");
-        document.documentElement.style.filter = "brightness(1.5) contrast(1.2)";
+        document.documentElement.style.filter = "brightness(1.22) contrast(1.05)";
 
         if (!prefersReducedMotion) {
           document.body.classList.remove("shake-my-eyes");
@@ -112,7 +119,7 @@ export function ThemeToggle() {
           }, 480);
         }
 
-        setToastMessage("Flashbang deployed. Your retinas have been notified.");
+        setToastMessage("Ultra Flashbang: Super Light Mode active.");
       } else {
         setUltraType("amoled");
         document.documentElement.classList.remove("ultra-flashbang");
@@ -124,7 +131,7 @@ export function ThemeToggle() {
           "0 0 16px rgba(95, 179, 143, 1), 0 0 32px rgba(95, 179, 143, 0.7)"
         );
 
-        setToastMessage("AMOLED Void active. Conserving photonic energy.");
+        setToastMessage("AMOLED Void: Super Dark Mode active.");
       }
 
       // Lasts longer: 10 full seconds before smoothly easing back to normal
@@ -169,8 +176,8 @@ export function ThemeToggle() {
     if (holdIntervalRef.current) clearInterval(holdIntervalRef.current);
   };
 
-  // Normal click toggle handler
-  const handleToggleClick = () => {
+  // Normal click toggle handler with Native View Transitions circular reveal
+  const handleToggleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     // If hold triggered the flashbang, suppress the normal toggle
     if (didTriggerHoldRef.current) {
       didTriggerHoldRef.current = false;
@@ -178,11 +185,13 @@ export function ThemeToggle() {
     }
 
     const nextTheme = theme === "light" ? "dark" : "light";
-    setTheme(nextTheme);
-    document.documentElement.setAttribute("data-theme", nextTheme);
-    try {
-      localStorage.setItem("theme", nextTheme);
-    } catch { }
+    const applyTheme = (t: "light" | "dark") => {
+      setTheme(t);
+      document.documentElement.setAttribute("data-theme", t);
+      try {
+        localStorage.setItem("theme", t);
+      } catch { }
+    };
 
     // Rapid tap tracker fallback
     const now = Date.now();
@@ -191,7 +200,79 @@ export function ThemeToggle() {
       now,
     ];
     if (tapHistoryRef.current.length >= 5) {
-      deployUltraMode(nextTheme === "light" ? "flashbang" : "amoled");
+      deployUltraMode(nextTheme === "dark" ? "amoled" : "flashbang");
+      return;
+    }
+
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Graceful fallback for unsupported browsers or prefers-reduced-motion
+    if (
+      typeof document === "undefined" ||
+      !("startViewTransition" in document) ||
+      prefersReducedMotion
+    ) {
+      applyTheme(nextTheme);
+      return;
+    }
+
+    // Cleanly cancel ongoing transition if clicked again mid-transition
+    if (activeThemeTransitionRef.current) {
+      try {
+        activeThemeTransitionRef.current.skipTransition();
+      } catch { }
+      activeThemeTransitionRef.current = null;
+    }
+
+    // Center coordinates of toggle button
+    const btn = buttonRef.current || e.currentTarget;
+    const rect = btn.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    document.documentElement.classList.add("theme-transition");
+
+    try {
+      const transition = (document as any).startViewTransition(() => {
+        applyTheme(nextTheme);
+      });
+      activeThemeTransitionRef.current = transition;
+
+      transition.ready
+        .then(() => {
+          document.documentElement.animate(
+            {
+              clipPath: [
+                `circle(0px at ${x}px ${y}px)`,
+                `circle(${endRadius}px at ${x}px ${y}px)`,
+              ],
+            },
+            {
+              duration: 380, // under 400ms
+              easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+              pseudoElement: "::view-transition-new(root)",
+            }
+          );
+        })
+        .catch(() => { });
+
+      transition.finished
+        .catch(() => { })
+        .finally(() => {
+          document.documentElement.classList.remove("theme-transition");
+          if (activeThemeTransitionRef.current === transition) {
+            activeThemeTransitionRef.current = null;
+          }
+        });
+    } catch {
+      document.documentElement.classList.remove("theme-transition");
+      applyTheme(nextTheme);
     }
   };
 
@@ -213,6 +294,7 @@ export function ThemeToggle() {
     <>
       {/* Theme Toggle Button with 3-Second Hold Indicator */}
       <button
+        ref={buttonRef}
         type="button"
         onClick={handleToggleClick}
         onMouseDown={startHold}
@@ -234,7 +316,6 @@ export function ThemeToggle() {
             : "border-[var(--rule)] hover:border-[var(--accent)]"
           }`}
         aria-label={label}
-        title={label}
       >
         {/* Subtle Radial Progress Ring while Holding */}
         {isHolding && (

@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { contactContent } from "@/content/contact";
 import { mediaManifest } from "@/content/media";
+import { useFocusTrap } from "@/lib/focus-trap";
+import { openResumeModal } from "./ResumeModal";
 
 type LogLevel = "V" | "D" | "I" | "W" | "E" | "A";
 
@@ -66,10 +68,22 @@ export function CommandPalette({
   const [isPaused, setIsPaused] = useState(false);
   const [copiedNotification, setCopiedNotification] = useState<string | null>(null);
 
+  const dialogRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const logConsoleRef = useRef<HTMLDivElement>(null);
   const suggestionListRef = useRef<HTMLDivElement>(null);
   const suggestionItemRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useFocusTrap(dialogRef, isOpen);
+
+  // Restore focus to the trigger when the palette closes
+  useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.activeElement as HTMLElement | null;
+    return () => {
+      prev?.focus();
+    };
+  }, [isOpen]);
 
   const initialLogs: LogEntry[] = useMemo(
     () => [
@@ -182,7 +196,7 @@ export function CommandPalette({
       cmd: "projects",
       alias: ["repo", "work", "apps", "#projects", "selected works"],
       category: "Nav",
-      description: "Navigate to Selected Works (#projects)",
+      description: "Navigate to Projects (#projects)",
       badge: "Section",
       closeOnExec: true,
       action: () => {
@@ -247,9 +261,9 @@ export function CommandPalette({
     },
     {
       cmd: "activity",
-      alias: ["commit", "heatmap", "github", "leetcode", "#activity"],
+      alias: ["commit", "heatmap", "github", "#activity"],
       category: "Nav",
-      description: "Navigate to Commit & Submission Activity (#activity)",
+      description: "Navigate to Contribution Activity (#activity)",
       badge: "Section",
       closeOnExec: true,
       action: () => {
@@ -258,7 +272,7 @@ export function CommandPalette({
         }, 80);
         return [
           makeLog("I", "Navigation", "Navigating to #activity..."),
-          makeLog("D", "Activity", "GitHub (315) + LeetCode (144) = 459 total activity records"),
+          makeLog("D", "Activity", "Public GitHub contribution calendar loaded"),
         ];
       },
     },
@@ -393,18 +407,15 @@ export function CommandPalette({
       cmd: "resume",
       alias: ["cv", "download-resume"],
       category: "Nav",
-      description: "Download Kartik's verified PDF résumé",
+      description: "View and download Kartik's verified PDF résumé",
       badge: "PDF",
-      closeOnExec: false,
+      closeOnExec: true,
       action: () => {
         if (resumeSlot?.src) {
-          const a = document.createElement("a");
-          a.href = resumeSlot.src;
-          a.download = "Kartik-Koundal-Resume.pdf";
-          a.click();
+          openResumeModal();
           return [
-            makeLog("I", "DownloadManager", "Dispatched download for Kartik-Koundal-Resume.pdf"),
-            makeLog("D", "Storage", "File delivered successfully."),
+            makeLog("I", "ResumeViewer", "Opened PDF preview modal."),
+            makeLog("D", "Storage", "File ready for download or view."),
           ];
         }
         return [
@@ -564,7 +575,7 @@ export function CommandPalette({
       case "D":
         return "text-emerald-700 dark:text-emerald-400 font-medium";
       case "I":
-        return "text-[var(--accent)] font-semibold dark:text-[#5FB38F]";
+        return "text-[var(--accent)] font-semibold";
       case "W":
         return "text-amber-600 dark:text-amber-400 font-semibold";
       case "E":
@@ -579,13 +590,14 @@ export function CommandPalette({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-6 sm:pt-12 px-3 sm:px-6 bg-[#111315]/85 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-6 sm:pt-12 px-3 sm:px-6 bg-black/75 backdrop-blur-xs">
           <m.div
+            ref={dialogRef}
             initial={{ opacity: 0, scale: 0.98, y: -6 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, y: -6 }}
             transition={{ duration: 0.2 }}
-            className="w-full max-w-4xl bg-[var(--paper)] border border-[var(--rule)] rounded-[8px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] font-mono text-xs"
+            className="w-full max-w-4xl bg-[var(--paper)] border border-[var(--rule)] rounded-none shadow-[0_1px_2px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col max-h-[90vh] font-mono text-xs"
             role="dialog"
             aria-modal="true"
             aria-label="Android Studio Logcat Command Palette"

@@ -6,11 +6,12 @@
     "predev": "node scripts/extract-classes.mjs",
     "prebuild": "node scripts/extract-classes.mjs",
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && node scripts/check-fonts.mjs && node scripts/post-export.mjs",
     "serve": "node scripts/serve.mjs",
-    "start": "next start",
+    "start": "node scripts/serve.mjs",
     "lint": "next lint",
-    "check:content": "node scripts/check-content.mjs"
+    "check:content": "node scripts/check-content.mjs",
+    "check:fonts": "node scripts/check-fonts.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.16.0",
@@ -24,8 +25,8 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "eslint": "^9.39.5",
-    "eslint-config-next": "^15.5.29",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.1.7",
     "postcss": "^8.5.32",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.0"

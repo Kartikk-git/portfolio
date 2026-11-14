@@ -1,16 +1,16 @@
 {
   "p1-shot-1": {
     "type": "screenshot",
-    "src": null,
-    "ratio": "9/19.5",
+    "src": "/projects/student-organizer/onboarding.webp",
+    "ratio": "16/9",
     "label": "Onboarding",
-    "caption": "Onboarding: the first-run carousel that introduces the app",
+    "caption": "Onboarding: the first-run carousel and authentication screens that introduce the app",
     "project": "Student Organizer"
   },
   "p1-shot-2": {
     "type": "screenshot",
-    "src": null,
-    "ratio": "9/19.5",
+    "src": "/projects/student-organizer/dashboard.webp",
+    "ratio": "1/1",
     "label": "Dashboard",
     "caption": "Dashboard: pending assignments, attendance, upcoming exams and active courses",
     "project": "Student Organizer"
@@ -25,7 +25,7 @@
   },
   "p1-shot-4": {
     "type": "screenshot",
-    "src": null,
+    "src": "/projects/student-organizer/assignments.webp",
     "ratio": "9/19.5",
     "label": "Assignments",
     "caption": "Assignments: tasks with status and priority",
@@ -33,7 +33,7 @@
   },
   "p1-shot-5": {
     "type": "screenshot",
-    "src": null,
+    "src": "/projects/student-organizer/calendar.webp",
     "ratio": "9/19.5",
     "label": "Calendar and attendance",
     "caption": "Calendar and attendance: the Compose calendar with tap-to-mark attendance",
@@ -41,7 +41,7 @@
   },
   "p1-shot-6": {
     "type": "screenshot",
-    "src": null,
+    "src": "/projects/student-organizer/notes.webp",
     "ratio": "9/19.5",
     "label": "Notes",
     "caption": "Notes: study notes filtered by course",
@@ -153,7 +153,7 @@
   },
   "cred-java": {
     "type": "certificate",
-    "src": null,
+    "src": "/docs/nptel-java-certificate.png",
     "ratio": "4/3",
     "label": "NPTEL Programming in Java",
     "caption": "NPTEL IIT Kharagpur Elite Certificate (95%)",
@@ -161,7 +161,7 @@
   },
   "cred-codechef-1": {
     "type": "certificate",
-    "src": null,
+    "src": "/docs/codechef-python-test.png",
     "ratio": "4/3",
     "label": "Python Skill Assessment",
     "caption": "CodeChef Python Assessment (90%)",
@@ -169,19 +169,19 @@
   },
   "cred-codechef-2": {
     "type": "certificate",
-    "src": null,
-    "ratio": "4/3",
-    "label": "Git/GitHub Track",
-    "caption": "CodeChef Git and GitHub Learning Track",
-    "title": "Git/GitHub"
+    "src": "/docs/CodeChefBadge.png",
+    "ratio": "1/1",
+    "label": "Problem Solver Gold Badge",
+    "caption": "CodeChef 500 Problems Solved Gold Badge",
+    "title": "Problem Solver Gold Badge"
   },
   "cred-codechef-3": {
     "type": "certificate",
-    "src": null,
-    "ratio": "4/3",
-    "label": "Learn HTML/CSS",
-    "caption": "CodeChef HTML/CSS Foundation",
-    "title": "Learn HTML/CSS"
+    "src": "/docs/kartik_koundal_badge.png",
+    "ratio": "16/9",
+    "label": "Python Online Test & Quiz",
+    "caption": "CodeChef Skill Test · Score 90% (2700/3000)",
+    "title": "Python Online Test & Quiz"
   },
   "cred-codechef-4": {
     "type": "certificate",
@@ -201,18 +201,18 @@
   },
   "cred-gcloud-1": {
     "type": "certificate",
-    "src": null,
-    "ratio": "4/3",
+    "src": "/docs/google-cloud-badge-proof-1.jpg",
+    "ratio": "16/9",
     "label": "Prompt Design in Vertex AI",
-    "caption": "Google Cloud Skill Badge",
+    "caption": "Google Cloud Skill Badge, verified on Credly",
     "title": "Prompt Design in Vertex AI"
   },
   "cred-gcloud-2": {
     "type": "certificate",
-    "src": null,
-    "ratio": "4/3",
+    "src": "/docs/google-cloud-badge-proof-2.jpg",
+    "ratio": "16/9",
     "label": "Develop GenAI Apps with Gemini and Streamlit",
-    "caption": "Google Cloud Skill Badge",
+    "caption": "Google Cloud Skill Badge, verified on Credly",
     "title": "Develop GenAI Apps with Gemini and Streamlit"
   },
   "cred-gcloud-3": {

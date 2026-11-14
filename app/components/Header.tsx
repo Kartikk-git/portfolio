@@ -5,12 +5,16 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { m, useScroll, useSpring } from "motion/react";
-import { Menu, X, Search, FileText, Terminal } from "lucide-react";
+import { Menu, X, FileText, Terminal } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { CrashDialog } from "./CrashDialog";
+import { openResumeModal } from "./ResumeModal";
 import { siteContent } from "@/content/site";
 import { contactContent } from "@/content/contact";
 import { mediaManifest } from "@/content/media";
+import { startViewTransition, viewTransitionsEnabled, type ViewTransition } from "@/lib/view-transition";
+import { prefersReducedMotion } from "@/lib/prefers-reduced-motion";
+import { useFocusTrap } from "@/lib/focus-trap";
 
 const CommandPalette = dynamic(
   () => import("./CommandPalette").then((mod) => mod.CommandPalette),
@@ -34,12 +38,25 @@ export function Header() {
   const [activeSection, setActiveSection] = useState<string>("projects");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [crashOpen, setCrashOpen] = useState(false);
   const [isGlitching, setIsGlitching] = useState(false);
   const nameClickHistoryRef = useRef<number[]>([]);
+  const activeNavTransitionRef = useRef<ViewTransition | null>(null);
+  const lastScrollYRef = useRef(0);
   const pathname = usePathname();
   const isHome = pathname === "/";
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Set initial visibility on homepage: at scroll 0, header is tucked away so only the name is visible
+  useEffect(() => {
+    if (isHome && typeof window !== "undefined" && window.scrollY <= 15) {
+      setIsVisible(false);
+    }
+  }, [isHome]);
+
+  useFocusTrap(mobileMenuRef, mobileMenuOpen);
 
   // Resume status
   const resumeSlot = mediaManifest["resume-pdf"];
@@ -52,6 +69,50 @@ export function Header() {
     damping: 32,
     restDelta: 0.001,
   });
+
+  // Smart hide on scroll down, reveal on scroll up
+  useEffect(() => {
+    const threshold = 8;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setIsScrolled(currentScrollY > 80);
+
+      if (mobileMenuOpen || paletteOpen || crashOpen) {
+        setIsVisible(true);
+        return;
+      }
+
+      // On home page, at the very top (before scroll), header is tucked away so only Kartik Koundal is displayed
+      if (isHome && currentScrollY <= 15) {
+        setIsVisible(false);
+        lastScrollYRef.current = currentScrollY;
+        return;
+      }
+
+      // Always show near top once scrolled
+      if (currentScrollY <= 100) {
+        setIsVisible(true);
+        lastScrollYRef.current = currentScrollY;
+        return;
+      }
+
+      const diff = currentScrollY - lastScrollYRef.current;
+
+      // Scroll down -> hide
+      if (diff > threshold) {
+        setIsVisible(false);
+      }
+      // Scroll up -> reveal
+      else if (diff < -threshold) {
+        setIsVisible(true);
+      }
+
+      lastScrollYRef.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [mobileMenuOpen, paletteOpen, crashOpen]);
 
   // Global Ctrl/Cmd+K listener
   useEffect(() => {
@@ -117,9 +178,77 @@ export function Header() {
       const targetId = href.replace("#", "");
       const el = document.getElementById(targetId);
       if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-        el.focus({ preventScroll: true });
-        window.history.replaceState(null, "", window.location.pathname);
+        const prefersReduced = prefersReducedMotion();
+
+        // Cancel previous nav transition mid-transition cleanly
+        if (activeNavTransitionRef.current) {
+          try {
+            activeNavTransitionRef.current.skipTransition();
+          } catch { }
+          activeNavTransitionRef.current = null;
+        }
+
+        // Graceful fallback: no view transition animation if unsupported or reduced motion
+        if (!viewTransitionsEnabled(prefersReduced)) {
+          el.scrollIntoView({ behavior: "smooth" });
+          el.focus({ preventScroll: true });
+          window.history.replaceState(null, "", window.location.pathname);
+          return;
+        }
+
+        // Target section heading (h2)
+        const heading = el.querySelector("h2");
+        if (heading) {
+          (heading as HTMLElement).style.viewTransitionName = "nav-heading-target";
+        }
+
+        try {
+          const transition = startViewTransition(() => {
+            el.scrollIntoView({ behavior: "smooth" });
+            el.focus({ preventScroll: true });
+            window.history.replaceState(null, "", window.location.pathname);
+          });
+          if (!transition) {
+            if (heading) {
+              (heading as HTMLElement).style.viewTransitionName = "";
+            }
+            el.scrollIntoView({ behavior: "smooth" });
+            el.focus({ preventScroll: true });
+            return;
+          }
+          activeNavTransitionRef.current = transition;
+
+          // Short fade & slide animation on destination heading (< 400ms)
+          if (heading) {
+            heading.animate(
+              [
+                { opacity: 0.2, transform: "translateY(8px)" },
+                { opacity: 1, transform: "translateY(0)" },
+              ],
+              {
+                duration: 320, // under 400ms
+                easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+              }
+            );
+          }
+
+          transition.finished
+            .catch(() => { })
+            .finally(() => {
+              if (heading) {
+                (heading as HTMLElement).style.viewTransitionName = "";
+              }
+              if (activeNavTransitionRef.current === transition) {
+                activeNavTransitionRef.current = null;
+              }
+            });
+        } catch {
+          if (heading) {
+            (heading as HTMLElement).style.viewTransitionName = "";
+          }
+          el.scrollIntoView({ behavior: "smooth" });
+          el.focus({ preventScroll: true });
+        }
       }
     } else {
       window.location.href = "/" + href;
@@ -146,16 +275,12 @@ export function Header() {
     if (recent.length >= 5) {
       e.preventDefault();
       nameClickHistoryRef.current = [];
-      setIsGlitching(true);
 
-      const prefersReducedMotion =
-        typeof window !== "undefined" &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      if (prefersReducedMotion) {
+      if (prefersReducedMotion()) {
         setIsGlitching(false);
         setCrashOpen(true);
       } else {
+        setIsGlitching(true);
         setTimeout(() => {
           setIsGlitching(false);
           setCrashOpen(true);
@@ -167,18 +292,38 @@ export function Header() {
   return (
     <>
       <header
-        className="sticky top-0 z-40 w-full bg-[var(--paper)]/95 backdrop-blur-xs border-b border-[var(--rule)] transition-colors duration-200"
+        onFocus={() => setIsVisible(true)}
+        className={`sticky top-0 z-40 w-full bg-[var(--paper)]/95 backdrop-blur-xs border-b border-[var(--rule)] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          isVisible ? "translate-y-0" : "-translate-y-full"
+        }`}
       >
         <div className="max-w-[1120px] mx-auto px-4 sm:px-8 h-16 flex items-center justify-between gap-4">
           {/* Wordmark */}
           <Link
             href="/"
             onClick={handleNameClick}
-            className={`font-serif text-lg sm:text-xl font-bold tracking-tight text-[var(--ink)] hover:text-[var(--accent)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 shrink-0 select-none ${
+            title="Kartik Koundal (psst: click a few times)"
+            className={`font-serif text-lg sm:text-xl font-bold tracking-tight text-[var(--ink)] hover:text-[var(--accent)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 shrink-0 select-none inline-flex items-center gap-2.5 ${
               isGlitching ? "animate-name-glitch text-rose-500" : ""
             }`}
           >
-            {siteContent.hero.name}
+            {/* Scroll-revealed circular avatar (NO borders) */}
+            <span
+              className={`relative rounded-full overflow-hidden border-0 ring-0 shrink-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                isScrolled
+                  ? "w-7 h-7 sm:w-8 sm:h-8 opacity-100 scale-100 mr-0.5"
+                  : "w-0 h-7 sm:h-8 opacity-0 scale-75 pointer-events-none -mr-2"
+              }`}
+            >
+              <img
+                src="/kartik-portrait-hero.webp"
+                alt="Kartik Koundal"
+                width={32}
+                height={32}
+                className="w-full h-full object-cover rounded-full"
+              />
+            </span>
+            <span>{siteContent.hero.name}</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -227,7 +372,7 @@ export function Header() {
               onClick={() => setPaletteOpen(true)}
               className="inline-flex items-center gap-1.5 px-2.5 py-1.5 border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink-muted)] hover:text-[var(--ink)] hover:border-[var(--accent)] rounded-[4px] text-xs font-mono cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               aria-label="Open Android Logcat command palette (Ctrl+K)"
-              title="Android Studio Logcat (Ctrl+K)"
+              title="Android Studio Logcat (Ctrl+K - psst: try running 'coffee' or 'easter')"
             >
               <Terminal size={14} strokeWidth={1.75} className="text-[var(--accent)]" />
               <span className="hidden sm:inline">Logcat</span>
@@ -238,14 +383,15 @@ export function Header() {
 
             {/* Resume Link */}
             {isResumeAvailable ? (
-              <a
-                href={resumeSlot.src!}
-                download="Kartik-Koundal-Resume.pdf"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 min-h-[36px] border border-[var(--rule)] bg-[var(--paper)] text-[var(--ink)] hover:border-[var(--accent)] rounded-[4px] text-xs font-mono font-medium transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+              <button
+                type="button"
+                onClick={openResumeModal}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 min-h-[36px] border border-[var(--rule)] bg-[var(--paper)] text-[var(--ink)] hover:border-[var(--accent)] rounded-[4px] text-xs font-mono font-medium transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+                title="View and download résumé"
               >
                 <FileText size={14} strokeWidth={1.5} />
                 <span>{siteContent.nav.resume}</span>
-              </a>
+              </button>
             ) : (
               <div className="relative group hidden sm:inline-block">
                 <button
@@ -256,7 +402,7 @@ export function Header() {
                   <FileText size={14} strokeWidth={1.5} />
                   <span>{siteContent.nav.resume}</span>
                 </button>
-                <div className="absolute top-full right-0 mt-2 hidden group-hover:block bg-[#111315] text-white px-2.5 py-1 rounded-[4px] font-mono text-[10px] whitespace-nowrap shadow-lg border border-white/10 z-30">
+                <div className="absolute top-full right-0 mt-2 hidden group-hover:block bg-[var(--ink)] text-[var(--paper)] px-2.5 py-1 rounded-[4px] font-mono text-[10px] whitespace-nowrap shadow-[0_1px_2px_rgba(0,0,0,0.06)] border border-[var(--paper)]/10 z-30">
                   {contactContent.resumePending}
                 </div>
               </div>
@@ -312,14 +458,17 @@ export function Header() {
 
             <div className="pt-6 border-t border-[var(--rule)]">
               {isResumeAvailable ? (
-                <a
-                  href={resumeSlot.src!}
-                  download="Kartik-Koundal-Resume.pdf"
-                  className="w-full px-4 py-3 border border-[var(--rule)] rounded-[4px] bg-[var(--ink)] text-[var(--paper)] font-mono text-sm font-medium flex items-center justify-between"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    openResumeModal();
+                  }}
+                  className="w-full px-4 py-3 border border-[var(--rule)] rounded-[4px] bg-[var(--ink)] text-[var(--paper)] font-mono text-sm font-medium flex items-center justify-between cursor-pointer"
                 >
                   <span>{siteContent.nav.resume} (PDF)</span>
                   <FileText size={16} strokeWidth={1.5} />
-                </a>
+                </button>
               ) : (
                 <div className="w-full px-4 py-3 border border-[var(--rule)] rounded-[4px] bg-[var(--surface)] text-[var(--ink-muted)] opacity-70 font-mono text-sm flex items-center justify-between cursor-not-allowed">
                   <span>{contactContent.resumePending}</span>

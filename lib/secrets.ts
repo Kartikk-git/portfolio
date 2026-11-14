@@ -6,7 +6,7 @@
 
 import { contactContent } from "@/content/contact";
 
-export type EggId = "bugdroid" | "crash" | "tabreturn" | "konami" | "theme" | "physics";
+export type EggId = "bugdroid" | "crash" | "tabreturn" | "konami" | "theme";
 
 export interface EggDefinition {
   id: EggId;
@@ -40,45 +40,50 @@ export const ALL_EGGS: EggDefinition[] = [
     name: "Ultra Theme Escalation",
     hint: "Hold or rapidly tap the sun/moon button in the header.",
   },
-  {
-    id: "physics",
-    name: "Physics Playground",
-    hint: "Play with gravity below the hero section and throw an object.",
-  },
 ];
 
 const STORAGE_KEY = "kartik_portfolio_secrets_v2";
 
+// In-memory fallback if localStorage is blocked or restricted
+const inMemoryFallback: Partial<Record<EggId, boolean>> = {};
+
 export function getStoredSecrets(): Record<EggId, boolean> {
-  const initial: Record<EggId, boolean> = {
-    bugdroid: false,
-    crash: false,
-    tabreturn: false,
-    konami: false,
-    theme: false,
-    physics: false,
-  };
+  const initial = ALL_EGGS.reduce((acc, egg) => {
+    acc[egg.id] = false;
+    return acc;
+  }, {} as Record<EggId, boolean>);
 
   if (typeof window === "undefined") return initial;
 
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return initial;
-    const parsed = JSON.parse(raw);
-    return {
-      bugdroid: Boolean(parsed.bugdroid),
-      crash: Boolean(parsed.crash),
-      tabreturn: Boolean(parsed.tabreturn),
-      konami: Boolean(parsed.konami),
-      theme: Boolean(parsed.theme),
-      physics: Boolean(parsed.physics),
-    };
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      ALL_EGGS.forEach((egg) => {
+        if (parsed && typeof parsed[egg.id] === "boolean") {
+          initial[egg.id] = parsed[egg.id];
+        }
+      });
+      return initial;
+    }
   } catch {
-    return initial;
+    // LocalStorage blocked, fall through to inMemoryFallback
   }
+
+  // Merge in-memory state
+  ALL_EGGS.forEach((egg) => {
+    if (typeof inMemoryFallback[egg.id] === "boolean") {
+      initial[egg.id] = inMemoryFallback[egg.id]!;
+    }
+  });
+
+  return initial;
 }
 
 function saveStoredSecrets(state: Record<EggId, boolean>): void {
+  // Always update inMemoryFallback
+  Object.assign(inMemoryFallback, state);
+
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -87,26 +92,20 @@ function saveStoredSecrets(state: Record<EggId, boolean>): void {
   }
 }
 
-function getProgressBar(found: number, total: number = 5): string {
-  const filled = "█".repeat(found);
-  const empty = "░".repeat(Math.max(0, total - found));
-  return `[${filled}${empty}]`;
-}
-
 export function printDevToolsSummary(): void {
   if (typeof window === "undefined") return;
 
-  const state = getStoredSecrets();
-  const foundCount = ALL_EGGS.filter((e) => state[e.id]).length;
-  const bar = getProgressBar(foundCount, ALL_EGGS.length);
-
-  // Styled green/mono console banner
   console.log(
-    `%cHey, you opened DevTools. Curious people get rewarded.\n%cEaster eggs found: ${foundCount}/${ALL_EGGS.length}  ${bar}`,
-    "color: #5FB38F; font-size: 14px; font-weight: bold; font-family: monospace; line-height: 1.5;",
-    "color: #A2A7AE; font-size: 12px; font-family: monospace;"
+    "%cNice, you're curious.%c Try the Konami code. Hint: ↑ ↑ ↓ ↓...",
+    "color: #5FB38F; font-size: 13px; font-weight: bold; padding: 2px 4px;",
+    "color: #9CA3AF; font-size: 12px;"
   );
+}
 
+export function printSecretsStatusTable(): void {
+  if (typeof window === "undefined") return;
+
+  const state = getStoredSecrets();
   const tableData = ALL_EGGS.map((egg) => {
     const isFound = Boolean(state[egg.id]);
     return {
@@ -183,6 +182,10 @@ export function initSecretsTracker(): void {
       return `Hint for a hidden secret: "${randomEgg.hint}"`;
     },
     reset() {
+      // Clear in-memory fallback
+      ALL_EGGS.forEach((egg) => {
+        inMemoryFallback[egg.id] = false;
+      });
       try {
         localStorage.removeItem(STORAGE_KEY);
       } catch {
@@ -192,11 +195,11 @@ export function initSecretsTracker(): void {
         "%cSecrets progress has been reset.",
         "color: #E9E8E3; font-family: monospace;"
       );
-      printDevToolsSummary();
+      printSecretsStatusTable();
       return `Progress reset to 0/${ALL_EGGS.length}.`;
     },
     status() {
-      printDevToolsSummary();
+      printSecretsStatusTable();
     },
   };
 
@@ -204,7 +207,7 @@ export function initSecretsTracker(): void {
   try {
     Object.defineProperty(window, "secrets", {
       get() {
-        printDevToolsSummary();
+        printSecretsStatusTable();
         return secretsAPI;
       },
       configurable: true,
@@ -215,4 +218,9 @@ export function initSecretsTracker(): void {
 
   // Print initial banner and table on page load
   printDevToolsSummary();
+}
+
+// Auto-initialize in browser environment immediately so DevTools is always populated
+if (typeof window !== "undefined") {
+  initSecretsTracker();
 }

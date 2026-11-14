@@ -128,7 +128,13 @@ export function AndroidEraEasterEgg() {
   // Keyboard listener for Konami sequence: ↑ ↑ ↓ ↓ ← → ← →
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore keypresses if the user is typing in an input, textarea, or contentEditable
+      // 1. Ignore if any modal/dialog is currently active
+      if (document.querySelector('[role="dialog"], [aria-modal="true"]')) {
+        sequenceProgressRef.current = 0;
+        return;
+      }
+
+      // 2. Ignore keypresses if the user is typing in an input, textarea, or contentEditable
       const target = e.target as HTMLElement | null;
       if (
         target &&

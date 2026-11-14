@@ -52,13 +52,15 @@ Canonical copy for kartik-koundal's portfolio. Every block has a stable key in b
 
 `hero.name` Kartik Koundal
 
-`hero.headline` I build native Android apps and data-driven web tools.
+`hero.headline` I turn ideas into apps, and curiosity into code.
 
 `hero.intro`
 
-I'm a Computer Science undergraduate at Dronacharya College of Engineering, interested in building software that solves practical problems. I work primarily with Java and Kotlin for Android development, alongside Python, Flask and JavaScript for web applications.
+I'm Kartik, a third-year Computer Science undergraduate at Dronacharya College of Engineering, Gurugram. I enjoy building things, experimenting with technologies and solving problems through code.
 
-My work includes developing native Android applications and building data-driven systems, with an emphasis on writing structured, maintainable code. I'm currently looking for software development internship opportunities where I can contribute to real projects, learn from experienced developers and grow as an engineer.
+My primary focus is native Android development with Kotlin and Java. I also work with Python, Flask and JavaScript, and enjoy exploring how different parts of software come together to create useful applications.
+
+I'm currently focused on building better projects, sharpening my problem-solving skills and becoming industry-ready. I'm looking for software development and Android internship opportunities where I can learn from experienced developers, contribute to real products and grow as an engineer.
 
 `hero.focus.label` Focus
 
@@ -84,7 +86,7 @@ My work includes developing native Android applications and building data-driven
 
 `projects.eyebrow` 01 · Projects
 
-`projects.heading` Selected Works
+`projects.heading` Projects
 
 `projects.intro` Five projects across native Android, a hackathon team build and data-driven web apps. Student Organizer is the one I'm putting the most into right now, so it gets the fullest write-up. Each card opens a detailed view.
 
@@ -392,29 +394,41 @@ The sign-out control in the navigation bar is currently a placeholder with no lo
 
 `about.eyebrow` 02 · About
 
-`about.heading` Background
+`about.heading` About Me
 
 `about.subline` Computer Science undergraduate at Dronacharya College of Engineering, Gurugram.
 
 `about.lead`
 
-I'm a B.Tech Computer Science student at Dronacharya College of Engineering in Gurugram, graduating in 2028. I live in New Delhi.
+I'm Kartik, a third-year B.Tech Computer Science student at Dronacharya College of Engineering, Gurugram, graduating in 2028. I'm someone who enjoys figuring out how things work, breaking them, fixing them, and occasionally spending way too much time making them work better.
+
+`about.intro.2`
+
+My journey into development started with HTML, CSS and Python, building small websites and applications. Over time, my curiosity took me towards Android development, where I found myself enjoying the combination of logic, design and problem-solving.
 
 `about.body.1`
 
-I came to programming through the web. My first projects were a hospital website and a personal portfolio in HTML and CSS, then a Flask application in Python. Android is where I've settled: Student Organizer, my main project, is written in Kotlin with Jetpack Compose and Room, and it's the project where I've learned the most about structuring a codebase, not just getting a screen to work.
+I started with the basics of web development, building a hospital website, a personal portfolio and a Flask application. Eventually, I moved towards Android development and started exploring Kotlin, Android Studio and modern app architecture. That's where things got interesting.
 
 `about.body.2`
 
-I like building things that keep working when conditions aren't ideal. That's why Student Organizer stores everything on the device, and why TEJOVIK's chat has a fallback when its backend is down. I try to keep data models simple, keep each package responsible for one thing, and write code that I can come back to a month later and still follow.
+My main project, Student Organizer, is where I put most of my learning into practice. It's an Android application built with Kotlin, Jetpack Compose and Room, designed to make student life a little more organized. More than just adding features, I've enjoyed learning how to structure an application, manage data and build things that actually work together.
 
 `about.body.3`
 
-Alongside projects I keep my fundamentals in shape through data structures and algorithms practice on LeetCode and CodeChef, and through an NPTEL Programming in Java course from IIT Kharagpur, where I earned an Elite certificate with a score of 95%.
+I'm not someone who likes sticking to just one technology. Alongside Android development, I'm exploring backend concepts, improving my understanding of software architecture and strengthening my programming fundamentals. I enjoy understanding not just how something works, but why it's built that way.
 
 `about.body.4`
 
-I'm looking for a software or Android internship where I can contribute to a real product, get my code reviewed, and learn how a team ships software. My short-term goal is to become a dependable Android developer; beyond that, I'm interested in the backend side that Android apps depend on.
+I regularly practice Data Structures and Algorithms on LeetCode and CodeChef, because writing code is one thing, but learning to write better and more efficient code is another. I've also completed NPTEL's Programming in Java course with an Elite certificate and a score of 95%.
+
+`about.body.5`
+
+I'm currently focused on becoming a stronger Android developer, building meaningful projects and preparing myself for real-world software development. I'm also interested in exploring AI/ML and backend technologies as I continue expanding my skill set.
+
+`about.closing`
+
+I believe there's always something new to learn, something better to build and probably another bug hiding somewhere. That's what makes development interesting to me.
 
 `about.facts.label` At a glance
 

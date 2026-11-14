@@ -1,10 +1,29 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
+import dynamic from "next/dynamic";
+import { X } from "lucide-react";
 import { projectsContent, ProjectItem } from "@/content/projects";
 import { siteContent } from "@/content/site";
+import { hasRealMedia } from "@/content/media";
+import { useFocusTrap } from "@/lib/focus-trap";
 import { MediaSlot } from "./MediaSlot";
 import { Lightbox } from "./Lightbox";
+
+// The interactive Android mockup is a large self-contained component; it only
+// renders inside the Student Organizer detail view, so it is code-split and
+// loaded on demand.
+const AndroidMockupDemo = dynamic(
+  () => import("./AndroidMockupDemo").then((mod) => mod.AndroidMockupDemo),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex justify-center py-6">
+        <span className="font-mono text-xs text-[var(--ink-muted)]">Loading prototype...</span>
+      </div>
+    ),
+  }
+);
 
 interface ProjectDetailProps {
   project: ProjectItem;
@@ -45,6 +64,7 @@ export function ProjectDetail({
   isReviewMode = false,
 }: ProjectDetailProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const prevActiveRef = useRef<HTMLElement | null>(null);
@@ -53,14 +73,27 @@ export function ProjectDetail({
   const [activeSection, setActiveSection] = useState("overview");
   const [lightboxSlotIndex, setLightboxSlotIndex] = useState<number | null>(null);
 
+  useFocusTrap(panelRef, true);
+
   const allProjects = projectsContent.items;
   const currentIndex = allProjects.findIndex((p) => p.id === project.id);
   const prevProject = currentIndex > 0 ? allProjects[currentIndex - 1] : allProjects[allProjects.length - 1];
   const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentIndex + 1] : allProjects[0];
 
+  // Gallery reduced to slots that actually have an asset; empty slots are omitted
+  const allSlots = project.gallerySlots ?? [];
+  const portraitSlots = allSlots.filter((id) => id.startsWith("p1-shot-") && hasRealMedia(id));
+  const landscapeSlots = allSlots.filter((id) => !id.startsWith("p1-shot-") && hasRealMedia(id));
+  const gallerySlots = portraitSlots.length > 0 ? [...portraitSlots, ...landscapeSlots] : allSlots.filter(hasRealMedia);
+
   useEffect(() => {
     prevActiveRef.current = document.activeElement as HTMLElement | null;
-    panelRef.current?.focus();
+    // Ensure focus moves to the detail view heading when it opens
+    if (headingRef.current) {
+      headingRef.current.focus();
+    } else {
+      panelRef.current?.focus();
+    }
     return () => {
       prevActiveRef.current?.focus();
     };
@@ -98,16 +131,21 @@ export function ProjectDetail({
   }, []);
 
   // Sections available for this project
-  const sections = [
-    { id: "overview", label: projectsContent.detailLabels.overview, exists: !!project.overview },
-    { id: "problem", label: projectsContent.detailLabels.problem, exists: !!project.problem },
-    { id: "contribution", label: projectsContent.detailLabels.contribution, exists: !!project.contribution },
-    { id: "functionality", label: projectsContent.detailLabels.functionality, exists: !!project.functionality },
-    { id: "implementation", label: projectsContent.detailLabels.implementation, exists: !!project.implementation },
-    { id: "decisions", label: projectsContent.detailLabels.decisions, exists: !!project.decisions },
-    { id: "next", label: projectsContent.detailLabels.next, exists: !!project.next },
-    { id: "gallery", label: projectsContent.detailLabels.gallery, exists: project.gallerySlots && project.gallerySlots.length > 0 },
-  ].filter((s) => s.exists);
+  const sections = useMemo(
+    () =>
+      [
+        { id: "overview", label: projectsContent.detailLabels.overview, exists: !!project.overview },
+        { id: "demo", label: "Interactive Demo", exists: project.slug === "student-organizer" },
+        { id: "problem", label: projectsContent.detailLabels.problem, exists: !!project.problem },
+        { id: "contribution", label: projectsContent.detailLabels.contribution, exists: !!project.contribution },
+        { id: "functionality", label: projectsContent.detailLabels.functionality, exists: !!project.functionality },
+        { id: "implementation", label: projectsContent.detailLabels.implementation, exists: !!project.implementation },
+        { id: "decisions", label: projectsContent.detailLabels.decisions, exists: !!project.decisions },
+        { id: "next", label: projectsContent.detailLabels.next, exists: !!project.next },
+        { id: "gallery", label: projectsContent.detailLabels.gallery, exists: gallerySlots.length > 0 },
+      ].filter((s) => s.exists),
+    [project, gallerySlots.length]
+  );
 
   // Reset scroll and active tab when switching project
   useEffect(() => {
@@ -142,8 +180,8 @@ export function ProjectDetail({
         const el = document.getElementById(`detail-${sec.id}`);
         if (!el) continue;
         const rect = el.getBoundingClientRect();
-        // Section is active when its top has reached within 72px of container top
-        if (rect.top - containerTop <= 72) {
+        // Section is active when its top is within 140px of container top
+        if (rect.top - containerTop <= 140) {
           current = sec.id;
         }
       }
@@ -202,7 +240,7 @@ export function ProjectDetail({
         onWheel={(e) => e.preventDefault()}
         onTouchMove={(e) => e.preventDefault()}
         aria-hidden="true"
-        className="fixed inset-0 z-50 bg-[#111315]/85 backdrop-blur-md transition-all duration-300"
+        className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs transition-all duration-300"
       />
 
       {/* Centered Primary Detailed View Modal */}
@@ -213,6 +251,7 @@ export function ProjectDetail({
           aria-label={project.title}
           tabIndex={-1}
           ref={panelRef}
+          style={{ viewTransitionName: "project-card" }}
           className="pointer-events-auto w-full max-w-4xl max-h-[90vh] bg-[var(--paper)] border border-[var(--rule)] rounded-[4px] shadow-2xl flex flex-col focus:outline-none overflow-hidden transition-all duration-200 overscroll-contain"
         >
           {/* Header Bar */}
@@ -245,9 +284,10 @@ export function ProjectDetail({
               <button
                 onClick={onClose}
                 aria-label={projectsContent.detailLabels.close}
-                className="font-mono text-xs px-3 py-1.5 bg-[var(--ink)] text-[var(--paper)] rounded-[4px] hover:opacity-90 cursor-pointer ml-2 font-medium transition-opacity"
+                className="font-mono text-xs px-2.5 py-1.5 bg-[var(--ink)] text-[var(--paper)] rounded-[4px] hover:opacity-90 cursor-pointer ml-2 font-medium transition-opacity inline-flex items-center gap-1.5"
               >
-                {siteContent.ui.modalClose} [Esc]
+                <span>{siteContent.ui.modalClose} [Esc]</span>
+                <X size={14} strokeWidth={2} />
               </button>
             </div>
           </div>
@@ -278,11 +318,16 @@ export function ProjectDetail({
           {/* Scrollable Body Content */}
           <div
             ref={scrollContainerRef}
-            className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-10 overscroll-contain"
+            className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-10 overscroll-contain relative scroll-smooth"
           >
             {/* Header Section */}
             <div>
-              <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-[var(--ink)] tracking-tight mb-2.5">
+              <h1
+                ref={headingRef}
+                tabIndex={-1}
+                style={{ viewTransitionName: "project-title" }}
+                className="font-serif text-2xl sm:text-3xl font-semibold text-[var(--ink)] tracking-tight mb-2.5 focus:outline-none"
+              >
                 {project.title}
               </h1>
               <p className="font-sans text-sm sm:text-[15px] text-[var(--ink-muted)] leading-relaxed mb-5">
@@ -290,7 +335,11 @@ export function ProjectDetail({
               </p>
 
               {/* Tags */}
-              <div className="flex flex-wrap gap-2 mb-6">
+              <div
+                data-tags-container
+                style={{ viewTransitionName: "project-tags" }}
+                className="flex flex-wrap gap-2 mb-6"
+              >
                 {project.tags.map((tag) => (
                   <span
                     key={tag}
@@ -303,14 +352,12 @@ export function ProjectDetail({
 
               {/* Links Row */}
               <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-[var(--rule)]">
-                {(project.slug === "student-organizer" || project.slug === "tejovik") && (
-                  <a
-                    href={`/projects/${project.slug}`}
-                    className="font-mono text-xs px-3.5 py-1.5 bg-[var(--ink)] text-[var(--paper)] hover:opacity-90 transition-opacity inline-flex items-center gap-1.5 rounded-[4px] font-medium"
-                  >
-                    Full Case Study &rarr;
-                  </a>
-                )}
+                <a
+                  href={`/projects/${project.slug}`}
+                  className="font-mono text-xs px-3.5 py-1.5 bg-[var(--ink)] text-[var(--paper)] hover:opacity-90 transition-opacity inline-flex items-center gap-1.5 rounded-[4px] font-medium"
+                >
+                  Full Case Study &rarr;
+                </a>
                 {project.links.source && (
                   <a
                     href={project.links.source}
@@ -368,6 +415,23 @@ export function ProjectDetail({
                 {project.overview.split("\n\n").map((para, i) => (
                   <p key={i}>{renderInlineFormatted(para)}</p>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Section: Interactive Android Prototype (Student Organizer only) */}
+          {project.slug === "student-organizer" && (
+            <div id="detail-demo" className="space-y-4 pt-6 border-t border-[var(--rule)]">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h2 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
+                  Interactive Android Prototype
+                </h2>
+                <span className="font-mono text-xs text-[var(--ink-muted)]">
+                  Live Figma &amp; Jetpack Compose Prototype
+                </span>
+              </div>
+              <div className="flex justify-center py-6 bg-[var(--surface-subtle)] border border-[var(--rule)] rounded-[6px] overflow-hidden">
+                <AndroidMockupDemo />
               </div>
             </div>
           )}
@@ -468,28 +532,28 @@ export function ProjectDetail({
             </div>
           )}
 
-          {/* Section: Gallery */}
-          {project.gallerySlots && project.gallerySlots.length > 0 && (
+          {/* Section: Gallery — only real assets render; empty slots are omitted */}
+          {gallerySlots.length > 0 && (
             <div id="detail-gallery" className="space-y-4 pt-6 border-t border-[var(--rule)]">
               <div className="flex items-baseline justify-between">
                 <h2 className="font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold">
                   {projectsContent.detailLabels.gallery}
                 </h2>
                 <span className="font-mono text-xs text-[var(--ink-muted)]">
-                  {project.gallerySlots.length} assets
+                  {gallerySlots.length} assets
                 </span>
               </div>
 
               {/* Portrait vs landscape grid */}
-              {project.id === "p1" ? (
-                // Student organizer: horizontal snap strip for 6 portrait screenshots + grid for demo/arch/erd
+              {portraitSlots.length > 0 ? (
+                // Student organizer: horizontal snap strip for portrait screenshots + grid for demo/arch/erd
                 <div className="space-y-6">
                   <div>
                     <span className="block font-mono text-[11px] uppercase tracking-wider text-[var(--ink-muted)] mb-3">
                       Interface Screens (Scroll horizontally)
                     </span>
                     <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
-                      {project.gallerySlots.slice(0, 6).map((slotId, idx) => (
+                      {portraitSlots.map((slotId, idx) => (
                         <div key={slotId} className="w-56 shrink-0 snap-start">
                           <MediaSlot
                             slotId={slotId}
@@ -500,24 +564,26 @@ export function ProjectDetail({
                     </div>
                   </div>
 
-                  <div>
-                    <span className="block font-mono text-[11px] uppercase tracking-wider text-[var(--ink-muted)] mb-3">
-                      Walkthrough & System Architecture
-                    </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {project.gallerySlots.slice(6).map((slotId, idx) => (
-                        <MediaSlot
-                          key={slotId}
-                          slotId={slotId}
-                          onClick={() => setLightboxSlotIndex(6 + idx)}
-                        />
-                      ))}
+                  {landscapeSlots.length > 0 && (
+                    <div>
+                      <span className="block font-mono text-[11px] uppercase tracking-wider text-[var(--ink-muted)] mb-3">
+                        Walkthrough &amp; System Architecture
+                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {landscapeSlots.map((slotId, idx) => (
+                          <MediaSlot
+                            key={slotId}
+                            slotId={slotId}
+                            onClick={() => setLightboxSlotIndex(portraitSlots.length + idx)}
+                          />
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {project.gallerySlots.map((slotId, idx) => (
+                  {gallerySlots.map((slotId, idx) => (
                     <MediaSlot
                       key={slotId}
                       slotId={slotId}
@@ -535,7 +601,7 @@ export function ProjectDetail({
       {/* Lightbox when slot clicked */}
       {lightboxSlotIndex !== null && (
         <Lightbox
-          slots={project.gallerySlots}
+          slots={gallerySlots}
           initialIndex={lightboxSlotIndex}
           onClose={() => setLightboxSlotIndex(null)}
         />

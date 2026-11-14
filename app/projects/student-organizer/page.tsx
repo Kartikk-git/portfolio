@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "Student Organizer Case Study — Kartik Koundal",
   description:
     "Native Android Academic Management Application built with Kotlin, Jetpack Compose Material 3, ViewPager2, and Room database.",
+  alternates: {
+    canonical: "/projects/student-organizer",
+  },
 };
 
 const ROOM_ENTITIES = [
@@ -24,9 +27,13 @@ export default function StudentOrganizerPage() {
   return (
     <CaseStudyTemplate
       project={project}
+      prevProject={{
+        title: "Personal Portfolio (Earlier Version)",
+        href: "/projects/portfolio-v1",
+      }}
       nextProject={{
-        title: "TEJOVIK",
-        href: "/projects/tejovik",
+        title: "MPLAD: Empowered Indian",
+        href: "/projects/mplad",
       }}
       roomEntities={ROOM_ENTITIES}
     />

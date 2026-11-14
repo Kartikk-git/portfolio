@@ -18,8 +18,8 @@ export const siteContent = {
   hero: {
     eyebrow: "Open to software and Android internships",
     name: "Kartik Koundal",
-    headline: "I build native Android apps and data-driven web tools.",
-    intro: "I'm a Computer Science undergraduate at Dronacharya College of Engineering, interested in building software that solves practical problems. I work primarily with Java and Kotlin for Android development, alongside Python, Flask and JavaScript for web applications.\n\nMy work includes developing native Android applications and building data-driven systems, with an emphasis on writing structured, maintainable code. I'm currently looking for software development internship opportunities where I can contribute to real projects, learn from experienced developers and grow as an engineer.",
+    headline: "I turn ideas into apps, and curiosity into code.",
+    intro: "I'm Kartik, a third-year Computer Science undergraduate at Dronacharya College of Engineering, Gurugram. I enjoy building things, experimenting with technologies and solving problems through code.\n\nMy primary focus is native Android development with Kotlin and Java. I also work with Python, Flask and JavaScript, and enjoy exploring how different parts of software come together to create useful applications.\n\nI'm currently focused on building better projects, sharpening my problem-solving skills and becoming industry-ready. I'm looking for software development and Android internship opportunities where I can learn from experienced developers, contribute to real products and grow as an engineer.",
     focusLabel: "Focus",
     focusItemsRaw: "Kotlin · Jetpack Compose · Python · Flask · TypeScript",
     focusItems: ["Kotlin","Jetpack Compose","Python","Flask","TypeScript"],

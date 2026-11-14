@@ -74,6 +74,12 @@ export const credentialsContent = {
       title: "B.Tech, Computer Science & Engineering",
       meta: "Dronacharya College of Engineering, Gurugram · 2024 to 2028 · CGPA 7.55/10 ⚠ latest semester",
       body: "A four-year undergraduate degree in Computer Science and Engineering. My coursework and self-study concentrate on data structures and algorithms, object-oriented programming, databases and SQL, alongside the Android and web projects on this site.",
+      coursework: [
+        "Data Structures & Algorithms",
+        "Object-Oriented Programming (OOP)",
+        "Database Management Systems (DBMS)",
+        "SQL",
+      ],
       confirm: true, // ⚠ latest semester CGPA
     },
     {

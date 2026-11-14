@@ -1,6 +1,6 @@
 # Kartik Koundal — Developer Portfolio
 
-Personal engineering portfolio for Kartik Koundal, a B.Tech Computer Science student at Dronacharya College of Engineering, built for software engineering and native Android internship applications.
+Personal engineering portfolio for **Kartik Koundal**, a B.Tech Computer Science & Engineering student at Dronacharya College of Engineering, built for software engineering and native Android internship applications.
 
 Built with **Next.js 15 (App Router, static export)**, **TypeScript (strict)**, **Tailwind CSS v4**, and **Motion**.
 
@@ -19,72 +19,100 @@ Built with **Next.js 15 (App Router, static export)**, **TypeScript (strict)**, 
 
 ---
 
+## Site Structure & Key Sections
+
+1. **Hero**: Editorial introduction with current focus, quick positioning, resume download, and contact links.
+2. **Selected Works (`ProjectsSection.tsx`)**:
+   - Architectural timeline replacing generic card grids.
+   - All 5 projects visible in sequence: **Student Organizer** (Android), **MPLAD** (Civic-Tech), **Hospital Management**, **Portfolio v1**, and **TEJOVIK** (Student Wellness).
+   - Commit metadata, branch tags, and slide-over / inline case-study detail views.
+3. **About (`AboutSection.tsx`)**:
+   - Concise background, core technical focus, and engineering strengths.
+4. **Activity & Commit Logs (`CommitLogSection.tsx`)**:
+   - Interactive contribution heatmaps with real GitHub contributions (315 commits) and LeetCode submissions (144 submissions across 18 days).
+   - "Replay Year" animation and platform filtering.
+   - Dynamically code-split to maximize main-thread performance.
+5. **Technical Stack (`SkillsSection.tsx`)**:
+   - Grouped by Languages, Web, Core Fundamentals, Tools, and Frameworks.
+   - Interactive stack explorer highlighting related projects on focus/hover.
+6. **Work & Internships (`ExperienceSection.tsx`)**:
+   - **Industrial Trainee · Java Android Kotlin** at **S O Infotech (P) Ltd. (Ducat)** (8 June – 20 July 2026).
+   - Interactive modal viewers for the **Completion Certificate** and **Training Confirmation Letter**.
+   - Direct link to the 46-page Student Organizer Project Report PDF.
+7. **Education & Credentials (`EducationSection.tsx`)**:
+   - Left-ruled vertical timeline with scroll-linked progress animation.
+   - Formal education (B.Tech CSE, Class XII, Class X) and verified credentials (NPTEL Java Elite 95%, CodeChef Learning Tracks, Google Cloud Skill Badges).
+   - Accessible modal certificate previewer with keyboard navigation.
+8. **Contact & Footer (`ContactSection.tsx`, `Footer.tsx`)**:
+   - Quick copy-email feedback with accessible live region, profile links, and minimal back-to-top navigation.
+
+---
+
+## Privacy & Document Redaction
+
+All original documents in `docs/` are permanently redacted before being published to `public/docs-redacted/`:
+- **Permanent Pixel-Level Redactions**: Third-party names (e.g. father's name) and university roll numbers are redacted using solid black boxes rendered directly into the pixels.
+- **Zero Hidden Text / Overlays**: No CSS overlays or hidden text layers remain in public artifacts.
+- **EXIF Stripped**: Image metadata is stripped to protect user privacy.
+
+---
+
+## Built-in Developer Secrets & Easter Eggs
+
+The site includes 5 subtle, fully accessible developer secrets tracked via `lib/secrets.ts` and inspectable in DevTools:
+1. **Footer Bugdroid**: A friendly Android mascot watching from the footer edge.
+2. **Fake Crash Dialog**: Tapping the header name repeatedly triggers an authentic Android ANR/crash dialog.
+3. **Tab Return**: Leaving the browser tab for 45+ seconds triggers a subtle "welcome back" notification.
+4. **Android Eras (Konami Code)**: Typing `↑ ↑ ↓ ↓ ← → ← →` cycles through classic Android visual themes (Android 4.0 Holo, 5.0 Lollipop, Material You) with instant revert controls.
+5. **Ultra Theme Escalation**: Holding or rapidly toggling the theme button unlocks high-contrast Flashbang and pure AMOLED modes.
+
+Open DevTools (`F12`) to inspect progress via `secrets.status()`, get hints with `secrets.hint()`, or reset with `secrets.reset()`.
+
+---
+
 ## Content System & Source of Truth
 
 The website content layer strictly separates presentation from copy:
 
 ```
 content/
-├── website-content.md          # Canonical single source of truth (Deliverable A)
+├── website-content.md          # Canonical single source of truth
 ├── site.ts                     # Nav, hero, footer, and UI strings
 ├── projects.ts                 # 5 projects (Student Organizer, MPLAD, Hospital, Portfolio v1, TEJOVIK)
-├── about.ts                    # Story, background, at a glance facts, how I work strengths
-├── activity.ts                 # Commit log & activity chart templates
-├── skills.ts                   # 4 categories & skill chip tooltips
+├── about.ts                    # Story, background, at-a-glance facts
+├── activity.ts                 # Commit log & activity chart strings
+├── skills.ts                   # 4 categories & technology definitions
 ├── credentials.ts              # Verified certificates, formal education, modal labels
-├── contact.ts                  # Direct contact details, mailto subject, profile links
-├── media.json                  # Media manifest for all 22 asset slots
-├── media.ts                    # Media slot definitions and placeholder copy
+├── contact.ts                  # Direct contact details and profile links
+├── media.json                  # Media manifest for all asset slots
+├── media.ts                    # Media slot definitions and fallback copy
 ├── github-contributions.json   # 315 public commits from real GitHub calendar
 └── leetcode-contributions.json # 144 submissions across 18 days from real LeetCode data
 ```
 
 ### Content Validation
-Run the validator to guarantee every string matches canonical copy verbatim:
+Run the automated validator to ensure all strings match the canonical copy verbatim:
 ```bash
 npm run check:content
 ```
-
----
-
-## Key Features & Interactions
-
-1. **Slide-Over Project Detail Panels**:
-   - Every project card opens an accessible detail panel (720px slide-over on desktop, full-screen on mobile).
-   - Deep-linked via URL hashes (`#project/student-organizer`, `#project/tejovik`, etc.).
-   - Includes a sticky mini-nav with scroll-spy, previous/next project navigation, and a gallery strip.
-2. **Designed Media Placeholders & Lightbox**:
-   - When assets are pending (`src: null` in `content/media.json`), components render custom aspect-ratio placeholders with hairline borders, monospace tags, and hatch backgrounds.
-   - Clicking any gallery item opens a full-screen, keyboard-navigable Lightbox.
-   - To supply a real asset, simply change `"src": "/path/to/image.png"` in `content/media.json`.
-3. **Live Contribution Heatmaps**:
-   - Real GitHub contributions (315 commits) and LeetCode problem solving (144 submissions across 18 days).
-   - Tab switching between *All activity*, *GitHub*, and *LeetCode*.
-   - Month labels can be clicked to highlight that month's cells for 2 seconds.
-   - Hovering legend intensity levels isolates matching days.
-4. **Credential Preview Modal**:
-   - Timeline items feature a "Preview certificate" action opening `CertificateModal.tsx` with a metadata sidebar (*Issuer*, *Issued*, *Score*, *Credential ID*, *Verify*).
-   - CodeChef modal steps through all 5 completed tracks and assessments.
-5. **Command Palette (`⌘K` / `Ctrl+K`)**:
-   - Keyboard-operable modal searching across sections, projects, skills, and actions (toggle theme, copy email, download resume).
-6. **Developer Review Mode (`?review=1`)**:
-   - Visiting `/?review=1` activates review mode, outlining unconfirmed (`confirm: true`) statements with amber tags for quick audit.
-
 ---
 
 ## Development & Building
 
 ```bash
-# Verify all content matches canonical copy verbatim
+# Verify content keys against website-content.md
 npm run check:content
 
-# Run TypeScript typecheck
+# Run strict TypeScript typecheck
 npx tsc --noEmit
 
-# Start Next.js development server
+# Run ESLint
+npm run lint
+
+# Start Next.js local development server
 npm run dev
 
-# Build production static export (outputs to /out)
+# Build optimized production static export (outputs to /out)
 npm run build
 
 # Serve static output locally on port 3000
@@ -93,6 +121,16 @@ npm run serve
 
 ---
 
+## Lighthouse & Performance Benchmarks
+
+Audited on production static build:
+- **Accessibility**: **100** / 100
+- **Best Practices**: **100** / 100
+- **SEO**: **100** / 100
+- **Performance (Desktop)**: **94** / 100
+
+---
+
 ## Static Deployment
 
-The site exports pure HTML/CSS/JS to `/out` and is 100% compatible with GitHub Pages, Vercel, Netlify, or any static hosting provider.
+The site exports pure HTML/CSS/JS to `/out` and is 100% compatible with GitHub Pages, Vercel, Netlify, Cloudflare Pages, or any static hosting provider.

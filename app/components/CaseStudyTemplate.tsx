@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, ExternalLink, Layers, CheckCircle2, Download } f
 import { Github } from "./Icons";
 import { Project } from "@/content/projects";
 import { Header } from "./Header";
+import { AndroidMockupDemo } from "./AndroidMockupDemo";
 
 interface CaseStudyTemplateProps {
   project: any;
@@ -141,6 +142,156 @@ const caseStudyCopy: Record<
       },
     ],
   },
+  mplad: {
+    inBrief:
+      "A civic-tech decision-support platform engineered for Smart India Hackathon (SIH26102) to audit and explore local area development funds (MPLADS). It couples regulatory scheme compliance validation with an Isolation Forest unsupervised anomaly detection engine to surface high-priority review items for civil auditors and citizens.",
+    narrativeBuilt:
+      "Public development initiatives generate extensive, decentralized expenditure records that remain opaque and difficult for citizens and oversight bodies to monitor effectively. As the frontend engineer on this hackathon team, I designed and built the responsive user interface in TypeScript, HTML, and CSS, interfacing with a multi-tier microservice architecture comprising a FastAPI backend and a scikit-learn ML anomaly detection service.",
+    stackRationale: [
+      {
+        name: "TypeScript & Component UI",
+        rationale:
+          "Provides strict type safety, modular component hierarchy, and responsive layout styling for dense administrative data views.",
+      },
+      {
+        name: "FastAPI Backend",
+        rationale:
+          "Serves scheme rule verification, JWT authentication, and administrative endpoints over high-throughput asynchronous Python routes.",
+      },
+      {
+        name: "Isolation Forest (scikit-learn)",
+        rationale:
+          "Runs unsupervised outlier detection to compute anomaly scores from expenditure rates, project duration, and sanction amounts, surfacing human-review priorities.",
+      },
+      {
+        name: "Supabase & PostgreSQL",
+        rationale:
+          "Persists a 29-table relational governance schema with deterministic loading pipelines for official public ministry datasets.",
+      },
+    ],
+    detailedFeatures: [
+      {
+        title: "Citizen transparency portal",
+        detail:
+          "Allows public exploration of sanctioned works, fund allocations, and completion milestones across states, districts, and parliamentary constituencies.",
+      },
+      {
+        title: "Rule-based compliance validation",
+        detail:
+          "Evaluates proposed and active works against codified MPLADS scheme guidelines to detect procedural violations before fund release.",
+      },
+      {
+        title: "Isolation Forest anomaly inspection",
+        detail:
+          "Surfaces explainable anomaly scores with factor breakdowns, explicitly treating flags as prioritized human-audit recommendations rather than punitive assertions.",
+      },
+      {
+        title: "Administrative telemetry dashboards",
+        detail:
+          "Renders multi-dimensional charts tracking fund utilization velocity, stalled project backlogs, and regional expenditure parity.",
+      },
+    ],
+  },
+  "hospital-management": {
+    inBrief:
+      "A multi-page healthcare web portal architected with pure semantic HTML5 and responsive CSS3, establishing an accessible medical directory, appointment booking interface, and department catalog across smartphone, tablet, and desktop viewports without third-party frameworks.",
+    narrativeBuilt:
+      "Healthcare websites require immediate legibility, high visual reassurance, and resilient layout stability for patients under stress. I designed and constructed this five-page responsive portal to master core web fundamentals: semantic document outlining, mobile-first CSS Grid and Flexbox layouts, accessible form controls, and zero-dependency performance.",
+    stackRationale: [
+      {
+        name: "Semantic HTML5",
+        rationale:
+          "Structures clinical content with strictly defined landmark elements (<article>, <section>, <nav>, <header>) ensuring screen-reader compatibility and natural search discoverability.",
+      },
+      {
+        name: "Modern CSS3 (Grid & Flexbox)",
+        rationale:
+          "Delivers fluid multi-column layouts, mobile-responsive navigation bars, and consistent typography hierarchies with zero framework bloat.",
+      },
+      {
+        name: "Zero-Dependency Architecture",
+        rationale:
+          "Eliminates client-side JavaScript execution overhead, guaranteeing sub-second rendering speeds on constrained cellular networks.",
+      },
+      {
+        name: "GitHub Pages CI/CD",
+        rationale:
+          "Provides static asset hosting directly from version control with automated branch deployment.",
+      },
+    ],
+    detailedFeatures: [
+      {
+        title: "Multi-page information architecture",
+        detail:
+          "Structured five distinct navigational views: Home, Appointment Booking, Approved Doctors Directory, Healthcare Ideas, and Recent Success stories.",
+      },
+      {
+        title: "Clinical services catalog",
+        detail:
+          "Organizes cardiology, neurology, pediatrics, and emergency departments into clear, readable content cards with clinical descriptions.",
+      },
+      {
+        title: "Structured appointment interface",
+        detail:
+          "Features an accessible multi-input scheduling form with native HTML5 validation constraints for patient demographics, department routing, and preferred visit windows.",
+      },
+      {
+        title: "Physician directory & schedules",
+        detail:
+          "Presents credentialed doctor rosters, specialties, OPD consultation schedules, and room allocations in clean tabular views.",
+      },
+      {
+        title: "Preventive health & patient guides",
+        detail:
+          "Delivers curated wellness guidelines, emergency protocol instructions, and verified clinical recovery narratives.",
+      },
+    ],
+  },
+  "portfolio-v1": {
+    inBrief:
+      "My inaugural personal portfolio: a responsive single-page application built with semantic HTML, modular CSS, and vanilla JavaScript, deployed on GitHub Pages. It served as my foundational project for understanding browser event loops, DOM manipulation, responsive design principles, and automated deployment pipelines.",
+    narrativeBuilt:
+      "Before adopting modern full-stack frameworks, I wanted to understand how the web works at the metal: how stylesheets cascade across breakpoints, how native JavaScript interacts directly with the Document Object Model, and how to manage the lifecycle of a deployed application through Git. This project established that foundation and informed the architectural choices of this current Next.js portfolio.",
+    stackRationale: [
+      {
+        name: "Vanilla HTML5 & CSS3",
+        rationale:
+          "Constructed responsive UI layouts using native CSS custom properties, media queries, and flexbox containers without relying on utility libraries.",
+      },
+      {
+        name: "Plain JavaScript (ES6+)",
+        rationale:
+          "Handled smooth scroll navigation, interactive modal lightbox previews for credentials, and dynamic DOM manipulation natively.",
+      },
+      {
+        name: "GitHub Pages",
+        rationale:
+          "Provided reliable, version-controlled static hosting directly integrated with Git version control.",
+      },
+    ],
+    detailedFeatures: [
+      {
+        title: "Single-page responsive layout",
+        detail:
+          "Organized personal bio, project cards, verified certificate previews, and contact channels into an unbroken scroll experience.",
+      },
+      {
+        title: "Interactive DOM controls",
+        detail:
+          "Implemented lightweight client-side scripts for modal dialog toggling, certificate image inspection, and smooth section scrolling.",
+      },
+      {
+        title: "Mobile-first responsive grids",
+        detail:
+          "Utilized custom CSS media breakpoints to adapt typography, spacing, and multi-column card rows between mobile devices and wide screens.",
+      },
+      {
+        title: "Credential verification showcase",
+        detail:
+          "Embedded verified NPTEL and learning track certificates with accessible visual inspection overlays.",
+      },
+    ],
+  },
 };
 
 export function CaseStudyTemplate({
@@ -157,12 +308,15 @@ export function CaseStudyTemplate({
     () => [
       { id: "overview", label: "Overview" },
       { id: "built", label: "What I Built" },
+      ...(project.slug === "student-organizer"
+        ? [{ id: "prototype", label: "Interactive Prototype" }]
+        : []),
       { id: "stack", label: "Stack & Architecture" },
       ...(roomEntities ? [{ id: "entities", label: "Room Entities" }] : []),
       ...(project.whatILearned ? [{ id: "learned", label: "What I Learned" }] : []),
       { id: "links", label: "Repository & Links" },
     ],
-    [roomEntities, project.whatILearned]
+    [roomEntities, project.whatILearned, project.slug]
   );
 
   useEffect(() => {
@@ -200,7 +354,13 @@ export function CaseStudyTemplate({
     e.preventDefault();
     const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
+      const headerOffset = 96;
+      const elementPosition = el.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
       el.focus({ preventScroll: true });
       if (typeof window !== "undefined" && window.history) {
         window.history.replaceState(null, "", window.location.pathname);
@@ -256,7 +416,7 @@ export function CaseStudyTemplate({
         {/* Main Content with Sticky Section Index */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-start">
           {/* Sticky Section Index (Scroll-Spy) in Sidebar */}
-          <aside className="md:col-span-4 lg:col-span-3 md:sticky md:top-20">
+          <aside className="md:col-span-4 lg:col-span-3 md:sticky md:top-24 self-start">
             <nav
               className="space-y-1 font-mono text-xs border border-[var(--rule)] p-4 rounded-[4px] bg-[var(--surface)]/40 backdrop-blur-xs"
               aria-label="Case Study Contents"
@@ -341,6 +501,23 @@ export function CaseStudyTemplate({
                 </ul>
               </div>
             </section>
+
+            {/* Interactive Prototype Section (Student Organizer only) */}
+            {project.slug === "student-organizer" && (
+              <section id="prototype" className="scroll-mt-24 space-y-6">
+                <div className="flex items-baseline justify-between border-b border-[var(--rule)] pb-2">
+                  <h2 className="font-serif text-2xl font-semibold text-[var(--ink)]">
+                    Interactive Prototype
+                  </h2>
+                  <span className="font-mono text-xs text-[var(--accent)] uppercase tracking-wider">
+                    Live Android Demo
+                  </span>
+                </div>
+                <div className="flex justify-center py-6 bg-[var(--surface-subtle)] border border-[var(--rule)] rounded-[6px] overflow-hidden">
+                  <AndroidMockupDemo />
+                </div>
+              </section>
+            )}
 
             {/* Section 3: Stack & Architecture with Rationale */}
             <section id="stack" className="scroll-mt-24 space-y-6">

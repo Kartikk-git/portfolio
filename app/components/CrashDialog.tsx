@@ -56,6 +56,16 @@ export function CrashDialog({ isOpen, onClose }: CrashDialogProps) {
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-[fadeIn_0.2s_ease-out]"
     >
       <div className="relative w-full max-w-sm bg-[var(--surface)] border border-[var(--rule)] rounded-[8px] p-6 shadow-2xl space-y-4">
+        {/* Top-right close button */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-4 right-4 p-1 rounded-[4px] text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--paper)] transition-colors cursor-pointer"
+          aria-label="Close dialog"
+        >
+          <X size={16} strokeWidth={2} />
+        </button>
+
         {/* Header with Android crash title */}
         <div className="flex items-start gap-3">
           <div className="p-2 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 shrink-0 mt-0.5">

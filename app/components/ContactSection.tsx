@@ -8,6 +8,7 @@ import { siteContent } from "@/content/site";
 import { mediaManifest } from "@/content/media";
 import { revealVariants } from "@/lib/motion";
 import { Section } from "./Section";
+import { openResumeModal } from "./ResumeModal";
 
 interface ContactSectionProps {
   isReviewMode?: boolean;
@@ -50,6 +51,7 @@ export function ContactSection({ isReviewMode = false }: ContactSectionProps) {
       heading={contactContent.heading}
       intro={contactContent.intro}
       headerExtra="Direct Contact"
+      isLast={true}
     >
       <m.div
         variants={revealVariants}
@@ -111,14 +113,15 @@ export function ContactSection({ isReviewMode = false }: ContactSectionProps) {
 
             {/* Résumé (PDF) Button with pending state handling */}
             {isResumeAvailable ? (
-              <a
-                href={resumeSlot.src!}
-                download="Kartik-Koundal-Resume.pdf"
-                className="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-[4px] border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink)] text-xs font-mono font-medium hover:border-[var(--accent)] transition-colors focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+              <button
+                type="button"
+                onClick={openResumeModal}
+                className="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-[4px] border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink)] text-xs font-mono font-medium hover:border-[var(--accent)] transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+                title="View and download résumé"
               >
                 <Download size={14} strokeWidth={1.5} />
                 <span>{contactContent.cta.resume}</span>
-              </a>
+              </button>
             ) : (
               <div className="relative group">
                 <button
@@ -129,7 +132,7 @@ export function ContactSection({ isReviewMode = false }: ContactSectionProps) {
                   <Download size={14} strokeWidth={1.5} />
                   <span>{contactContent.cta.resume}</span>
                 </button>
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-[#111315] text-white px-2.5 py-1 rounded-[4px] font-mono text-[10px] whitespace-nowrap shadow-lg border border-white/10 z-20">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-[var(--ink)] text-[var(--paper)] px-2.5 py-1 rounded-[4px] font-mono text-[10px] whitespace-nowrap shadow-[0_1px_2px_rgba(0,0,0,0.06)] border border-[var(--paper)]/10 z-20">
                   {contactContent.resumePending}
                 </div>
               </div>

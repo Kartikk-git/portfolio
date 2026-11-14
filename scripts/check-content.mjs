@@ -55,7 +55,14 @@ for (const file of contentFiles) {
 let errors = 0;
 let checked = 0;
 
+// Keys retired from the rendered site by owner decision (2026-11-13):
+// visitor-visible placeholders are forbidden by the brief, so media slots
+// without an asset are omitted from the page instead of showing "coming soon"
+// copy. Their canonical strings stay in website-content.md for reference.
+const RETIRED_KEY_PREFIXES = ["ph."];
+
 for (const [key, expectedVal] of markdownEntries) {
+  if (RETIRED_KEY_PREFIXES.some((p) => key.startsWith(p))) continue;
   if (!expectedVal) continue;
   checked++;
   

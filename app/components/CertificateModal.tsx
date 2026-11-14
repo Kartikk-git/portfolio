@@ -1,8 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { X, ChevronRight } from "lucide-react";
 import { credentialsContent } from "@/content/credentials";
+import { mediaManifest } from "@/content/media";
 import { MediaSlot } from "./MediaSlot";
+import { useFocusTrap } from "@/lib/focus-trap";
 
 interface CertificateModalProps {
   certId: string;
@@ -11,9 +14,20 @@ interface CertificateModalProps {
   onNext?: () => void;
 }
 
+/** Resolve the first media slot that actually has an asset for a credential. */
+function certSlotId(certId: string): string | null {
+  if (mediaManifest[certId]?.src) return certId;
+  const cert = credentialsContent.certifications.find((c) => c.id === certId);
+  const itemSlot = cert?.items?.map((it) => it.slot).find((s) => mediaManifest[s]?.src);
+  return itemSlot ?? null;
+}
+
 export function CertificateModal({ certId, onClose, onPrev, onNext }: CertificateModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const prevActiveRef = useRef<HTMLElement | null>(null);
+  const [selectedSlotOverride, setSelectedSlotOverride] = useState<string | null>(null);
+
+  useFocusTrap(dialogRef, true);
 
   useEffect(() => {
     prevActiveRef.current = document.activeElement as HTMLElement | null;
@@ -54,6 +68,9 @@ export function CertificateModal({ certId, onClose, onPrev, onNext }: Certificat
 
   if (!cert) return null;
 
+  const defaultSlot = certSlotId(cert.id);
+  const activeSlot = selectedSlotOverride || defaultSlot;
+
   return (
     <div
       role="dialog"
@@ -69,13 +86,13 @@ export function CertificateModal({ certId, onClose, onPrev, onNext }: Certificat
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#111315]/85 backdrop-blur-md p-4 sm:p-6 transition-all duration-200 overscroll-contain"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 sm:p-6 transition-all duration-200 overscroll-contain"
     >
-      <div className="relative w-full max-w-4xl bg-[var(--paper)] border border-[var(--rule)] rounded-[4px] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] overscroll-contain">
+      <div className="relative w-full max-w-4xl bg-[var(--paper)] border border-[var(--rule)] rounded-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col md:flex-row max-h-[90vh] overscroll-contain">
         {/* Certificate Display Area */}
         <div className="flex-1 bg-[var(--surface)] p-6 sm:p-8 flex items-center justify-center border-b md:border-b-0 md:border-r border-[var(--rule)]">
           <div className="w-full max-w-lg">
-            <MediaSlot slotId={cert.id} isClickable={false} className="shadow-md" />
+            {activeSlot && <MediaSlot slotId={activeSlot} isClickable={false} />}
           </div>
         </div>
 
@@ -89,9 +106,10 @@ export function CertificateModal({ certId, onClose, onPrev, onNext }: Certificat
               <button
                 onClick={onClose}
                 aria-label={credentialsContent.modal.close}
-                className="font-mono text-xs px-3 py-1.5 bg-[var(--ink)] text-[var(--paper)] rounded-[4px] hover:opacity-90 cursor-pointer font-medium transition-opacity focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 shrink-0 shadow-sm"
+                className="font-mono text-xs px-2.5 py-1.5 bg-[var(--ink)] text-[var(--paper)] rounded-[4px] hover:opacity-90 cursor-pointer font-medium transition-opacity focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2 shrink-0 shadow-sm inline-flex items-center gap-1.5"
               >
-                Close [Esc]
+                <span>Close [Esc]</span>
+                <X size={14} strokeWidth={2} />
               </button>
             </div>
 
@@ -132,27 +150,41 @@ export function CertificateModal({ certId, onClose, onPrev, onNext }: Certificat
                     {cert.verifyLabel} &rarr;
                   </a>
                 </div>
-              ) : (
-                <div>
-                  <span className="block text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold mb-0.5">Verify</span>
-                  <span className="font-sans text-base italic opacity-75">Verification link pending confirmation</span>
-                </div>
-              )}
+              ) : null}
             </div>
 
-            {/* Sub-items for CodeChef or GCloud */}
+            {/* Sub-items for CodeChef or GCloud with interactive selection */}
             {cert.items && (
               <div className="mt-4 pt-4 border-t border-[var(--rule)]">
                 <span className="block font-mono text-xs uppercase tracking-[0.06em] text-[var(--accent)] font-semibold mb-2">
-                  Completed Tracks
+                  Completed Tracks &amp; Badges
                 </span>
-                <ul className="space-y-1 font-sans text-base text-[var(--ink)] list-disc list-inside">
-                  {cert.items.map((it, idx) => (
-                    <li key={idx}>
-                      {it.title} {it.score ? `(${it.score})` : ""}
-                    </li>
-                  ))}
-                </ul>
+                <div className="space-y-1 font-mono text-xs">
+                  {cert.items.map((it, idx) => {
+                    const hasAsset = Boolean(it.slot && mediaManifest[it.slot]?.src);
+                    const isCurrent = activeSlot === it.slot;
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => hasAsset && it.slot && setSelectedSlotOverride(it.slot)}
+                        className={`flex items-center justify-between p-1.5 rounded-[2px] transition-colors ${
+                          hasAsset
+                            ? "cursor-pointer hover:bg-[var(--surface)] text-[var(--ink)]"
+                            : "text-[var(--ink-muted)] opacity-60"
+                        } ${isCurrent ? "bg-[var(--accent-tint)] border border-[var(--accent-border)] font-semibold text-[var(--accent)]" : ""}`}
+                      >
+                        <span className="truncate">
+                          {it.title} {it.score ? `(${it.score})` : ""}
+                        </span>
+                        {hasAsset && (
+                          <span className="text-[10px] text-[var(--accent)] shrink-0 ml-1">
+                            {isCurrent ? "Active" : "View"} &rarr;
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
             {cert.badges && (

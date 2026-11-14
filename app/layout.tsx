@@ -3,8 +3,11 @@ import { sourceSerif4, ibmPlexSans, ibmPlexMono } from "./fonts";
 import { MotionProvider } from "./components/MotionProvider";
 import { AndroidEraEasterEgg } from "./components/AndroidEraEasterEgg";
 import { EasterEggsManager } from "./components/EasterEggsManager";
+import { ToastManager } from "./components/ToastManager";
+import { ResumeModal } from "./components/ResumeModal";
 import { siteContent } from "@/content/site";
 import { contactContent } from "@/content/contact";
+import { fontPreloads } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -19,13 +22,22 @@ export const metadata: Metadata = {
     description: siteContent.description,
     url: "https://kartikk-git.github.io",
     siteName: siteContent.title,
-    locale: "en_GB",
+    locale: "en_IN",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: `${siteContent.hero.name} · Portfolio`,
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: siteContent.title,
     description: siteContent.description,
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -76,22 +88,44 @@ export default function RootLayout({
       className={`${sourceSerif4.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable}`}
     >
       <head>
+        {/*
+          next/font preload links are dropped under output: "export"; these
+          restore them (see fontPreloads in app/fonts.ts and
+          scripts/check-fonts.mjs, which verifies this list after each build).
+        */}
+        {fontPreloads.map((href) => (
+          <link
+            key={href}
+            rel="preload"
+            as="font"
+            type="font/woff2"
+            href={href}
+            crossOrigin="anonymous"
+          />
+        ))}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.setAttribute('data-theme','light');}else{document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();`,
+          }}
+        />
+        {/* Hero intro plays only on a true first visit; returning visits skip it before first paint */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(sessionStorage.getItem('hero-seen')){document.documentElement.setAttribute('data-hero-seen','true');}else{sessionStorage.setItem('hero-seen','true');}}catch(e){}})();`,
           }}
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdPerson) }}
         />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js" async />
       </head>
       <body className="font-sans antialiased bg-[var(--paper)] text-[var(--ink)] min-h-screen">
         <MotionProvider>
           {children}
           <AndroidEraEasterEgg />
           <EasterEggsManager />
+          <ToastManager />
+          <ResumeModal />
         </MotionProvider>
       </body>
     </html>

@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { mediaManifest, mediaCopy, MediaSlotDef } from "@/content/media";
+import { X } from "lucide-react";
+import { mediaManifest, MediaSlotDef } from "@/content/media";
 import { siteContent } from "@/content/site";
+import { useFocusTrap } from "@/lib/focus-trap";
 
 interface LightboxProps {
   slots: string[];
@@ -14,6 +16,8 @@ export function Lightbox({ slots, initialIndex = 0, onClose }: LightboxProps) {
   const [index, setIndex] = useState(initialIndex);
   const dialogRef = useRef<HTMLDivElement>(null);
   const prevActiveRef = useRef<HTMLElement | null>(null);
+
+  useFocusTrap(dialogRef, true);
 
   useEffect(() => {
     prevActiveRef.current = document.activeElement as HTMLElement | null;
@@ -79,102 +83,66 @@ export function Lightbox({ slots, initialIndex = 0, onClose }: LightboxProps) {
       onTouchMove={(e) => {
         if (e.target === e.currentTarget) e.preventDefault();
       }}
-      className="fixed inset-0 z-50 flex flex-col justify-between bg-[#111315]/90 backdrop-blur-sm p-4 sm:p-6 transition-opacity duration-200 overscroll-contain"
+      className="fixed inset-0 z-50 flex flex-col justify-between bg-black/90 backdrop-blur-xs p-4 sm:p-6 transition-opacity duration-200 overscroll-contain"
     >
       {/* Top bar */}
-      <div className="flex items-center justify-between text-[var(--paper)] max-w-5xl w-full mx-auto pb-4 border-b border-white/10">
+      <div className="flex items-center justify-between text-[var(--paper)] max-w-5xl w-full mx-auto pb-4 border-b border-[var(--paper)]/10">
         <span className="font-mono text-xs uppercase tracking-[0.06em] opacity-80">
           {counterText}
         </span>
         <button
           onClick={onClose}
           aria-label={siteContent.ui.lightboxClose}
-          className="font-mono text-xs uppercase tracking-[0.06em] px-3 py-1.5 border border-white/20 hover:border-white/60 hover:bg-white/10 transition-colors rounded-[4px] cursor-pointer text-white"
+          className="font-mono text-xs uppercase tracking-[0.06em] px-2.5 py-1.5 border border-[var(--paper)]/20 hover:border-[var(--paper)]/60 hover:bg-[var(--paper)]/10 transition-colors rounded-[4px] cursor-pointer text-[var(--paper)] inline-flex items-center gap-1.5"
         >
-          {siteContent.ui.modalClose} [Esc]
+          <span>{siteContent.ui.modalClose} [Esc]</span>
+          <X size={14} strokeWidth={2} />
         </button>
       </div>
 
       {/* Main media view */}
       <div className="flex-1 flex items-center justify-center my-4 overflow-hidden relative max-w-5xl w-full mx-auto">
-        {slot ? (
+        {slot && slot.src ? (
           <div className="max-h-[75vh] max-w-full flex items-center justify-center">
-            {slot.src ? (
-              slot.type === "video" ? (
-                <video
-                  src={slot.src}
-                  controls
-                  preload="metadata"
-                  className="max-h-[75vh] max-w-full object-contain rounded-[4px] border border-white/10"
-                >
-                  Your browser does not support the video tag.
-                </video>
-              ) : (
-                <img
-                  src={slot.src}
-                  alt={slot.caption || slot.label}
-                  className="max-h-[75vh] max-w-full object-contain rounded-[4px] border border-white/10 shadow-2xl"
-                />
-              )
-            ) : (
-              <div
-                style={slot.ratio ? { aspectRatio: slot.ratio } : { width: "560px", maxWidth: "90vw", height: "380px" }}
-                className="border border-white/20 bg-[#181B1E] p-6 sm:p-8 flex flex-col justify-between rounded-[4px] shadow-2xl text-white relative overflow-hidden"
+            {slot.type === "video" ? (
+              <video
+                src={slot.src}
+                controls
+                preload="metadata"
+                className="max-h-[75vh] max-w-full object-contain rounded-[4px] border border-[var(--paper)]/10"
               >
-                <div
-                  className="absolute inset-0 pointer-events-none opacity-10"
-                  style={{
-                    backgroundImage: `repeating-linear-gradient(45deg, #FFF 0, #FFF 1px, transparent 0, transparent 12px)`,
-                  }}
-                  aria-hidden="true"
-                />
-                <div className="relative z-10 flex items-center justify-between font-mono text-xs opacity-75">
-                  <span>[{slot.type.toUpperCase()} · {slot.label}]</span>
-                  <span>{slot.ratio || "standard"}</span>
-                </div>
-                <div className="relative z-10 my-auto text-left py-4">
-                  <h3 className="font-serif text-xl sm:text-2xl text-white mb-2">
-                    {slot.type === "video"
-                      ? mediaCopy.phVideoTitle
-                      : slot.type === "diagram"
-                      ? mediaCopy.phDiagramTitle
-                      : slot.type === "certificate"
-                      ? mediaCopy.phCertificateTitle
-                      : mediaCopy.phScreenshotTitle}
-                  </h3>
-                  <p className="font-sans text-sm sm:text-base text-gray-300 max-w-md leading-relaxed">
-                    {slot.caption || slot.label}
-                  </p>
-                </div>
-                <div className="relative z-10 pt-3 border-t border-white/10 text-[11px] font-mono text-gray-400 flex justify-between">
-                  <span>slot: {currentSlotId}</span>
-                  <span className="text-emerald-400">Media slot ready for production asset</span>
-                </div>
-              </div>
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <img
+                src={slot.src}
+                alt={slot.caption || slot.label}
+                className="max-h-[75vh] max-w-full object-contain rounded-[4px] border border-[var(--paper)]/10 shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
+              />
             )}
           </div>
         ) : (
-          <div className="text-white font-mono text-sm">Slot {currentSlotId} not found</div>
+          <div className="text-[var(--paper)] font-mono text-sm">Media not available</div>
         )}
       </div>
 
       {/* Bottom controls & caption */}
-      <div className="max-w-5xl w-full mx-auto pt-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-white">
-        <p className="font-sans text-xs sm:text-sm text-gray-300 text-center sm:text-left max-w-xl">
+      <div className="max-w-5xl w-full mx-auto pt-3 border-t border-[var(--paper)]/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[var(--paper)]">
+        <p className="font-sans text-xs sm:text-sm text-[var(--paper)]/70 text-center sm:text-left max-w-xl">
           {slot?.caption || slot?.label}
         </p>
         <div className="flex items-center gap-2">
           <button
             onClick={goPrev}
             aria-label={siteContent.ui.lightboxPrev}
-            className="font-mono text-xs px-3 py-1.5 border border-white/20 hover:border-white/60 hover:bg-white/10 transition-colors rounded-[4px] cursor-pointer"
+            className="font-mono text-xs px-3 py-1.5 border border-[var(--paper)]/20 hover:border-[var(--paper)]/60 hover:bg-[var(--paper)]/10 transition-colors rounded-[4px] cursor-pointer"
           >
             &larr; Prev
           </button>
           <button
             onClick={goNext}
             aria-label={siteContent.ui.lightboxNext}
-            className="font-mono text-xs px-3 py-1.5 border border-white/20 hover:border-white/60 hover:bg-white/10 transition-colors rounded-[4px] cursor-pointer"
+            className="font-mono text-xs px-3 py-1.5 border border-[var(--paper)]/20 hover:border-[var(--paper)]/60 hover:bg-[var(--paper)]/10 transition-colors rounded-[4px] cursor-pointer"
           >
             Next &rarr;
           </button>
