@@ -31,18 +31,18 @@ export function Section({
   const isInView = useInView(containerRef, { once: false, margin: "-8% 0px -8% 0px" });
   const prefersReduced = useReducedMotion();
 
-  // Entrance: section fades in from 0 to 1 as its top enters from bottom of viewport (100%) to 50% of viewport
+  // Entrance: section fades in from 0 to 1 as its top enters from bottom of viewport (100%) to 75% of viewport.
+  // Reaches full crisp opacity quickly so content is immediately readable as it enters.
   const { scrollYProgress: enterProgress } = useScroll({
     target: containerRef,
-    offset: ["start end", "start 50%"],
+    offset: ["start end", "start 75%"],
   });
 
-  // Exit: section fades out from 1 to 0 as its bottom moves from 80% to 50% of viewport.
-  // Because Section A's bottom touches Section B's top:
-  // When the NEXT section reaches 50% of the viewport, the current section reaches exit = 1.0 (opacity = 0).
+  // Exit: section fades out from 1 to 0 as its bottom moves from 65% to 45% of viewport.
+  // Because the next section is already at 100% opacity by 75%, this creates a gapless handoff with zero blank space.
   const { scrollYProgress: exitProgress } = useScroll({
     target: containerRef,
-    offset: ["end 80%", "end 50%"],
+    offset: ["end 65%", "end 45%"],
   });
 
   const opacity = useTransform([enterProgress, exitProgress], (values: number[]) => {

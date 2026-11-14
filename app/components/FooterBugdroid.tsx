@@ -98,7 +98,7 @@ export function FooterBugdroid() {
           }
         }}
         className={`group relative flex flex-col items-center cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-4 rounded-[4px] ${
-          isDancing && !prefersReducedMotion ? "animate-[bugdroid-dance_1.2s_ease-in-out]" : ""
+          isDancing && !prefersReducedMotion ? "bugdroid-dancing" : ""
         }`}
       >
         {/* Held Sign with Rotating Hint */}
@@ -116,38 +116,43 @@ export function FooterBugdroid() {
             xmlns="http://www.w3.org/2000/svg"
             className="w-full h-full drop-shadow-sm"
           >
-            {/* Antennae */}
-            <line
-              x1="22"
-              y1="16"
-              x2="17"
-              y2="9"
-              stroke="#5FB38F"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
-            <circle cx="16" cy="8" r="1.5" fill="#5FB38F" />
+            {/* Head Group (Dome Head + Antennae + Eyes) with subtle friendly tilt */}
+            <g transform="translate(32, 24)">
+              <g className={prefersReducedMotion ? "" : "bugdroid-nodding-head"}>
+                {/* Antennae */}
+                <line
+                  x1="-10"
+                  y1="-8"
+                  x2="-15"
+                  y2="-15"
+                  stroke="#5FB38F"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                <circle cx="-16" cy="-16" r="1.5" fill="#5FB38F" />
 
-            <line
-              x1="42"
-              y1="16"
-              x2="47"
-              y2="9"
-              stroke="#5FB38F"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
-            <circle cx="48" cy="8" r="1.5" fill="#5FB38F" />
+                <line
+                  x1="10"
+                  y1="-8"
+                  x2="15"
+                  y2="-15"
+                  stroke="#5FB38F"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                <circle cx="16" cy="-16" r="1.5" fill="#5FB38F" />
 
-            {/* Dome Head */}
-            <path
-              d="M18 24C18 16.268 24.268 10 32 10C39.732 10 46 16.268 46 24H18Z"
-              fill="#5FB38F"
-            />
+                {/* Dome Head */}
+                <path
+                  d="M-14 0C-14 -7.732 -7.732 -14 0 -14C7.732 -14 14 -7.732 14 0H-14Z"
+                  fill="#5FB38F"
+                />
 
-            {/* Eyes */}
-            <circle cx="26" cy="18" r="2" fill="var(--paper)" />
-            <circle cx="38" cy="18" r="2" fill="var(--paper)" />
+                {/* Eyes */}
+                <circle cx="-6" cy="-6" r="2" fill="var(--paper)" />
+                <circle cx="6" cy="-6" r="2" fill="var(--paper)" />
+              </g>
+            </g>
 
             {/* Body */}
             <rect
@@ -169,17 +174,19 @@ export function FooterBugdroid() {
               fill="#5FB38F"
             />
 
-            {/* Right Arm (Waving / Holding Sign) */}
-            <g className={prefersReducedMotion ? "" : "origin-[48px_28px] animate-[bugdroid-wave_2.5s_ease-in-out_infinite]"}>
-              <rect
-                x="48"
-                y="20"
-                width="4"
-                height="16"
-                rx="2"
-                transform="rotate(-25 48 20)"
-                fill="#5FB38F"
-              />
+            {/* Right Arm: Natural waving animation at user */}
+            <g transform="translate(48, 28)">
+              <g className={prefersReducedMotion ? "" : "bugdroid-waving-arm"}>
+                <rect
+                  x="-2"
+                  y="-14"
+                  width="4"
+                  height="15"
+                  rx="2"
+                  fill="#5FB38F"
+                />
+                <circle cx="0" cy="-14" r="2.2" fill="#5FB38F" />
+              </g>
             </g>
 
             {/* Stubby Legs */}

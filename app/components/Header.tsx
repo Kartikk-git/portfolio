@@ -49,13 +49,6 @@ export function Header() {
   const isHome = pathname === "/";
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-  // Set initial visibility on homepage: at scroll 0, header is tucked away so only the name is visible
-  useEffect(() => {
-    if (isHome && typeof window !== "undefined" && window.scrollY <= 15) {
-      setIsVisible(false);
-    }
-  }, [isHome]);
-
   useFocusTrap(mobileMenuRef, mobileMenuOpen);
 
   // Resume status
@@ -82,14 +75,7 @@ export function Header() {
         return;
       }
 
-      // On home page, at the very top (before scroll), header is tucked away so only Kartik Koundal is displayed
-      if (isHome && currentScrollY <= 15) {
-        setIsVisible(false);
-        lastScrollYRef.current = currentScrollY;
-        return;
-      }
-
-      // Always show near top once scrolled
+      // Always show near top
       if (currentScrollY <= 100) {
         setIsVisible(true);
         lastScrollYRef.current = currentScrollY;
