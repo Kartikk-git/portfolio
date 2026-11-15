@@ -9,7 +9,7 @@ interface SectionProps {
   eyebrow: string;
   heading: string;
   intro: string;
-  counter?: string;
+  counter?: React.ReactNode;
   headerExtra?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
@@ -38,11 +38,11 @@ export function Section({
     offset: ["start end", "start 75%"],
   });
 
-  // Exit: section fades out from 1 to 0 as its bottom moves from 65% to 45% of viewport.
-  // Because the next section is already at 100% opacity by 75%, this creates a gapless handoff with zero blank space.
+  // Exit: section fades out from 1 to 0 as its bottom leaves the viewport (from 15% to -5%).
+  // Stays at 100% full opacity while readable, preventing half-faded text and blank gaps.
   const { scrollYProgress: exitProgress } = useScroll({
     target: containerRef,
-    offset: ["end 65%", "end 45%"],
+    offset: ["end 15%", "end -5%"],
   });
 
   const opacity = useTransform([enterProgress, exitProgress], (values: number[]) => {
@@ -68,14 +68,14 @@ export function Section({
     <section
       id={id}
       ref={containerRef}
-      className={`min-h-[75vh] flex flex-col justify-center py-20 md:py-28 border-b border-[var(--rule)] scroll-mt-16 overflow-hidden ${className}`}
+      className={`min-h-[50vh] flex flex-col justify-center py-12 md:py-16 border-b border-[var(--rule)] scroll-mt-16 overflow-hidden ${className}`}
     >
       <m.div
         style={prefersReduced ? undefined : { opacity, y, pointerEvents }}
         className="max-w-[1120px] mx-auto px-4 sm:px-8 w-full"
       >
         {/* Section Header */}
-        <div className="mb-12">
+        <div className="mb-8 sm:mb-10">
           <div className="flex items-baseline justify-between mb-2">
             <div className="font-mono text-xs uppercase tracking-[0.06em]">
               <span className="text-[var(--accent)] font-semibold">{eyebrow}</span>

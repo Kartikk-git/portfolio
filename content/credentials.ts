@@ -1,6 +1,6 @@
 // Verbatim education & credentials content from content/website-content.md
 export const credentialsContent = {
-  eyebrow: "05 · Credentials",
+  eyebrow: "06 · Credentials",
   heading: "Education & Certifications",
   intro: "Formal education, plus certificates and badges I've earned through NPTEL, CodeChef and Google Cloud. Select a certificate to preview it.",
   groupCert: "Verified credentials & certifications",

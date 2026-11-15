@@ -1,59 +1,198 @@
 "use client";
 
-import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
-import { m, AnimatePresence } from "motion/react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+  type ReactNode,
+} from "react";
+import { m, AnimatePresence, useReducedMotion } from "motion/react";
 import {
   Terminal,
-  Trash2,
-  Play,
-  Pause,
-  X,
-  Smartphone,
+  ArrowRight,
+  ExternalLink,
+  FileText,
   Check,
-  Search,
+  Sun,
+  Moon,
+  Smartphone,
+  Sparkles,
+  X,
+  type LucideIcon,
 } from "lucide-react";
+import { siteContent } from "@/content/site";
+import { railContent } from "@/content/rail";
 import { contactContent } from "@/content/contact";
-import { mediaManifest } from "@/content/media";
-import { useFocusTrap } from "@/lib/focus-trap";
+import { projectsContent } from "@/content/projects";
 import { openResumeModal } from "./ResumeModal";
+import { triggerAndroidEraEasterEgg } from "./AndroidEraEasterEgg";
+import { showToast } from "./ToastManager";
+import { usePhoneState } from "@/lib/phone-state";
+import { useActiveSection } from "@/lib/active-section";
+import { markFound, ALL_EGGS } from "@/lib/secrets";
+import { useFocusTrap } from "@/lib/focus-trap";
+import { MOTION_TOKENS } from "@/lib/motion";
+import { Z_INDEX } from "@/lib/z-index";
+import { createPortal } from "react-dom";
 
-type LogLevel = "V" | "D" | "I" | "W" | "E" | "A";
-
-interface LogEntry {
+interface CommandItem {
   id: string;
-  time: string;
-  pid: string;
-  tid: string;
-  level: LogLevel;
-  tag: string;
-  message: string;
-}
-
-interface CommandDef {
-  cmd: string;
-  alias?: string[];
-  category: "Core" | "Android" | "Fun" | "Nav";
-  description: string;
+  groupId: string;
+  groupTitle: string;
+  label: string;
+  sublabel?: string;
+  keywords: string[];
   badge?: string;
-  closeOnExec?: boolean;
-  action: () => LogEntry[] | Promise<LogEntry[]>;
+  icon: LucideIcon;
+  run: () => void;
 }
 
-const getLogTimestamp = () => {
-  const d = new Date();
-  const pad = (n: number, s = 2) => String(n).padStart(s, "0");
-  return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${pad(d.getMilliseconds(), 3)}`;
-};
+interface FuzzyResult {
+  matches: boolean;
+  score: number;
+  highlightIndices: number[];
+}
 
-const makeLog = (level: LogLevel, tag: string, message: string): LogEntry => ({
-  id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-  time: getLogTimestamp(),
-  pid: "2026",
-  tid: "2048",
-  level,
-  tag,
-  message,
-});
+function fuzzyMatch(text: string, query: string, keywords: string[] = []): FuzzyResult {
+  if (!query) {
+    return { matches: true, score: 0, highlightIndices: [] };
+  }
+
+  const lowerText = text.toLowerCase();
+  const lowerQuery = query.toLowerCase();
+
+  // 1. Exact match
+  if (lowerText === lowerQuery) {
+    return {
+      matches: true,
+      score: 1000,
+      highlightIndices: Array.from({ length: text.length }, (_, i) => i),
+    };
+  }
+
+  // 2. Prefix match on label
+  if (lowerText.startsWith(lowerQuery)) {
+    return {
+      matches: true,
+      score: 900 - text.length,
+      highlightIndices: Array.from({ length: query.length }, (_, i) => i),
+    };
+  }
+
+  // 3. Word-start match on label
+  const words = lowerText.split(/\s+/);
+  let wordStartIdx = -1;
+  let runningLen = 0;
+  for (const w of words) {
+    if (w.startsWith(lowerQuery)) {
+      wordStartIdx = runningLen;
+      break;
+    }
+    runningLen += w.length + 1;
+  }
+  if (wordStartIdx !== -1) {
+    return {
+      matches: true,
+      score: 800 - wordStartIdx,
+      highlightIndices: Array.from({ length: query.length }, (_, i) => wordStartIdx + i),
+    };
+  }
+
+  // 4. Substring match in label
+  const subIdx = lowerText.indexOf(lowerQuery);
+  if (subIdx !== -1) {
+    return {
+      matches: true,
+      score: 700 - subIdx,
+      highlightIndices: Array.from({ length: query.length }, (_, i) => subIdx + i),
+    };
+  }
+
+  // 5. Keyword exact / prefix / substring match
+  for (const kw of keywords) {
+    const lkw = kw.toLowerCase();
+    if (lkw === lowerQuery) {
+      return { matches: true, score: 650, highlightIndices: [] };
+    }
+    if (lkw.startsWith(lowerQuery)) {
+      return { matches: true, score: 600, highlightIndices: [] };
+    }
+    if (lkw.includes(lowerQuery)) {
+      return { matches: true, score: 550, highlightIndices: [] };
+    }
+  }
+
+  // 6. Subsequence match on label (fuzzy characters in sequence)
+  let qIdx = 0;
+  const indices: number[] = [];
+  for (let i = 0; i < text.length && qIdx < lowerQuery.length; i++) {
+    if (lowerText[i] === lowerQuery[qIdx]) {
+      indices.push(i);
+      qIdx++;
+    }
+  }
+  if (qIdx === lowerQuery.length) {
+    const span = indices[indices.length - 1] - indices[0];
+    return {
+      matches: true,
+      score: 400 - span,
+      highlightIndices: indices,
+    };
+  }
+
+  return { matches: false, score: 0, highlightIndices: [] };
+}
+
+function HighlightedText({ text, indices }: { text: string; indices: number[] }) {
+  if (!indices || indices.length === 0) return <span>{text}</span>;
+  const indexSet = new Set(indices);
+  const elements: ReactNode[] = [];
+  let currentRun = "";
+  let isHighlighted = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const charHighlight = indexSet.has(i);
+    if (i === 0) {
+      isHighlighted = charHighlight;
+      currentRun = text[i];
+    } else if (charHighlight === isHighlighted) {
+      currentRun += text[i];
+    } else {
+      if (isHighlighted) {
+        elements.push(
+          <mark
+            key={i}
+            className="text-[var(--accent)] bg-transparent font-bold underline decoration-[var(--accent)]/50"
+          >
+            {currentRun}
+          </mark>
+        );
+      } else {
+        elements.push(<span key={i}>{currentRun}</span>);
+      }
+      isHighlighted = charHighlight;
+      currentRun = text[i];
+    }
+  }
+  if (currentRun) {
+    if (isHighlighted) {
+      elements.push(
+        <mark
+          key="last"
+          className="text-[var(--accent)] bg-transparent font-bold underline decoration-[var(--accent)]/50"
+        >
+          {currentRun}
+        </mark>
+      );
+    } else {
+      elements.push(<span key="last">{currentRun}</span>);
+    }
+  }
+
+  return <span>{elements}</span>;
+}
 
 export function CommandPalette({
   isOpen,
@@ -63,791 +202,741 @@ export function CommandPalette({
   onClose: () => void;
 }) {
   const [query, setQuery] = useState("");
-  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
-  const [levelFilter, setLevelFilter] = useState<LogLevel | "ALL">("ALL");
-  const [isPaused, setIsPaused] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [copiedNotification, setCopiedNotification] = useState<string | null>(null);
+  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("dark");
+  const [mounted, setMounted] = useState(false);
 
   const dialogRef = useRef<HTMLDivElement>(null);
+  const portalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const logConsoleRef = useRef<HTMLDivElement>(null);
-  const suggestionListRef = useRef<HTMLDivElement>(null);
-  const suggestionItemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+
+  const prefersReduced = useReducedMotion();
+  const { activeSection } = useActiveSection();
+  const { isOpen: isPhoneOpen, openPhone, closePhone } = usePhoneState();
 
   useFocusTrap(dialogRef, isOpen);
 
-  // Restore focus to the trigger when the palette closes
   useEffect(() => {
-    if (!isOpen) return;
-    const prev = document.activeElement as HTMLElement | null;
-    return () => {
-      prev?.focus();
-    };
-  }, [isOpen]);
+    setMounted(true);
+  }, []);
 
-  const initialLogs: LogEntry[] = useMemo(
-    () => [
-      {
-        id: "init-1",
-        time: getLogTimestamp(),
-        pid: "2026",
-        tid: "2048",
-        level: "V",
-        tag: "AndroidRuntime",
-        message: ">>>>>> START com.kartikkoundal.portfolio [API 34 arm64-v8a] <<<<<<",
-      },
-      {
-        id: "init-2",
-        time: getLogTimestamp(),
-        pid: "2026",
-        tid: "2048",
-        level: "D",
-        tag: "Portfolio",
-        message: "Connected to Logcat runtime · Kartik Koundal portfolio environment ready.",
-      },
-      {
-        id: "init-3",
-        time: getLogTimestamp(),
-        pid: "2026",
-        tid: "2048",
-        level: "I",
-        tag: "Commands",
-        message: "Quick commands: projects · skills · open student-organizer · theme · hire-me · sudo make-coffee",
-      },
-      {
-        id: "init-4",
-        time: getLogTimestamp(),
-        pid: "2026",
-        tid: "2048",
-        level: "D",
-        tag: "Logcat",
-        message: "Type a command or press ↑ / ↓ to select, Enter to run, Tab to autocomplete.",
-      },
-    ],
-    []
-  );
-
-  const [logs, setLogs] = useState<LogEntry[]>(initialLogs);
-
-  // Background scroll lock
+  // Save the trigger element before moving focus into the input
   useEffect(() => {
     if (isOpen) {
-      const origHtmlOverflow = document.documentElement.style.overflow;
-      const origBodyOverflow = document.body.style.overflow;
-      document.documentElement.style.overflow = "hidden";
-      document.body.style.overflow = "hidden";
-      return () => {
-        document.documentElement.style.overflow = origHtmlOverflow;
-        document.body.style.overflow = origBodyOverflow;
-      };
+      triggerRef.current = (document.activeElement as HTMLElement) || null;
     }
   }, [isOpen]);
+
+  // Restore focus to trigger on close
+  useEffect(() => {
+    if (!isOpen && triggerRef.current) {
+      const el = triggerRef.current;
+      triggerRef.current = null;
+      setTimeout(() => {
+        el.focus();
+      }, 20);
+    }
+  }, [isOpen]);
+
+  // Read current theme from DOM
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const themeAttr = document.documentElement.getAttribute("data-theme") as "light" | "dark" | null;
+    if (themeAttr === "light") {
+      setCurrentTheme("light");
+    } else {
+      setCurrentTheme("dark");
+    }
+  }, [isOpen]);
+
+  // Lock background scroll and set inert & aria-hidden on other body elements while open
+  useEffect(() => {
+    if (!isOpen || !mounted) return;
+
+    const origHtmlOverflow = document.documentElement.style.overflow;
+    const origBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+
+    const inertedElements: HTMLElement[] = [];
+    const portalEl = portalRef.current;
+
+    Array.from(document.body.children).forEach((child) => {
+      if (
+        child instanceof HTMLElement &&
+        child !== portalEl &&
+        !child.contains(portalEl) &&
+        child.tagName !== "SCRIPT" &&
+        child.tagName !== "STYLE"
+      ) {
+        if (!child.hasAttribute("inert")) {
+          child.setAttribute("inert", "");
+          child.setAttribute("aria-hidden", "true");
+          inertedElements.push(child);
+        }
+      }
+    });
+
+    return () => {
+      document.documentElement.style.overflow = origHtmlOverflow;
+      document.body.style.overflow = origBodyOverflow;
+      inertedElements.forEach((el) => {
+        el.removeAttribute("inert");
+        el.removeAttribute("aria-hidden");
+      });
+    };
+  }, [isOpen, mounted]);
 
   // Focus input and reset query on open
   useEffect(() => {
     if (isOpen) {
       setQuery("");
-      setSelectedSuggestionIndex(0);
-      const timer = setTimeout(() => inputRef.current?.focus(), 60);
+      setSelectedIndex(0);
+      setCopiedNotification(null);
+      const timer = setTimeout(() => inputRef.current?.focus(), 50);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
-  // Auto-scroll log console unless paused
-  useEffect(() => {
-    if (!isPaused && logConsoleRef.current) {
-      logConsoleRef.current.scrollTop = logConsoleRef.current.scrollHeight;
-    }
-  }, [logs, isPaused]);
-
-  // Global Esc listener
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen) return;
-      if (e.key === "Escape") {
-        e.preventDefault();
-        onClose();
-      }
-      if (e.ctrlKey && e.key === "l") {
-        e.preventDefault();
-        setLogs([]);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
-
-  // Helpers
-  const toggleThemeMode = () => {
-    const current = document.documentElement.getAttribute("data-theme") || "light";
-    const nextTheme = current === "light" ? "dark" : "light";
+  // Theme toggle helper
+  const handleToggleTheme = useCallback(() => {
+    const nextTheme = currentTheme === "light" ? "dark" : "light";
     document.documentElement.setAttribute("data-theme", nextTheme);
     try {
       localStorage.setItem("theme", nextTheme);
     } catch {}
-    return nextTheme;
-  };
+    setCurrentTheme(nextTheme);
+    window.dispatchEvent(new Event("storage"));
+  }, [currentTheme]);
 
-  const resumeSlot = mediaManifest["resume-pdf"];
+  // Build the complete command catalogue
+  const allCommands = useMemo<CommandItem[]>(() => {
+    const list: CommandItem[] = [];
 
-  // Command Definitions
-  const commandList: CommandDef[] = useMemo(() => [
-    {
-      cmd: "projects",
-      alias: ["repo", "work", "apps", "#projects", "selected works"],
-      category: "Nav",
-      description: "Navigate to Projects (#projects)",
-      badge: "Section",
-      closeOnExec: true,
-      action: () => {
+    // Group 1: Navigate (all 7 sections)
+    railContent.items.forEach((item) => {
+      list.push({
+        id: `nav-${item.id}`,
+        groupId: "navigate",
+        groupTitle: siteContent.command.groupNavigate,
+        label: item.name,
+        sublabel: item.href,
+        keywords: [item.name, item.href, "section", "scroll", item.id],
+        badge: "Section",
+        icon: Terminal,
+        run: () => {
+          onClose();
+          setTimeout(() => {
+            document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" });
+          }, 80);
+        },
+      });
+    });
+
+    // Group 2: Projects (case studies)
+    projectsContent.items.forEach((proj) => {
+      const routePath = `/projects/${proj.slug}`;
+      list.push({
+        id: `proj-${proj.slug}`,
+        groupId: "projects",
+        groupTitle: siteContent.command.groupProjects,
+        label: proj.title,
+        sublabel: routePath,
+        keywords: [
+          proj.title,
+          proj.slug,
+          ...(proj.tags || []),
+          "project",
+          "case study",
+        ],
+        badge: "Case Study",
+        icon: ArrowRight,
+        run: () => {
+          onClose();
+          setTimeout(() => {
+            window.location.href = routePath;
+          }, 100);
+        },
+      });
+    });
+
+    // Group 3: Actions
+    list.push({
+      id: "act-resume",
+      groupId: "actions",
+      groupTitle: siteContent.command.groupActions,
+      label: siteContent.command.actionResume,
+      sublabel: "PDF",
+      keywords: ["resume", "cv", "pdf", "download", "credentials"],
+      badge: "PDF",
+      icon: FileText,
+      run: () => {
+        onClose();
         setTimeout(() => {
-          document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
-        }, 80);
-        return [
-          makeLog("I", "Navigation", "Navigating to #projects..."),
-          makeLog("D", "Projects", "Loaded catalog: TEJOVIK, Student Organizer, Hospital Management, Portfolio"),
-        ];
+          openResumeModal();
+        }, 120);
       },
-    },
-    {
-      cmd: "skills",
-      alias: ["stack", "tech", "languages", "#skills", "technical skills"],
-      category: "Nav",
-      description: "Navigate to Technical Skills (#skills)",
-      badge: "Section",
-      closeOnExec: true,
-      action: () => {
-        setTimeout(() => {
-          document.getElementById("skills")?.scrollIntoView({ behavior: "smooth" });
-        }, 80);
-        return [
-          makeLog("I", "Navigation", "Navigating to #skills..."),
-          makeLog("D", "Skills", "Core: Java (95% NPTEL), Kotlin, Python, C++, Compose, Room SQLite"),
-        ];
-      },
-    },
-    {
-      cmd: "about",
-      alias: ["bio", "intro", "#about", "who is kartik"],
-      category: "Nav",
-      description: "Navigate to About Kartik (#about)",
-      badge: "Section",
-      closeOnExec: true,
-      action: () => {
-        setTimeout(() => {
-          document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
-        }, 80);
-        return [
-          makeLog("I", "Navigation", "Navigating to #about..."),
-        ];
-      },
-    },
-    {
-      cmd: "education",
-      alias: ["college", "certifications", "credentials", "#education", "nptel"],
-      category: "Nav",
-      description: "Navigate to Education & Credentials (#education)",
-      badge: "Section",
-      closeOnExec: true,
-      action: () => {
-        setTimeout(() => {
-          document.getElementById("education")?.scrollIntoView({ behavior: "smooth" });
-        }, 80);
-        return [
-          makeLog("I", "Navigation", "Navigating to #education..."),
-          makeLog("D", "Education", "B.Tech CSE (DCE), NPTEL 95% Elite, CodeChef, Google Cloud"),
-        ];
-      },
-    },
-    {
-      cmd: "activity",
-      alias: ["commit", "heatmap", "github", "#activity"],
-      category: "Nav",
-      description: "Navigate to Contribution Activity (#activity)",
-      badge: "Section",
-      closeOnExec: true,
-      action: () => {
-        setTimeout(() => {
-          document.getElementById("activity")?.scrollIntoView({ behavior: "smooth" });
-        }, 80);
-        return [
-          makeLog("I", "Navigation", "Navigating to #activity..."),
-          makeLog("D", "Activity", "Public GitHub contribution calendar loaded"),
-        ];
-      },
-    },
-    {
-      cmd: "hire-me",
-      alias: ["contact", "hire", "email", "internship", "#contact"],
-      category: "Nav",
-      description: "Copy direct email & navigate to Contact (#contact)",
-      badge: "Section",
-      closeOnExec: true,
-      action: () => {
+    });
+
+    list.push({
+      id: "act-email",
+      groupId: "actions",
+      groupTitle: siteContent.command.groupActions,
+      label: siteContent.command.actionEmail,
+      sublabel: contactContent.primary.email,
+      keywords: [
+        "email",
+        "contact",
+        "copy",
+        contactContent.primary.email,
+        "hire",
+      ],
+      badge: "Clipboard",
+      icon: Check,
+      run: () => {
         try {
           navigator.clipboard.writeText(contactContent.primary.email);
-          setCopiedNotification(contactContent.primary.email);
-          setTimeout(() => setCopiedNotification(null), 3000);
-        } catch {}
-
-        setTimeout(() => {
-          document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-        }, 80);
-
-        return [
-          makeLog("I", "RecruiterService", "Inbound candidate query received for: Kartik Koundal"),
-          makeLog("I", "Contact", `Email copied to clipboard: ${contactContent.primary.email} 📋`),
-          makeLog("D", "Navigation", "Scrolling viewport to #contact..."),
-        ];
-      },
-    },
-    {
-      cmd: "open student-organizer",
-      alias: ["student-organizer", "organizer", "open organizer"],
-      category: "Android",
-      description: "Launch Student Organizer case study page",
-      badge: "Case Study",
-      closeOnExec: true,
-      action: () => {
-        setTimeout(() => {
-          window.location.href = "/projects/student-organizer";
-        }, 150);
-        return [
-          makeLog(
-            "D",
-            "AndroidRuntime",
-            "Starting Intent { act=android.intent.action.VIEW cmp=com.kartik.studentorganizer/.ui.MainActivity }"
-          ),
-          makeLog("I", "StudentOrganizer", "Opening /projects/student-organizer..."),
-        ];
-      },
-    },
-    {
-      cmd: "open tejovik",
-      alias: ["tejovik", "open tejovik"],
-      category: "Core",
-      description: "Launch TEJOVIK case study page",
-      badge: "Case Study",
-      closeOnExec: true,
-      action: () => {
-        setTimeout(() => {
-          window.location.href = "/projects/tejovik";
-        }, 150);
-        return [
-          makeLog("I", "Navigation", "Opening /projects/tejovik..."),
-        ];
-      },
-    },
-    {
-      cmd: "theme",
-      alias: ["dark", "light", "toggle-theme", "mode"],
-      category: "Core",
-      description: "Toggle theme mode (Day / Night)",
-      badge: "UI Mode",
-      closeOnExec: false,
-      action: () => {
-        const next = toggleThemeMode();
-        return [
-          makeLog("D", "UiModeManager", "Dispatching Configuration.UI_MODE_NIGHT change request..."),
-          makeLog(
-            "I",
-            "Theme",
-            `Theme successfully switched to ${next === "dark" ? "NIGHT (Dark)" : "DAY (Light)"}.`
-          ),
-        ];
-      },
-    },
-    {
-      cmd: "sudo make-coffee",
-      alias: ["coffee", "make-coffee", "brew"],
-      category: "Fun",
-      description: "Superuser barista routine with RFC 2324 protocol",
-      badge: "root",
-      closeOnExec: false,
-      action: () => {
-        return [
-          makeLog("D", "su", "Validating root superuser authentication for uid=0..."),
-          makeLog("E", "Boredom", "not found in active process stack trace"),
-          makeLog("W", "CoffeeMaker", "HTCPCP-TEA/1.0 418 I'm a teapot (RFC 2324 specification)"),
-          makeLog("I", "Barista", "Bypassing teapot error with automated pour-over valve..."),
-          makeLog("D", "Barista", "Heating boiler to 93.5°C at 9.0 bars pressure"),
-          makeLog("D", "Barista", "Dosing 18.5g Ethiopian single-origin specialty roast..."),
-          makeLog("D", "Barista", "Extracting 36.0g velvety crema espresso in 27s... [98% yield]"),
-          makeLog("I", "CoffeeMaker", "Espresso shot extracted! ☕ Enjoy coding. Energy level restored to 100%."),
-        ];
-      },
-    },
-    {
-      cmd: "easter-egg",
-      alias: ["matrix", "dev-mode", "android-dessert", "adb reboot"],
-      category: "Fun",
-      description: "Trigger the hidden Android developer easter egg",
-      badge: "Android 15",
-      closeOnExec: false,
-      action: () => {
-        return [
-          makeLog("D", "AndroidRuntime", ">>>>>> ANDROID DEV EASTER EGG UNLOCKED <<<<<<"),
-          makeLog("I", "Build.VERSION", "RELEASE=15 (VanillaIceCream) SDK_INT=35 CODENAME=VanillaIceCream"),
-          makeLog("I", "SystemServer", "╔═══════════════════════════════════════════════════════╗"),
-          makeLog("I", "SystemServer", "║   _  __           _   _ _      _  __                  ║"),
-          makeLog("I", "SystemServer", "║  | |/ /__ _ _ __ | |_(_) | __ | |/ /___  _   _ _ __   ║"),
-          makeLog("I", "SystemServer", "║  | ' // _' | '__|| __| | |/ / | ' // _ \\| | | | '_ \\  ║"),
-          makeLog("I", "SystemServer", "║  | . \\ (_| | |   | |_| |   <  | . \\ (_) | |_| | | | | ║"),
-          makeLog("I", "SystemServer", "║  |_|\\_\\__,_|_|    \\__|_|_|\\_\\ |_|\\_\\___/ \\__,_|_| |_| ║"),
-          makeLog("I", "SystemServer", "║                                                       ║"),
-          makeLog("I", "SystemServer", "║  \"I like building things that keep working when       ║"),
-          makeLog("I", "SystemServer", "║   conditions aren't ideal.\"                           ║"),
-          makeLog("I", "SystemServer", "╚═══════════════════════════════════════════════════════╝"),
-          makeLog("D", "PackageManager", "Feature enabled: ANDROID_DEVELOPER_PRO_MAX"),
-          makeLog("I", "Toast", 'Showing system toast: "Ready to build world-class Android apps! 🚀"'),
-        ];
-      },
-    },
-    {
-      cmd: "resume",
-      alias: ["cv", "download-resume"],
-      category: "Nav",
-      description: "View and download Kartik's verified PDF résumé",
-      badge: "PDF",
-      closeOnExec: true,
-      action: () => {
-        if (resumeSlot?.src) {
-          openResumeModal();
-          return [
-            makeLog("I", "ResumeViewer", "Opened PDF preview modal."),
-            makeLog("D", "Storage", "File ready for download or view."),
-          ];
+          setCopiedNotification(siteContent.toast.emailCopied);
+          setTimeout(() => {
+            setCopiedNotification(null);
+            onClose();
+          }, 800);
+        } catch {
+          onClose();
         }
-        return [
-          makeLog("W", "DownloadManager", "Direct PDF file pending owner upload."),
-          makeLog("D", "Contact", `Please request directly at ${contactContent.primary.email}`),
-        ];
       },
-    },
-    {
-      cmd: "help",
-      alias: ["?", "man"],
-      category: "Core",
-      description: "List all executable Logcat commands and usage",
-      badge: "docs",
-      closeOnExec: false,
-      action: () => [
-        makeLog("I", "Logcat", "Command reference:"),
-        makeLog("D", "Commands", "• projects              : Navigate to #projects"),
-        makeLog("D", "Commands", "• skills                : Navigate to #skills"),
-        makeLog("D", "Commands", "• about                 : Navigate to #about"),
-        makeLog("D", "Commands", "• education             : Navigate to #education"),
-        makeLog("D", "Commands", "• activity              : Navigate to #activity"),
-        makeLog("D", "Commands", "• open student-organizer: Launch native Android case study"),
-        makeLog("D", "Commands", "• theme                 : Toggle between Day (Paper) and Night (Dark) mode"),
-        makeLog("D", "Commands", "• hire-me               : Copy contact email & navigate to #contact"),
-        makeLog("D", "Commands", "• sudo make-coffee      : Execute superuser barista routine"),
-        makeLog("D", "Commands", "• easter-egg            : Unlock the hidden Android ASCII banner"),
-        makeLog("D", "Commands", "• resume                : Download verified PDF résumé"),
-        makeLog("D", "Commands", "• clear                 : Clear active Logcat output window"),
-      ],
-    },
-    {
-      cmd: "clear",
-      alias: ["cls", "reset"],
-      category: "Core",
-      description: "Clear Logcat console stream (Ctrl+L)",
-      closeOnExec: false,
-      action: () => {
-        setLogs([]);
-        return [];
-      },
-    },
-  ], [resumeSlot]);
-
-  // Filtering suggestions based on input
-  const cleanQuery = query.trim().toLowerCase();
-  const suggestions = useMemo(() => {
-    if (!cleanQuery) return commandList;
-    return commandList.filter((item) => {
-      if (item.cmd.toLowerCase().includes(cleanQuery)) return true;
-      if (item.description.toLowerCase().includes(cleanQuery)) return true;
-      if (item.alias?.some((a) => a.toLowerCase().includes(cleanQuery))) return true;
-      return false;
     });
-  }, [cleanQuery, commandList]);
 
+    const profiles = contactContent.profiles.filter((p) => p.url);
+    profiles.forEach((profile) => {
+      let cmdLabel = profile.label;
+      let badge = "Profile";
+      if (profile.label === "GitHub") {
+        cmdLabel = siteContent.command.actionGithub;
+        badge = "Source";
+      } else if (profile.label === "LinkedIn") {
+        cmdLabel = siteContent.command.actionLinkedin;
+      } else if (profile.label === "LeetCode") {
+        cmdLabel = siteContent.command.actionLeetcode;
+      } else if (profile.label === "Credly") {
+        cmdLabel = siteContent.command.actionCredly;
+        badge = "Badges";
+      }
+
+      list.push({
+        id: `act-${profile.label.toLowerCase()}`,
+        groupId: "actions",
+        groupTitle: siteContent.command.groupActions,
+        label: cmdLabel,
+        sublabel: profile.value,
+        keywords: [profile.label, profile.value, "link", "external"],
+        badge,
+        icon: ExternalLink,
+        run: () => {
+          onClose();
+          if (profile.url) {
+            window.open(profile.url, "_blank", "noopener,noreferrer");
+          }
+        },
+      });
+    });
+
+    // Group 4: Theme
+    if (currentTheme === "dark") {
+      list.push({
+        id: "theme-toggle",
+        groupId: "theme",
+        groupTitle: siteContent.command.groupTheme,
+        label: siteContent.nav.themeToLight,
+        sublabel: "Day Mode",
+        keywords: ["light", "day", "paper", "theme", "mode", "color"],
+        badge: "Theme",
+        icon: Sun,
+        run: handleToggleTheme,
+      });
+    } else {
+      list.push({
+        id: "theme-toggle",
+        groupId: "theme",
+        groupTitle: siteContent.command.groupTheme,
+        label: siteContent.nav.themeToDark,
+        sublabel: "Night Mode",
+        keywords: ["dark", "night", "dark mode", "theme", "color"],
+        badge: "Theme",
+        icon: Moon,
+        run: handleToggleTheme,
+      });
+    }
+
+    // Group 5: App Preview (Phone)
+    if (!isPhoneOpen) {
+      list.push({
+        id: "preview-open",
+        groupId: "preview",
+        groupTitle: siteContent.command.groupPreview,
+        label: siteContent.command.actionPhoneOpen,
+        sublabel: "Student Organizer",
+        keywords: ["phone", "preview", "mobile", "mockup", "android", "bot", "demo"],
+        badge: "Mobile",
+        icon: Smartphone,
+        run: () => {
+          onClose();
+          openPhone();
+        },
+      });
+    }
+    if (isPhoneOpen) {
+      list.push({
+        id: "preview-close",
+        groupId: "preview",
+        groupTitle: siteContent.command.groupPreview,
+        label: siteContent.command.actionPhoneClose,
+        sublabel: "Dismiss preview",
+        keywords: ["phone", "close", "mockup", "dismiss", "hide"],
+        badge: "Mobile",
+        icon: X,
+        run: () => {
+          onClose();
+          closePhone();
+        },
+      });
+    }
+
+    // Group 6: Easter Eggs & Secrets
+    list.push({
+      id: "secret-trigger",
+      groupId: "secrets",
+      groupTitle: siteContent.command.groupSecrets,
+      label: siteContent.command.actionEasterEgg,
+      sublabel: "Android Developer Mode",
+      keywords: [
+        "easter",
+        "egg",
+        "secret",
+        "bugdroid",
+        "coffee",
+        "sudo make-coffee",
+        "konami",
+        "matrix",
+      ],
+      badge: "Secret",
+      icon: Sparkles,
+      run: () => {
+        markFound("bugdroid");
+        try {
+          console.log(
+            "%c🎉 Android Developer Mode triggered from command palette!",
+            "color: #5FB38F; font-size: 14px; font-weight: bold; font-family: monospace;"
+          );
+        } catch {}
+        onClose();
+        triggerAndroidEraEasterEgg();
+        showToast(siteContent.toast.devModeUnlocked, {
+          type: "sparkle",
+          duration: 3200,
+        });
+      },
+    });
+
+    return list;
+  }, [
+    currentTheme,
+    isPhoneOpen,
+    onClose,
+    handleToggleTheme,
+    openPhone,
+    closePhone,
+  ]);
+
+  // Filter & score with in-house fuzzy search
+  const filteredResults = useMemo(() => {
+    const cleanQ = query.trim();
+    if (!cleanQ) {
+      return allCommands.map((item) => ({
+        item,
+        score: 0,
+        highlightIndices: [],
+      }));
+    }
+
+    const scored = allCommands
+      .map((item) => {
+        const res = fuzzyMatch(item.label, cleanQ, item.keywords);
+        return {
+          item,
+          score: res.score,
+          highlightIndices: res.highlightIndices,
+        };
+      })
+      .filter((r) => r.score > 0);
+
+    // Sort by score descending
+    scored.sort((a, b) => b.score - a.score);
+    return scored;
+  }, [allCommands, query]);
+
+  // Grouped results preserving group structure
+  const groupedResults = useMemo(() => {
+    const groupOrder = [
+      "navigate",
+      "projects",
+      "actions",
+      "theme",
+      "preview",
+      "secrets",
+    ];
+    const groupMap = new Map<
+      string,
+      {
+        groupId: string;
+        groupTitle: string;
+        items: { item: CommandItem; highlightIndices: number[] }[];
+      }
+    >();
+
+    filteredResults.forEach(({ item, highlightIndices }) => {
+      if (!groupMap.has(item.groupId)) {
+        groupMap.set(item.groupId, {
+          groupId: item.groupId,
+          groupTitle: item.groupTitle,
+          items: [],
+        });
+      }
+      groupMap.get(item.groupId)!.items.push({ item, highlightIndices });
+    });
+
+    const ordered: {
+      groupId: string;
+      groupTitle: string;
+      items: { item: CommandItem; highlightIndices: number[] }[];
+    }[] = [];
+
+    groupOrder.forEach((gId) => {
+      const g = groupMap.get(gId);
+      if (g && g.items.length > 0) {
+        ordered.push(g);
+      }
+    });
+
+    return ordered;
+  }, [filteredResults]);
+
+  // Flattened visible items for keyboard indexing
+  const flattenedItems = useMemo(() => {
+    const flat: { item: CommandItem; highlightIndices: number[] }[] = [];
+    groupedResults.forEach((group) => {
+      group.items.forEach((entry) => flat.push(entry));
+    });
+    return flat;
+  }, [groupedResults]);
+
+  // Reset selectedIndex on query change
   useEffect(() => {
-    setSelectedSuggestionIndex(0);
+    setSelectedIndex(0);
   }, [query]);
 
-  // Scroll active suggestion into view
-  const updateSelectedSuggestion = useCallback((newIndex: number) => {
-    setSelectedSuggestionIndex(newIndex);
-    const itemEl = suggestionItemRefs.current[newIndex];
-    if (itemEl) {
-      itemEl.scrollIntoView({ block: "nearest" });
+  // Scroll active item into view
+  const updateSelectedIndex = useCallback((newIdx: number) => {
+    setSelectedIndex(newIdx);
+    const el = itemRefs.current.get(newIdx);
+    if (el) {
+      el.scrollIntoView({ block: "nearest" });
     }
   }, []);
 
-  // Execute a command
-  const executeCommand = async (commandName: string) => {
-    const trimmed = commandName.trim().toLowerCase();
-    if (!trimmed) return;
-
-    // Find matching command definition
-    const matched = commandList.find(
-      (c) =>
-        c.cmd.toLowerCase() === trimmed ||
-        c.alias?.some((a) => a.toLowerCase() === trimmed)
-    );
-
-    // Echo input line
-    const userLog = makeLog("D", "Input", `> ${commandName}`);
-    setLogs((prev) => [...prev, userLog]);
-    setQuery("");
-
-    if (matched) {
-      const result = await matched.action();
-      if (result.length > 0) {
-        setLogs((prev) => [...prev, ...result]);
-      }
-
-      // If this was a navigation / section search command, hide palette so user sees the section!
-      if (matched.closeOnExec) {
-        setTimeout(() => {
-          onClose();
-        }, 180);
-      }
-    } else {
-      setLogs((prev) => [
-        ...prev,
-        makeLog("E", "CommandNotFound", `Unknown command or action: '${commandName}'`),
-        makeLog(
-          "I",
-          "Help",
-          "Try: projects, skills, about, education, activity, open student-organizer, theme, hire-me, sudo make-coffee, easter-egg, help"
-        ),
-      ]);
-    }
-  };
-
-  // Keyboard navigation: Up/Down moves vertically through suggestions
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  // Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      const nextIdx = selectedSuggestionIndex < suggestions.length - 1 ? selectedSuggestionIndex + 1 : 0;
-      updateSelectedSuggestion(nextIdx);
+      if (flattenedItems.length === 0) return;
+      const next = selectedIndex < flattenedItems.length - 1 ? selectedIndex + 1 : 0;
+      updateSelectedIndex(next);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      const nextIdx = selectedSuggestionIndex > 0 ? selectedSuggestionIndex - 1 : suggestions.length - 1;
-      updateSelectedSuggestion(nextIdx);
-    } else if (e.key === "Tab") {
+      if (flattenedItems.length === 0) return;
+      const prev = selectedIndex > 0 ? selectedIndex - 1 : flattenedItems.length - 1;
+      updateSelectedIndex(prev);
+    } else if (e.key === "Home") {
       e.preventDefault();
-      if (suggestions[selectedSuggestionIndex]) {
-        setQuery(suggestions[selectedSuggestionIndex].cmd);
-      }
+      if (flattenedItems.length === 0) return;
+      updateSelectedIndex(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      if (flattenedItems.length === 0) return;
+      updateSelectedIndex(flattenedItems.length - 1);
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (suggestions.length > 0 && suggestions[selectedSuggestionIndex]) {
-        executeCommand(suggestions[selectedSuggestionIndex].cmd);
-      } else if (query.trim()) {
-        executeCommand(query);
+      if (flattenedItems.length > 0 && flattenedItems[selectedIndex]) {
+        flattenedItems[selectedIndex].item.run();
       }
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      onClose();
     }
   };
 
-  // Filter logs by level
-  const displayedLogs = useMemo(() => {
-    if (levelFilter === "ALL") return logs;
-    const hierarchy: Record<LogLevel, number> = {
-      V: 1,
-      D: 2,
-      I: 3,
-      W: 4,
-      E: 5,
-      A: 6,
-    };
-    const targetLevel = hierarchy[levelFilter];
-    return logs.filter((log) => hierarchy[log.level] >= targetLevel);
-  }, [logs, levelFilter]);
+  const selectedItem = flattenedItems[selectedIndex]?.item;
+  const activeDescendantId = selectedItem ? `cmd-opt-${selectedItem.id}` : undefined;
 
-  // Color mapping matching Android Studio Logcat
-  const getLevelStyle = (level: LogLevel) => {
-    switch (level) {
-      case "V":
-        return "text-[var(--ink-muted)] opacity-80";
-      case "D":
-        return "text-emerald-700 dark:text-emerald-400 font-medium";
-      case "I":
-        return "text-[var(--accent)] font-semibold";
-      case "W":
-        return "text-amber-600 dark:text-amber-400 font-semibold";
-      case "E":
-        return "text-rose-600 dark:text-rose-400 font-bold";
-      case "A":
-        return "text-red-700 dark:text-red-300 font-extrabold uppercase";
-      default:
-        return "text-[var(--ink)]";
-    }
-  };
+  if (!mounted) return null;
 
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-6 sm:pt-12 px-3 sm:px-6 bg-black/75 backdrop-blur-xs">
-          <m.div
-            ref={dialogRef}
-            initial={{ opacity: 0, scale: 0.98, y: -6 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: -6 }}
-            transition={{ duration: 0.2 }}
-            className="w-full max-w-4xl bg-[var(--paper)] border border-[var(--rule)] rounded-none shadow-[0_1px_2px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col max-h-[90vh] font-mono text-xs"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Android Studio Logcat Command Palette"
+  return createPortal(
+    <div ref={portalRef} id="command-palette-portal">
+      <AnimatePresence>
+        {isOpen && (
+          <div
+            className="fixed inset-0 flex items-start justify-center pt-4 sm:pt-16 px-3 sm:px-6 pointer-events-none"
+            style={{ zIndex: "var(--z-palette, 901)" }}
           >
-            {/* Top Bar: Android Studio IDE Window Chrome */}
-            <div className="flex items-center justify-between px-3.5 py-2.5 bg-[var(--surface)] border-b border-[var(--rule)] select-none">
-              {/* Left: IDE Tabs */}
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[var(--paper)] border border-[var(--rule)] rounded-[4px] text-[11px] font-medium text-[var(--ink)] shadow-xs">
-                  <span className="w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse" />
-                  <Terminal size={12} strokeWidth={2} className="text-[var(--accent)]" />
-                  <span>Logcat</span>
-                </div>
-                <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 text-[11px] text-[var(--ink-muted)] opacity-60">
-                  <Smartphone size={11} strokeWidth={1.5} />
-                  <span>pixel_8_pro (API 34)</span>
-                </div>
-                <div className="hidden md:flex items-center px-1.5 py-0.5 rounded text-[10px] bg-[var(--surface-subtle)] text-[var(--ink-muted)] border border-[var(--rule)]/60">
-                  <span>com.kartikkoundal.portfolio:2026</span>
-                </div>
-              </div>
+            {/* Dim Overlay with 2px backdrop blur covering the whole page */}
+            <m.div
+              key="palette-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                duration: prefersReduced ? 0 : MOTION_TOKENS.duration.fast,
+                ease: MOTION_TOKENS.ease.standard,
+              }}
+              onClick={onClose}
+              aria-hidden="true"
+              className="fixed inset-0 bg-black/60 backdrop-blur-[2px] pointer-events-auto cursor-pointer"
+              style={{
+                zIndex: "var(--z-palette-backdrop, 900)",
+                backgroundColor: "rgba(0, 0, 0, 0.6)",
+                backdropFilter: "blur(2px)",
+                WebkitBackdropFilter: "blur(2px)",
+              }}
+            />
 
-              {/* Right: Actions */}
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => setIsPaused((prev) => !prev)}
-                  title={isPaused ? "Resume auto-scroll" : "Pause auto-scroll"}
-                  className={`p-1.5 rounded-[3px] border border-transparent transition-colors cursor-pointer ${
-                    isPaused
-                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
-                      : "text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--surface-subtle)]"
-                  }`}
-                >
-                  {isPaused ? <Play size={12} /> : <Pause size={12} />}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setLogs([])}
-                  title="Clear Logcat Buffer (Ctrl+L)"
-                  className="p-1.5 rounded-[3px] text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--surface-subtle)] transition-colors cursor-pointer"
-                >
-                  <Trash2 size={12} />
-                </button>
-                <div className="h-3 w-px bg-[var(--rule)] mx-1" />
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-2 py-1 rounded-[3px] text-[11px] font-mono text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--surface-subtle)] border border-[var(--rule)] transition-colors cursor-pointer"
-                  title="Close Logcat (Esc)"
-                >
-                  Close [Esc]
-                </button>
-              </div>
-            </div>
-
-            {/* Sub-bar: Log Level Filter & Filter Query */}
-            <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-1.5 bg-[var(--surface-subtle)] border-b border-[var(--rule)]/60 text-[11px]">
-              {/* Level Filter Chips */}
-              <div className="flex items-center gap-1">
-                <span className="text-[var(--ink-muted)] text-[10px] uppercase tracking-wider mr-1">
-                  Level:
-                </span>
-                {(["ALL", "V", "D", "I", "W", "E"] as const).map((lvl) => {
-                  const isActive = levelFilter === lvl;
-                  const labels: Record<string, string> = {
-                    ALL: "All",
-                    V: "Verbose",
-                    D: "Debug",
-                    I: "Info",
-                    W: "Warn",
-                    E: "Error",
-                  };
-                  return (
-                    <button
-                      key={lvl}
-                      type="button"
-                      onClick={() => setLevelFilter(lvl)}
-                      className={`px-1.5 py-0.5 rounded-[2px] transition-colors cursor-pointer text-[10px] ${
-                        isActive
-                          ? "bg-[var(--accent)] text-white font-semibold"
-                          : "text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--surface)]"
-                      }`}
-                    >
-                      {labels[lvl]}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Notification Pill */}
-              {copiedNotification && (
-                <div className="flex items-center gap-1 text-[10px] text-[var(--accent)] font-medium animate-fadeIn">
-                  <Check size={11} strokeWidth={2.5} />
-                  <span>Copied: {copiedNotification}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Android Studio Filter / Command Input Prompt */}
-            <div className="flex items-center px-3.5 py-2.5 bg-[var(--paper)] border-b border-[var(--rule)]">
-              <span className="text-[var(--accent)] font-bold mr-2 select-none">&gt;</span>
-              <span className="text-[var(--ink-muted)] text-[11px] mr-2 select-none hidden sm:inline opacity-70">
-                package:mine
+            {/* Opaque Palette Dialog Panel */}
+            <m.div
+              key="palette-panel"
+              ref={dialogRef}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{
+                duration: prefersReduced ? 0 : MOTION_TOKENS.duration.fast,
+                ease: MOTION_TOKENS.ease.standard,
+              }}
+              style={{
+                zIndex: "var(--z-palette, 901)",
+                backgroundColor: "var(--surface)",
+              }}
+              className="pointer-events-auto relative z-palette w-full max-w-2xl bg-[var(--surface)] border border-[var(--rule)] rounded-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col font-mono text-xs"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Command palette"
+            >
+              {/* Terminal Command Input Prompt */}
+              <div
+                className="flex items-center px-3.5 py-3 bg-[var(--surface)] border-b border-[var(--rule)]"
+                style={{ backgroundColor: "var(--surface)" }}
+              >
+              <span className="text-[var(--accent)] font-bold mr-2 select-none text-sm">
+                &gt;
               </span>
               <input
                 ref={inputRef}
                 type="text"
+                role="combobox"
+                aria-expanded="true"
+                aria-haspopup="listbox"
+                aria-autocomplete="list"
+                aria-controls="command-palette-listbox"
+                aria-activedescendant={activeDescendantId}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={handleInputKeyDown}
-                placeholder="Search section or command: projects, skills, about, education, theme, hire-me, sudo make-coffee, easter-egg..."
+                onKeyDown={handleKeyDown}
+                placeholder={siteContent.nav.searchPlaceholder}
                 className="w-full bg-transparent font-mono text-xs sm:text-sm text-[var(--ink)] placeholder:text-[var(--ink-muted)] outline-none"
-                aria-label="Logcat command input"
+                aria-label="Command search"
               />
               {query && (
                 <button
                   type="button"
                   onClick={() => setQuery("")}
-                  className="text-[var(--ink-muted)] hover:text-[var(--ink)] px-1"
-                  title="Clear input"
+                  className="text-[var(--ink-muted)] hover:text-[var(--ink)] p-1 cursor-pointer"
+                  title="Clear search"
+                  aria-label="Clear search"
                 >
-                  <X size={12} />
+                  <X size={13} />
                 </button>
               )}
+              <button
+                type="button"
+                onClick={onClose}
+                className="ml-1 px-1.5 py-0.5 rounded-[2px] text-[10px] text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--surface-subtle)] border border-[var(--rule)] cursor-pointer"
+                title="Close palette (Esc)"
+                aria-label="Close command palette"
+              >
+                esc
+              </button>
             </div>
 
-            {/* VERTICAL Command Suggestions Dropdown (Up/Down arrow key navigable) */}
-            {suggestions.length > 0 && (
+            {/* Notification Pill */}
+            {copiedNotification && (
               <div
-                ref={suggestionListRef}
-                className="max-h-[190px] overflow-y-auto divide-y divide-[var(--rule)]/40 border-b border-[var(--rule)] bg-[var(--surface-subtle)]"
+                className="px-3.5 py-1.5 bg-[var(--surface-subtle)] border-b border-[var(--rule)] flex items-center gap-1.5 text-[11px] text-[var(--accent)] font-medium"
+                role="status"
               >
-                {suggestions.map((item, idx) => {
-                  const isSelected = idx === selectedSuggestionIndex;
-                  return (
-                    <div
-                      key={item.cmd}
-                      ref={(el) => {
-                        suggestionItemRefs.current[idx] = el;
-                      }}
-                      onClick={() => executeCommand(item.cmd)}
-                      onMouseEnter={() => setSelectedSuggestionIndex(idx)}
-                      className={`px-3.5 py-2 flex items-center justify-between gap-3 cursor-pointer transition-colors ${
-                        isSelected
-                          ? "bg-[var(--accent)] text-white font-medium shadow-xs"
-                          : "hover:bg-[var(--surface)] text-[var(--ink)]"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 truncate">
-                        <span className="font-mono font-bold tracking-tight">{item.cmd}</span>
-                        <span
-                          className={`text-[11px] truncate ${
-                            isSelected ? "text-white/85" : "text-[var(--ink-muted)]"
-                          }`}
-                        >
-                          {item.description}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-2 shrink-0">
-                        {item.badge && (
-                          <span
-                            className={`text-[9.5px] px-1.5 py-0.5 rounded-[2px] font-mono ${
-                              isSelected
-                                ? "bg-white/20 text-white"
-                                : "bg-[var(--surface)] text-[var(--ink-muted)] border border-[var(--rule)]"
-                            }`}
-                          >
-                            {item.badge}
-                          </span>
-                        )}
-                        <span
-                          className={`text-[10px] font-mono opacity-60 ${
-                            isSelected ? "text-white" : "text-[var(--ink-muted)]"
-                          }`}
-                        >
-                          ↵ run
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+                <Check size={12} strokeWidth={2.5} />
+                <span>{copiedNotification}</span>
               </div>
             )}
 
-            {/* Main Logcat Console Output Area (Spacious & Clean Monospace) */}
+            {/* Polite screen-reader status */}
+            <div className="sr-only" aria-live="polite" aria-atomic="true">
+              {flattenedItems.length === 0
+                ? siteContent.command.empty
+                : `${flattenedItems.length} commands available.`}
+            </div>
+
+            {/* Command Listbox */}
             <div
-              ref={logConsoleRef}
-              className="flex-1 overflow-y-auto p-3.5 bg-[var(--paper)] max-h-[380px] min-h-[240px] divide-y divide-[var(--rule)]/20 leading-relaxed font-mono select-text"
-              tabIndex={0}
+              id="command-palette-listbox"
+              role="listbox"
+              aria-label="Commands"
+              style={{ backgroundColor: "var(--surface)" }}
+              className="max-h-[60vh] overflow-y-auto divide-y divide-[var(--rule)]/30 font-mono text-xs"
             >
-              {displayedLogs.length === 0 ? (
+              {flattenedItems.length === 0 ? (
                 <div className="p-8 text-center text-xs text-[var(--ink-muted)]">
-                  Logcat console empty. Type a command above or press Enter to run.
+                  <p className="font-semibold text-[var(--ink)] mb-1">
+                    {siteContent.command.empty}
+                  </p>
+                  <p className="text-[11px] opacity-80">
+                    Try searching for a section, project name, or action.
+                  </p>
                 </div>
               ) : (
-                displayedLogs.map((log) => (
-                  <div
-                    key={log.id}
-                    className="py-1 px-1 flex items-baseline gap-x-2 text-[11px] sm:text-[11.5px] hover:bg-[var(--surface)]/40 transition-colors rounded-[2px]"
-                  >
-                    {/* Timestamp */}
-                    <span className="text-[var(--ink-muted)] text-[10.5px] shrink-0 select-none opacity-70">
-                      {log.time}
-                    </span>
+                (() => {
+                  let flatIndexTracker = 0;
+                  return groupedResults.map((group) => (
+                    <div
+                      key={group.groupId}
+                      role="group"
+                      aria-label={group.groupTitle}
+                    >
+                      {/* Small mono heading */}
+                      <div
+                        role="presentation"
+                        className="px-3.5 py-1.5 bg-[var(--surface-subtle)] text-[10px] uppercase tracking-wider font-mono text-[var(--ink-muted)] font-semibold select-none border-b border-[var(--rule)]/20"
+                      >
+                        {group.groupTitle}
+                      </div>
 
-                    {/* PID-TID */}
-                    <span className="text-[var(--ink-muted)] text-[10.5px] shrink-0 select-none opacity-50 hidden sm:inline">
-                      {log.pid}-{log.tid}
-                    </span>
+                      {/* Items */}
+                      <div className="divide-y divide-[var(--rule)]/20">
+                        {group.items.map(({ item, highlightIndices }) => {
+                          const currentFlatIdx = flatIndexTracker++;
+                          const isSelected = currentFlatIdx === selectedIndex;
+                          const ItemIcon = item.icon;
 
-                    {/* Level / Tag */}
-                    <span className={`shrink-0 font-semibold ${getLevelStyle(log.level)}`}>
-                      {log.level}/{log.tag}:
-                    </span>
+                          return (
+                            <div
+                              key={item.id}
+                              id={`cmd-opt-${item.id}`}
+                              ref={(el) => {
+                                if (el) itemRefs.current.set(currentFlatIdx, el);
+                                else itemRefs.current.delete(currentFlatIdx);
+                              }}
+                              role="option"
+                              aria-selected={isSelected}
+                              onClick={item.run}
+                              onMouseEnter={() => setSelectedIndex(currentFlatIdx)}
+                              className={`px-3.5 py-2.5 sm:py-2 flex items-center justify-between gap-3 cursor-pointer min-h-[44px] transition-colors ${
+                                isSelected
+                                  ? "bg-[var(--accent)] text-white font-medium shadow-xs"
+                                  : "hover:bg-[var(--surface-subtle)] text-[var(--ink)]"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <ItemIcon
+                                  size={14}
+                                  strokeWidth={1.75}
+                                  className={`shrink-0 ${
+                                    isSelected ? "text-white" : "text-[var(--accent)]"
+                                  }`}
+                                />
+                                <div className="flex items-baseline gap-2 truncate">
+                                  <span className="font-mono text-xs truncate">
+                                    <HighlightedText
+                                      text={item.label}
+                                      indices={highlightIndices}
+                                    />
+                                  </span>
+                                  {item.sublabel && (
+                                    <span
+                                      className={`text-[10.5px] truncate hidden sm:inline ${
+                                        isSelected
+                                          ? "text-white/80"
+                                          : "text-[var(--ink-muted)]"
+                                      }`}
+                                    >
+                                      {item.sublabel}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
 
-                    {/* Message Body: No break-all, preserves ASCII art & formatting cleanly */}
-                    <span className="text-[var(--ink)] whitespace-pre font-mono overflow-x-auto scrollbar-none flex-1">
-                      {log.message}
-                    </span>
-                  </div>
-                ))
+                              <div className="flex items-center gap-2 shrink-0">
+                                {item.badge && (
+                                  <span
+                                    className={`text-[9.5px] px-1.5 py-0.5 rounded-[2px] font-mono ${
+                                      isSelected
+                                        ? "bg-white/20 text-white"
+                                        : "bg-[var(--surface-subtle)] text-[var(--ink-muted)] border border-[var(--rule)]"
+                                    }`}
+                                  >
+                                    {item.badge}
+                                  </span>
+                                )}
+                                <span
+                                  className={`text-[10px] font-mono hidden sm:inline ${
+                                    isSelected
+                                      ? "text-white"
+                                      : "text-[var(--ink-muted)] opacity-70"
+                                  }`}
+                                >
+                                  {siteContent.command.hintRun}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ));
+                })()
               )}
             </div>
 
-            {/* Android Studio Status Bar */}
-            <div className="px-3.5 py-1.5 bg-[var(--surface)] border-t border-[var(--rule)] flex flex-wrap items-center justify-between text-[10.5px] text-[var(--ink-muted)] select-none">
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
-                  <span>emulator-5554 online</span>
-                </span>
-                <span className="hidden sm:inline">
-                  Lines: {displayedLogs.length} / {logs.length}
+            {/* Footer Shortcut Hints (Mono, hidden on mobile) */}
+            <div className="hidden sm:flex items-center justify-between px-3.5 py-2 bg-[var(--surface-subtle)] border-t border-[var(--rule)] text-[10.5px] font-mono text-[var(--ink-muted)] select-none">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
+                <span>
+                  {flattenedItems.length} command{flattenedItems.length === 1 ? "" : "s"}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <span>↑↓ navigate vertical list</span>
+              <div className="flex items-center gap-3">
+                <span>{siteContent.command.hintRun}</span>
                 <span>·</span>
-                <span>Tab complete</span>
+                <span>{siteContent.command.hintNavigate}</span>
                 <span>·</span>
-                <span>↵ execute</span>
-                <span>·</span>
-                <span>Esc close</span>
+                <span>{siteContent.command.hintClose}</span>
               </div>
             </div>
           </m.div>
         </div>
       )}
     </AnimatePresence>
-  );
+  </div>,
+  document.body
+);
 }

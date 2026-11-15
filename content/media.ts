@@ -2,8 +2,9 @@
 import mediaData from './media.json';
 
 export interface MediaSlotDef {
-  type: 'screenshot' | 'video' | 'diagram' | 'certificate' | 'file';
+  type: 'screenshot' | 'video' | 'diagram' | 'certificate' | 'marksheet' | 'file';
   src: string | null;
+  thumb?: string;
   ratio?: string;
   label: string;
   caption?: string;

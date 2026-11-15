@@ -104,6 +104,14 @@ export function Header() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        const target = e.target as HTMLElement | null;
+        const tag = target?.tagName?.toLowerCase();
+        if (tag === "input" || tag === "textarea" || target?.isContentEditable) {
+          // Allow if the input is within the command palette itself so Ctrl+K can toggle it closed
+          if (!target?.closest('[role="dialog"]')) {
+            return;
+          }
+        }
         e.preventDefault();
         setPaletteOpen((prev) => !prev);
       }
@@ -279,7 +287,7 @@ export function Header() {
     <>
       <header
         onFocus={() => setIsVisible(true)}
-        className={`sticky top-0 z-40 w-full bg-[var(--paper)]/95 backdrop-blur-xs border-b border-[var(--rule)] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        className={`sticky top-0 z-header w-full bg-[var(--paper)]/95 backdrop-blur-xs border-b border-[var(--rule)] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           isVisible ? "translate-y-0" : "-translate-y-full"
         }`}
       >
@@ -314,7 +322,7 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav
-            className="hidden md:flex items-center gap-1 font-mono text-xs relative"
+            className="hidden lg:flex items-center gap-1 font-mono text-xs relative"
             aria-label="Main Navigation"
           >
             {navItems.map((item) => {
@@ -401,7 +409,7 @@ export function Header() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="md:hidden inline-flex items-center justify-center w-11 h-11 border border-[var(--rule)] rounded-[4px] bg-[var(--surface)] text-[var(--ink)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
+              className="lg:hidden inline-flex items-center justify-center w-11 h-11 border border-[var(--rule)] rounded-[4px] bg-[var(--surface)] text-[var(--ink)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
               aria-label={mobileMenuOpen ? siteContent.nav.menuClose : siteContent.nav.menuOpen}
               aria-expanded={mobileMenuOpen}
             >
@@ -427,9 +435,26 @@ export function Header() {
             role="dialog"
             aria-modal="true"
             aria-label="Mobile Navigation"
-            className="md:hidden fixed inset-x-0 top-16 bottom-0 z-50 bg-[var(--paper)] border-b border-[var(--rule)] px-6 py-8 flex flex-col justify-between overflow-y-auto"
+            className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-50 bg-[var(--paper)] border-b border-[var(--rule)] px-6 py-8 flex flex-col justify-between overflow-y-auto"
           >
             <nav className="flex flex-col space-y-3 font-mono text-base" aria-label="Mobile Navigation List">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setPaletteOpen(true);
+                }}
+                className="w-full px-4 py-3 border border-[var(--rule)] rounded-[4px] bg-[var(--surface)] text-[var(--ink)] hover:border-[var(--accent)] font-mono text-sm flex items-center justify-between cursor-pointer"
+                aria-label="Open command palette search (Ctrl+K)"
+              >
+                <span className="flex items-center gap-2">
+                  <Terminal size={16} strokeWidth={1.75} className="text-[var(--accent)]" />
+                  <span>{siteContent.nav.searchLabel} (Ctrl+K)</span>
+                </span>
+                <kbd className="text-[10px] text-[var(--ink-muted)] border border-[var(--rule)] px-1.5 py-0.5 rounded bg-[var(--paper)]">
+                  ⌘K
+                </kbd>
+              </button>
               {navItems.map((item) => (
                 <a
                   key={item.href}
@@ -466,10 +491,8 @@ export function Header() {
         )}
       </header>
 
-      {/* Command Palette Modal */}
-      {paletteOpen && (
-        <CommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} />
-      )}
+      {/* Command Palette Modal (rendered through React Portal into document.body) */}
+      <CommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} />
 
       {/* Fake Crash Dialog Easter Egg */}
       <CrashDialog isOpen={crashOpen} onClose={() => setCrashOpen(false)} />

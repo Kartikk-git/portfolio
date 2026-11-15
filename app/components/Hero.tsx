@@ -1,13 +1,16 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { m, useScroll, useTransform, useReducedMotion } from "motion/react";
 import { ArrowDown, Download, Mail, GraduationCap } from "lucide-react";
 import { Github, Linkedin } from "./Icons";
 import { siteContent } from "@/content/site";
+import { credentialsContent } from "@/content/credentials";
 import { contactContent } from "@/content/contact";
 import { mediaManifest } from "@/content/media";
 import { openResumeModal } from "./ResumeModal";
+import { useCountUp } from "@/lib/count-up";
+import { useTiltGlow } from "@/lib/tilt-glow";
 
 export function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -24,6 +27,88 @@ export function Hero() {
 
   const resumeSlot = mediaManifest["resume-pdf"];
   const isResumeAvailable = Boolean(resumeSlot?.src);
+
+  const portraitTilt = useTiltGlow<HTMLDivElement>({ maxTilt: 6, perspective: 900 });
+
+  // Tagline typing effect & scroll-to-top replay
+  const tagline = siteContent.hero.headline;
+  const [displayedTagline, setDisplayedTagline] = useState(tagline);
+  const [showCursor, setShowCursor] = useState(false);
+  const [isCursorFading, setIsCursorFading] = useState(false);
+  const [replayKey, setReplayKey] = useState(0);
+
+  // Detect when user scrolls down away from top (>180px), then returns to the very top (<=15px)
+  useEffect(() => {
+    let scrolledAway = false;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY || document.documentElement.scrollTop;
+      if (currentScrollY > 180) {
+        scrolledAway = true;
+      } else if (scrolledAway && currentScrollY <= 15) {
+        scrolledAway = false;
+        // User scrolled back to the very top: replay typing and count-up!
+        setReplayKey((k) => k + 1);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      setDisplayedTagline(tagline);
+      setShowCursor(false);
+      return;
+    }
+
+    setDisplayedTagline("");
+    setShowCursor(true);
+    setIsCursorFading(false);
+
+    let typingInterval: NodeJS.Timeout | null = null;
+    let fadeTimeout: NodeJS.Timeout | null = null;
+    let removeCursorTimeout: NodeJS.Timeout | null = null;
+
+    const startTimeout = setTimeout(() => {
+      let charIndex = 0;
+      typingInterval = setInterval(() => {
+        charIndex++;
+        setDisplayedTagline(tagline.slice(0, charIndex));
+
+        if (charIndex >= tagline.length) {
+          if (typingInterval) clearInterval(typingInterval);
+
+          // Cursor keeps blinking for 2 seconds after typing ends, then fades out
+          fadeTimeout = setTimeout(() => {
+            setIsCursorFading(true);
+            removeCursorTimeout = setTimeout(() => {
+              setShowCursor(false);
+            }, 400);
+          }, 2000);
+        }
+      }, 35);
+    }, 250);
+
+    return () => {
+      clearTimeout(startTimeout);
+      if (typingInterval) clearInterval(typingInterval);
+      if (fadeTimeout) clearTimeout(fadeTimeout);
+      if (removeCursorTimeout) clearTimeout(removeCursorTimeout);
+    };
+  }, [tagline, prefersReducedMotion, replayKey]);
+
+  // Academic Score count-up: parse CGPA from credentialsContent to avoid hardcoding numbers
+  const cgpaMatch = credentialsContent.education[0]?.meta?.match(/CGPA\s*([0-9.]+)/);
+  const targetCgpa = cgpaMatch ? parseFloat(cgpaMatch[1]) : 7.55;
+
+  const { displayValue: cgpaValue, ref: cgpaRef } = useCountUp({
+    end: targetCgpa,
+    decimals: 2,
+    duration: 1.2,
+    triggerKey: replayKey,
+  });
 
   return (
     <section
@@ -54,8 +139,26 @@ export function Hero() {
             <div className="mb-4">
               <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-[var(--ink)] leading-[1.12]">
                 <span className="block">{siteContent.hero.name}</span>
-                <span className="block font-normal text-lg sm:text-xl md:text-2xl text-[var(--ink-muted)] mt-2 leading-snug">
-                  {siteContent.hero.headline}
+                <span className="relative block font-normal text-lg sm:text-xl md:text-2xl text-[var(--ink-muted)] mt-2 leading-snug">
+                  {/* Screen readers read full tagline in one go */}
+                  <span className="sr-only">{tagline}</span>
+
+                  {/* Invisible text reserves exact line wraps and height with zero jump */}
+                  <span aria-hidden="true" className="invisible select-none block">
+                    {tagline}
+                  </span>
+
+                  {/* Visible animated typing text positioned over the reserved space */}
+                  <span aria-hidden="true" className="absolute inset-0 select-none block">
+                    {displayedTagline}
+                    {showCursor && (
+                      <span
+                        className={`inline-block w-[0.55em] h-[1.05em] align-[-0.12em] ml-1 bg-[var(--accent)] transition-opacity duration-300 ${
+                          isCursorFading ? "opacity-0" : "animate-pulse"
+                        }`}
+                      />
+                    )}
+                  </span>
                 </span>
               </h1>
             </div>
@@ -140,8 +243,14 @@ export function Hero() {
                 <div className="absolute w-38 h-38 sm:w-46 sm:h-46 lg:w-50 lg:h-50 bg-gradient-to-bl from-[var(--accent-hover)]/25 via-teal-400/15 to-[var(--accent)]/20 blur-sm green-aura-wave-2 opacity-65 dark:opacity-85" />
               </div>
 
-              {/* The Circular Portrait */}
-              <div className="relative z-10 w-36 h-36 sm:w-44 sm:h-44 lg:w-48 lg:h-48 rounded-full overflow-hidden border-0 ring-0 shadow-2xl bg-[var(--surface)] select-none">
+              {/* The Circular Portrait with 3D Tilt, Subtle Cursor Glow & Thin Accent Ring */}
+              <div
+                ref={portraitTilt.ref}
+                onPointerMove={portraitTilt.onPointerMove}
+                onPointerEnter={portraitTilt.onPointerEnter}
+                onPointerLeave={portraitTilt.onPointerLeave}
+                className="group relative z-10 w-36 h-36 sm:w-44 sm:h-44 lg:w-48 lg:h-48 rounded-full overflow-hidden shadow-2xl bg-[var(--surface)] select-none border border-[var(--accent)]/30 hover:border-[var(--accent)]/70 transition-colors"
+              >
                 <img
                   src="/kartik-portrait-hero.webp"
                   alt="Kartik Koundal"
@@ -149,6 +258,16 @@ export function Hero() {
                   height={192}
                   className="w-full h-full object-cover object-center rounded-full"
                   priority-load="true"
+                />
+
+                {/* Soft accent glow following cursor inside circular portrait */}
+                <div
+                  className="pointer-events-none absolute inset-0 rounded-full z-10 select-none opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  style={{
+                    background:
+                      "radial-gradient(160px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%)",
+                  }}
+                  aria-hidden="true"
                 />
               </div>
             </div>
@@ -187,8 +306,13 @@ export function Hero() {
                 {/* Academic Score */}
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-[var(--ink-muted)] shrink-0">Academic Score:</span>
-                  <span className="font-semibold px-2 py-0.5 rounded-[2px] bg-[var(--accent-tint)] text-[var(--accent)] border border-[var(--accent-border)]">
-                    CGPA: 7.55 / 10
+                  <span
+                    ref={cgpaRef as React.RefObject<HTMLSpanElement>}
+                    role="text"
+                    aria-label={`CGPA: ${targetCgpa.toFixed(2)} / 10`}
+                    className="font-semibold px-2 py-0.5 rounded-[2px] bg-[var(--accent-tint)] text-[var(--accent)] border border-[var(--accent-border)] font-mono text-xs tabular-nums"
+                  >
+                    <span aria-hidden="true">CGPA: {cgpaValue} / 10</span>
                   </span>
                 </div>
 

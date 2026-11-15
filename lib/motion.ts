@@ -73,6 +73,23 @@ export const revealVariants: Variants = {
   }),
 };
 
+// 1b. cardReveal: Project cards staggered reveal (16px rise, 70ms stagger)
+export const cardRevealVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 16,
+  },
+  visible: (custom: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: MOTION_TOKENS.duration.base,
+      ease: MOTION_TOKENS.ease.standard,
+      delay: custom * 0.07, // 70ms stagger
+    },
+  }),
+};
+
 // 2. lineMask: Headline lines revealing through clipped overflow container
 export const lineMaskVariants: Variants = {
   hidden: {

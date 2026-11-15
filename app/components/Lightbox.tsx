@@ -83,7 +83,7 @@ export function Lightbox({ slots, initialIndex = 0, onClose }: LightboxProps) {
       onTouchMove={(e) => {
         if (e.target === e.currentTarget) e.preventDefault();
       }}
-      className="fixed inset-0 z-50 flex flex-col justify-between bg-black/90 backdrop-blur-xs p-4 sm:p-6 transition-opacity duration-200 overscroll-contain"
+      className="fixed inset-0 z-modal flex flex-col justify-between bg-black/90 backdrop-blur-xs p-4 sm:p-6 transition-opacity duration-200 overscroll-contain"
     >
       {/* Top bar */}
       <div className="flex items-center justify-between text-[var(--paper)] max-w-5xl w-full mx-auto pb-4 border-b border-[var(--paper)]/10">

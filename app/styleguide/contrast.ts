@@ -89,11 +89,11 @@ export const darkContrastData: ContrastResult[] = [
   },
   {
     element: "Secondary Text (Ink Muted on Dark Background)",
-    foreground: { name: "Ink Muted", hex: "#A2A7AE" },
+    foreground: { name: "Ink Muted", hex: "#B8BCC4" },
     background: { name: "Background", hex: "#111315" },
-    ratio: Number(getContrastRatio("#A2A7AE", "#111315").toFixed(2)),
+    ratio: Number(getContrastRatio("#B8BCC4", "#111315").toFixed(2)),
     wcagAA: true,
-    wcagAAA: false,
+    wcagAAA: true,
     targetRequirement: ">= 4.5:1 (WCAG AA)",
   },
   {

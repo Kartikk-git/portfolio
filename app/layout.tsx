@@ -8,19 +8,22 @@ import { ResumeModal } from "./components/ResumeModal";
 import { siteContent } from "@/content/site";
 import { contactContent } from "@/content/contact";
 import { fontPreloads } from "./fonts";
+import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
+
+export { SITE_URL };
 
 export const metadata: Metadata = {
   title: siteContent.title,
   description: siteContent.description,
-  metadataBase: new URL("https://kartikk-git.github.io"),
+  metadataBase: new URL(SITE_URL),
   alternates: {
-    canonical: "/",
+    canonical: SITE_URL,
   },
   openGraph: {
     title: siteContent.title,
     description: siteContent.description,
-    url: "https://kartikk-git.github.io",
+    url: SITE_URL,
     siteName: siteContent.title,
     locale: "en_IN",
     type: "website",
@@ -54,7 +57,7 @@ const jsonLdPerson = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: siteContent.hero.name,
-  url: "https://kartikk-git.github.io",
+  url: SITE_URL,
   email: contactContent.primary.email,
   address: {
     "@type": "PostalAddress",

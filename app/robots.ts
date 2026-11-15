@@ -1,10 +1,9 @@
 import { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/site-url";
 
 export const dynamic = "force-static";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://kartikk-git.github.io";
-
   return {
     rules: [
       {
@@ -13,6 +12,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/styleguide", "/styleguide/*"],
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

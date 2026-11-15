@@ -350,7 +350,7 @@ export function ThemeToggle() {
         <div
           role="status"
           aria-live="polite"
-          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] px-4 py-2.5 rounded-[6px] font-mono text-xs shadow-2xl flex items-center gap-3 border transition-all duration-300 ${ultraType === "flashbang"
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-toast px-4 py-2.5 rounded-[6px] font-mono text-xs shadow-2xl flex items-center gap-3 border transition-all duration-300 ${ultraType === "flashbang"
               ? "bg-white text-black border-neutral-300 shadow-white/40 ring-2 ring-black"
               : "bg-[#0A0D0B] text-[#5FB38F] border-[#1B6B4F] shadow-emerald-900/50 ring-1 ring-[#5FB38F]/50"
             }`}

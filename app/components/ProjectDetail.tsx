@@ -240,11 +240,11 @@ export function ProjectDetail({
         onWheel={(e) => e.preventDefault()}
         onTouchMove={(e) => e.preventDefault()}
         aria-hidden="true"
-        className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs transition-all duration-300"
+        className="fixed inset-0 z-modal bg-black/75 backdrop-blur-xs transition-all duration-300"
       />
 
       {/* Centered Primary Detailed View Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-8 pointer-events-none overscroll-contain">
+      <div className="fixed inset-0 z-modal flex items-center justify-center p-3 sm:p-6 md:p-8 pointer-events-none overscroll-contain">
         <div
           role="dialog"
           aria-modal="true"

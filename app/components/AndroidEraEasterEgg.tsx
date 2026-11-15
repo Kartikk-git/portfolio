@@ -99,10 +99,31 @@ const KONAMI_SEQUENCE = [
   "ArrowRight",
 ];
 
+export const TRIGGER_ANDROID_ERA_EVENT = "kartik:trigger-android-era";
+
+/**
+ * Dispatcher to trigger or cycle Android Eras easter egg from anywhere.
+ */
+export function triggerAndroidEraEasterEgg(): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(TRIGGER_ANDROID_ERA_EVENT));
+}
+
 export function AndroidEraEasterEgg() {
   const [activeEra, setActiveEra] = useState<EraTheme | null>(null);
+  const [prefersReduced, setPrefersReduced] = useState(false);
   const nextEraIndexRef = useRef<number>(0);
   const sequenceProgressRef = useRef<number>(0);
+
+  // Check reduced motion setting
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReduced(media.matches);
+    const listener = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
+    media.addEventListener("change", listener);
+    return () => media.removeEventListener("change", listener);
+  }, []);
 
   // Revert all swapped CSS variables on <html> back to normal
   const revertToNormal = useCallback(() => {
@@ -124,6 +145,32 @@ export function AndroidEraEasterEgg() {
 
     setActiveEra(era);
   }, []);
+
+  // Cycle through: Holo -> Lollipop -> Material You -> Revert to normal -> Holo...
+  const cycleToNextEra = useCallback(() => {
+    markFound("konami");
+
+    // If active era is the last era, cycle to normal (revert)
+    if (activeEra && activeEra.id === ANDROID_ERAS[ANDROID_ERAS.length - 1].id) {
+      revertToNormal();
+      nextEraIndexRef.current = 0;
+      return;
+    }
+
+    const era = ANDROID_ERAS[nextEraIndexRef.current];
+    nextEraIndexRef.current = (nextEraIndexRef.current + 1) % ANDROID_ERAS.length;
+    flashAndroidEra(era);
+  }, [activeEra, flashAndroidEra, revertToNormal]);
+
+  // Listen for programmatic / command palette trigger event
+  useEffect(() => {
+    const handleTriggerEvent = () => {
+      cycleToNextEra();
+    };
+
+    window.addEventListener(TRIGGER_ANDROID_ERA_EVENT, handleTriggerEvent);
+    return () => window.removeEventListener(TRIGGER_ANDROID_ERA_EVENT, handleTriggerEvent);
+  }, [cycleToNextEra]);
 
   // Keyboard listener for Konami sequence: ↑ ↑ ↓ ↓ ← → ← →
   useEffect(() => {
@@ -154,12 +201,7 @@ export function AndroidEraEasterEgg() {
           // Konami sequence complete!
           e.preventDefault();
           sequenceProgressRef.current = 0;
-          markFound("konami");
-
-          // Cycle to next Android era
-          const era = ANDROID_ERAS[nextEraIndexRef.current];
-          nextEraIndexRef.current = (nextEraIndexRef.current + 1) % ANDROID_ERAS.length;
-          flashAndroidEra(era);
+          cycleToNextEra();
         } else {
           sequenceProgressRef.current = nextProgress;
         }
@@ -171,7 +213,7 @@ export function AndroidEraEasterEgg() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [flashAndroidEra]);
+  }, [cycleToNextEra]);
 
 
   if (!activeEra) return null;
@@ -180,7 +222,7 @@ export function AndroidEraEasterEgg() {
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] px-4 py-2.5 rounded-[6px] font-mono text-xs shadow-2xl flex items-center gap-3 border transition-all duration-200 select-none bg-[var(--surface)] text-[var(--ink)] border-[var(--rule)]"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-toast px-4 py-2.5 rounded-[6px] font-mono text-xs shadow-2xl flex items-center gap-3 border transition-all duration-200 select-none bg-[var(--surface)] text-[var(--ink)] border-[var(--rule)]"
       style={{
         boxShadow: `0 10px 25px -5px ${activeEra.accentColor}30, 0 4px 10px rgba(0,0,0,0.5)`,
         borderColor: `${activeEra.accentColor}50`,

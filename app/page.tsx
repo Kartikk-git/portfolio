@@ -12,14 +12,26 @@ import { ExperienceSection } from "./components/ExperienceSection";
 import { EducationSection } from "./components/EducationSection";
 import { ContactSection } from "./components/ContactSection";
 import { Footer } from "./components/Footer";
+import { SectionRail } from "./components/SectionRail";
 import { siteContent } from "@/content/site";
+
+// Dynamically code-split auxiliary interactive elements to keep initial bundle lean
+const PhoneMockup = dynamic(
+  () => import("./components/PhoneMockup").then((mod) => mod.PhoneMockup),
+  { ssr: false }
+);
+
+const HeroBot = dynamic(
+  () => import("./components/HeroBot").then((mod) => mod.HeroBot),
+  { ssr: false }
+);
 
 // Lazy-load below-the-fold heavy heatmap activity component
 const CommitLogSection = dynamic(
   () => import("./components/CommitLogSection").then((mod) => mod.CommitLogSection),
   {
     loading: () => (
-      <div className="py-24 border-t border-[var(--rule)] flex justify-center items-center">
+      <div id="activity" className="py-24 border-t border-[var(--rule)] flex justify-center items-center">
         <span className="font-mono text-xs text-[var(--ink-muted)]">Loading activity metrics...</span>
       </div>
     ),
@@ -87,6 +99,15 @@ export default function HomePage() {
       {/* Sticky Minimal Header */}
       <Header />
 
+      {/* Slim Sticky Vertical Section Rail in Left Gutter (>=1280px) */}
+      <SectionRail />
+
+      {/* Modern Android Phone Mockup in Right Gutter (>=1600px) & Modal Popover (<1600px) */}
+      <PhoneMockup />
+
+      {/* Android Hero Companion Bot (Hero only launcher & invite companion) */}
+      <HeroBot />
+
       {/* Main Content Sections */}
       <main id="main-content" className="flex-1 w-full">
         {/* 1. Hero */}
@@ -101,7 +122,7 @@ export default function HomePage() {
         {/* 4. Activity & Contributions (Commit Log, mounted when the browser is idle) */}
         <IdleMount
           fallback={
-            <div className="py-24 border-t border-[var(--rule)] flex justify-center items-center">
+            <div id="activity" className="py-24 border-t border-[var(--rule)] flex justify-center items-center">
               <span className="font-mono text-xs text-[var(--ink-muted)]">Loading activity metrics...</span>
             </div>
           }

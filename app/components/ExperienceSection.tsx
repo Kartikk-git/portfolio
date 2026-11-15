@@ -42,7 +42,7 @@ export function ExperienceSection() {
   return (
     <Section
       id="experience"
-      eyebrow="04 · Experience"
+      eyebrow="05 · Experience"
       heading="Work &amp; Internships"
       intro="Practical software development and engineering experience gained through industrial internships and team-based client builds."
       headerExtra="1 Industrial Internship"

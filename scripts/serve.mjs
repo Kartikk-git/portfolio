@@ -26,6 +26,58 @@ const MIME_TYPES = {
   '.xml': 'application/xml; charset=utf-8',
 };
 
+// Parse Cloudflare Pages _headers file to accurately mirror production security headers
+function loadCloudflareHeaders() {
+  const headersFile = path.join(ROOT, '_headers');
+  if (!fs.existsSync(headersFile)) return [];
+  const lines = fs.readFileSync(headersFile, 'utf8').split('\n');
+  const rules = [];
+  let currentPattern = null;
+  let currentHeaders = {};
+
+  for (const rawLine of lines) {
+    const line = rawLine.trimEnd();
+    if (!line || line.startsWith('#')) continue;
+    if (line.startsWith(' ') || line.startsWith('\t')) {
+      const idx = line.indexOf(':');
+      if (idx > -1 && currentPattern) {
+        const k = line.substring(0, idx).trim();
+        const v = line.substring(idx + 1).trim();
+        currentHeaders[k] = v;
+      }
+    } else {
+      if (currentPattern) {
+        rules.push({ pattern: currentPattern, headers: { ...currentHeaders } });
+      }
+      currentPattern = line.trim();
+      currentHeaders = {};
+    }
+  }
+  if (currentPattern) {
+    rules.push({ pattern: currentPattern, headers: { ...currentHeaders } });
+  }
+  return rules;
+}
+
+const cfRules = loadCloudflareHeaders();
+
+function getSecurityHeadersForPath(requestPath) {
+  const matched = {};
+  for (const rule of cfRules) {
+    if (rule.pattern === '/*' || rule.pattern === '*') {
+      Object.assign(matched, rule.headers);
+    } else if (rule.pattern.endsWith('/*')) {
+      const prefix = rule.pattern.slice(0, -2);
+      if (requestPath.startsWith(prefix)) {
+        Object.assign(matched, rule.headers);
+      }
+    } else if (rule.pattern === requestPath) {
+      Object.assign(matched, rule.headers);
+    }
+  }
+  return matched;
+}
+
 // Content types that benefit from gzip; binaries (images, fonts, PDFs) are
 // already compressed and are streamed as-is.
 const GZIP_TYPES = new Set([
@@ -82,6 +134,7 @@ const server = http.createServer((req, res) => {
     const headers = {
       'Content-Type': contentType,
       'Cache-Control': cacheControlFor(filePath),
+      ...getSecurityHeadersForPath(cleanPath),
     };
 
     const acceptsGzip = (req.headers['accept-encoding'] || '').includes('gzip');

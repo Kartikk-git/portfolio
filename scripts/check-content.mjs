@@ -29,7 +29,13 @@ for (let i = 0; i < lines.length; i++) {
   }
 }
 
-console.log(`Parsed ${markdownEntries.size} canonical keys from content/website-content.md.`);
+const RETIRED_KEY_PREFIXES = ["ph.", "edu.scorecard."];
+let retiredCount = 0;
+for (const [key] of markdownEntries) {
+  if (RETIRED_KEY_PREFIXES.some((p) => key.startsWith(p))) retiredCount++;
+}
+
+console.log(`Parsed ${markdownEntries.size} canonical keys from content/website-content.md (${retiredCount} retired ph.*/edu.scorecard.* keys excluded, ${markdownEntries.size - retiredCount} active to verify).`);
 
 const contentFiles = [
   'content/site.ts',
@@ -39,6 +45,8 @@ const contentFiles = [
   'content/credentials.ts',
   'content/contact.ts',
   'content/projects.ts',
+  'content/rail.ts',
+  'content/phone.ts',
   'content/media.ts',
   'content/media.json'
 ];
@@ -59,7 +67,6 @@ let checked = 0;
 // visitor-visible placeholders are forbidden by the brief, so media slots
 // without an asset are omitted from the page instead of showing "coming soon"
 // copy. Their canonical strings stay in website-content.md for reference.
-const RETIRED_KEY_PREFIXES = ["ph."];
 
 for (const [key, expectedVal] of markdownEntries) {
   if (RETIRED_KEY_PREFIXES.some((p) => key.startsWith(p))) continue;

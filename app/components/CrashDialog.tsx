@@ -53,7 +53,7 @@ export function CrashDialog({ isOpen, onClose }: CrashDialogProps) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="crash-dialog-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-[fadeIn_0.2s_ease-out]"
+      className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-[fadeIn_0.2s_ease-out]"
     >
       <div className="relative w-full max-w-sm bg-[var(--surface)] border border-[var(--rule)] rounded-[8px] p-6 shadow-2xl space-y-4">
         {/* Top-right close button */}

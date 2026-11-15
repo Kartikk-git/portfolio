@@ -4,6 +4,7 @@ import React from "react";
 import { m } from "motion/react";
 import { aboutContent } from "@/content/about";
 import { revealVariants } from "@/lib/motion";
+import { useTiltGlow } from "@/lib/tilt-glow";
 import { Section } from "./Section";
 
 interface AboutSectionProps {
@@ -11,6 +12,8 @@ interface AboutSectionProps {
 }
 
 export function AboutSection({ isReviewMode = false }: AboutSectionProps) {
+  const photoTilt = useTiltGlow<HTMLDivElement>({ maxTilt: 4, perspective: 900 });
+
   const facts = [
     { label: "Studying", value: "B.Tech Computer Science and Engineering, 2024 to 2028" },
     { label: "College", value: "Dronacharya College of Engineering, Gurugram" },
@@ -44,7 +47,7 @@ export function AboutSection({ isReviewMode = false }: AboutSectionProps) {
             variants={revealVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-10% 0px" }}
+            viewport={{ once: true, margin: "0px" }}
             custom={0}
             className="space-y-3.5 border-b border-[var(--rule-subtle)] pb-5"
           >
@@ -64,7 +67,7 @@ export function AboutSection({ isReviewMode = false }: AboutSectionProps) {
                 variants={revealVariants}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: "-10% 0px" }}
+                viewport={{ once: true, margin: "0px" }}
                 custom={idx + 1}
                 className="space-y-2 border-l-2 border-[var(--rule-subtle)] hover:border-[var(--accent)] pl-4 transition-colors"
               >
@@ -86,7 +89,7 @@ export function AboutSection({ isReviewMode = false }: AboutSectionProps) {
               variants={revealVariants}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: "-10% 0px" }}
+              viewport={{ once: true, margin: "0px" }}
               custom={6}
               className="pt-4 border-t border-[var(--rule-subtle)] font-serif italic text-[15px] sm:text-base text-[var(--ink)] leading-relaxed"
             >
@@ -102,19 +105,38 @@ export function AboutSection({ isReviewMode = false }: AboutSectionProps) {
             variants={revealVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-10% 0px" }}
+            viewport={{ once: true, margin: "0px" }}
             custom={4.5}
-            className="border border-[var(--rule)] rounded-[4px] bg-[var(--surface-subtle)] p-4 overflow-hidden flex flex-col items-center gap-3"
+            className="border border-[var(--rule)] rounded-[4px] bg-[var(--surface-subtle)] p-3 sm:p-3.5 overflow-hidden flex flex-col items-center gap-2 sm:gap-2.5 w-full max-w-[330px] sm:max-w-[340px] mx-auto lg:mx-0"
           >
-            <div className="w-full aspect-[4/5] rounded-[2px] overflow-hidden border border-[var(--rule)] bg-[var(--surface)]">
+            {/* Portrait Photo Frame with 3D Tilt, Cursor Glow & Inner Image Zoom */}
+            <div
+              ref={photoTilt.ref}
+              onPointerMove={photoTilt.onPointerMove}
+              onPointerEnter={photoTilt.onPointerEnter}
+              onPointerLeave={photoTilt.onPointerLeave}
+              className="group relative w-full aspect-[4/4.5] max-h-[320px] rounded-[2px] overflow-hidden border border-[var(--rule)] bg-[var(--surface)] select-none"
+            >
               <img
                 src="/kartik-about.webp"
                 alt="Kartik Koundal"
                 width={720}
                 height={960}
-                className="w-full h-full object-cover object-top"
+                className="w-full h-full object-cover object-top transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
+              />
+
+              {/* Cursor-following radial glow */}
+              <div
+                className="pointer-events-none absolute inset-0 z-10 select-none opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                style={{
+                  background:
+                    "radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 15%, transparent), transparent 75%)",
+                }}
+                aria-hidden="true"
               />
             </div>
+
+            {/* Static Caption underneath (remains still) */}
             <div className="w-full flex items-center justify-between font-mono text-[11px] text-[var(--ink-muted)] pt-1 px-1">
               <span>Kartik Koundal</span>
               <span>New Delhi, India</span>
@@ -126,7 +148,7 @@ export function AboutSection({ isReviewMode = false }: AboutSectionProps) {
             variants={revealVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-10% 0px" }}
+            viewport={{ once: true, margin: "0px" }}
             custom={5}
             className="p-5 sm:p-6 border border-[var(--rule)] rounded-[4px] bg-[var(--surface-subtle)] space-y-3.5"
           >
@@ -152,7 +174,7 @@ export function AboutSection({ isReviewMode = false }: AboutSectionProps) {
             variants={revealVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-10% 0px" }}
+            viewport={{ once: true, margin: "0px" }}
             custom={6}
             className="p-5 sm:p-6 border border-[var(--rule)] rounded-[4px] bg-[var(--surface-subtle)] space-y-3.5"
           >

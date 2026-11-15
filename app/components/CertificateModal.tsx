@@ -86,7 +86,7 @@ export function CertificateModal({ certId, onClose, onPrev, onNext }: Certificat
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 sm:p-6 transition-all duration-200 overscroll-contain"
+      className="fixed inset-0 z-modal flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 sm:p-6 transition-all duration-200 overscroll-contain"
     >
       <div className="relative w-full max-w-4xl bg-[var(--paper)] border border-[var(--rule)] rounded-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col md:flex-row max-h-[90vh] overscroll-contain">
         {/* Certificate Display Area */}

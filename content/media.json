@@ -154,6 +154,7 @@
   "cred-java": {
     "type": "certificate",
     "src": "/docs/nptel-java-certificate.png",
+    "thumb": "/docs/cred-java-thumb.webp",
     "ratio": "4/3",
     "label": "NPTEL Programming in Java",
     "caption": "NPTEL IIT Kharagpur Elite Certificate (95%)",
@@ -162,6 +163,7 @@
   "cred-codechef-1": {
     "type": "certificate",
     "src": "/docs/codechef-python-test.png",
+    "thumb": "/docs/cred-codechef-thumb.webp",
     "ratio": "4/3",
     "label": "Python Skill Assessment",
     "caption": "CodeChef Python Assessment (90%)",
@@ -199,9 +201,19 @@
     "caption": "CodeChef HTML/CSS Projects Track",
     "title": "Projects using HTML/CSS"
   },
+  "cred-gcloud": {
+    "type": "certificate",
+    "src": "/docs/google-cloud-badge-proof-1.jpg",
+    "thumb": "/docs/cred-gcloud-thumb.webp",
+    "ratio": "16/9",
+    "label": "Google Cloud Skill Badges",
+    "caption": "Google Cloud Skill Badge, verified on Credly",
+    "title": "Google Cloud Skill Badges"
+  },
   "cred-gcloud-1": {
     "type": "certificate",
     "src": "/docs/google-cloud-badge-proof-1.jpg",
+    "thumb": "/docs/cred-gcloud-thumb.webp",
     "ratio": "16/9",
     "label": "Prompt Design in Vertex AI",
     "caption": "Google Cloud Skill Badge, verified on Credly",
@@ -222,6 +234,24 @@
     "label": "Deploy and Manage Applications on Google App Engine",
     "caption": "Google Cloud Skill Badge",
     "title": "Deploy and Manage Applications on Google App Engine"
+  },
+  "edu-xii": {
+    "type": "marksheet",
+    "src": "/docs/12th.jpeg",
+    "thumb": "/docs/edu-12th-thumb.webp",
+    "ratio": "16/10",
+    "label": "Senior Secondary (Class XII) Marksheet",
+    "caption": "Class XII marksheet (77.4%)",
+    "title": "Senior Secondary (Class XII)"
+  },
+  "edu-x": {
+    "type": "marksheet",
+    "src": "/docs/10th.jpeg",
+    "thumb": "/docs/edu-10th-thumb.webp",
+    "ratio": "16/10",
+    "label": "Secondary (Class X) Marksheet",
+    "caption": "Class X marksheet (77.2%)",
+    "title": "Secondary (Class X)"
   },
   "resume-pdf": {
     "type": "file",

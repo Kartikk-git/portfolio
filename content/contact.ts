@@ -1,6 +1,6 @@
 // Verbatim contact content from content/website-content.md
 export const contactContent = {
-  eyebrow: "06 · Contact",
+  eyebrow: "07 · Contact",
   heading: "Get in Touch",
   intro: "I'm looking for a software or Android internship where I can contribute to a real codebase and learn from code review. If you're hiring, have feedback on one of my projects, or want to talk about Android or Flask, email is the quickest way to reach me.",
   primary: {

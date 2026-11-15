@@ -76,7 +76,7 @@ export function SkillsSection() {
             variants={revealVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-10% 0px" }}
+            viewport={{ once: true, margin: "0px" }}
             custom={index}
             className="border border-[var(--rule)] rounded-[4px] bg-[var(--surface-subtle)]/70 hover:border-[var(--accent-soft)]/50 p-6 transition-colors"
           >

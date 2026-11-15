@@ -4,8 +4,9 @@ import React, { useRef, useState } from "react";
 import { m, useScroll, useTransform, useReducedMotion } from "motion/react";
 import { ExternalLink, Award, GraduationCap } from "lucide-react";
 import { credentialsContent } from "@/content/credentials";
-import { hasRealMedia } from "@/content/media";
+import { hasRealMedia, mediaManifest } from "@/content/media";
 import { revealVariants } from "@/lib/motion";
+import { useTiltGlow } from "@/lib/tilt-glow";
 import { CertificateModal } from "./CertificateModal";
 import { DocumentModal, DocumentPreviewItem } from "./DocumentModal";
 import { Section } from "./Section";
@@ -16,6 +17,74 @@ interface EducationSectionProps {
 
 // The canonical content keeps internal "⚠" verify flags; they never render.
 const stripVerifyFlags = (s: string) => s.replace(/\s*⚠/g, "");
+
+/**
+ * Interactive Thumbnail Button for Certificates and School Marksheets
+ * - Certificates: max height 180px, max width 320px on desktop, left-aligned at top of card, object-fit: cover
+ * - Marksheets: max height 140px, max width 280px, object-fit: cover, object-position: top (CBSE crest & header visible), 2px blur
+ * - Fixed dimensions prevent layout shift (CLS = 0)
+ * - 3D Tilt + Cursor-following glow via shared useTiltGlow hook
+ * - Hover zoom to 1.04 inside clipped frame
+ * - Real <button> with focus-visible styling and aria-label from content/
+ */
+function CredentialThumbnailButton({
+  slotId,
+  onClick,
+  title,
+  ariaLabel,
+  isMarksheet = false,
+}: {
+  slotId: string;
+  onClick: () => void;
+  title: string;
+  ariaLabel: string;
+  isMarksheet?: boolean;
+  aspectRatio?: string;
+}) {
+  const tilt = useTiltGlow<HTMLButtonElement>({ maxTilt: 4, perspective: 900 });
+  const slot = mediaManifest[slotId];
+  if (!slot?.src) return null;
+
+  const imgSrc = slot.thumb || slot.src;
+
+  const containerClasses = isMarksheet
+    ? "group relative w-full max-w-[280px] h-[140px] max-h-[140px] overflow-hidden rounded-[2px] border border-[var(--rule)] bg-[var(--surface)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)] select-none block mb-3.5"
+    : "group relative w-full max-w-[320px] h-[160px] sm:h-[180px] max-h-[180px] overflow-hidden rounded-[2px] border border-[var(--rule)] bg-[var(--surface)] cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)] select-none block mb-3.5";
+
+  return (
+    <button
+      type="button"
+      ref={tilt.ref}
+      onPointerMove={tilt.onPointerMove}
+      onPointerEnter={tilt.onPointerEnter}
+      onPointerLeave={tilt.onPointerLeave}
+      onClick={onClick}
+      aria-label={ariaLabel}
+      className={containerClasses}
+    >
+      <img
+        src={imgSrc}
+        alt={title}
+        loading="lazy"
+        decoding="async"
+        width={isMarksheet ? 280 : 320}
+        height={isMarksheet ? 140 : 180}
+        className={`w-full h-full object-cover transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04] ${
+          isMarksheet ? "object-top blur-[2px] select-none" : "object-center"
+        }`}
+      />
+      {/* Soft radial glow following cursor */}
+      <div
+        className="pointer-events-none absolute inset-0 z-10 select-none opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        style={{
+          background:
+            "radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 15%, transparent), transparent 75%)",
+        }}
+        aria-hidden="true"
+      />
+    </button>
+  );
+}
 
 export function EducationSection({ isReviewMode = false }: EducationSectionProps) {
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -72,12 +141,12 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
           </div>
 
           <div className="space-y-6">
-            {/* Primary Degree Card: B.Tech CSE */}
+            {/* Primary Degree Card: B.Tech CSE (In progress; no certificate image yet) */}
             <m.div
               variants={revealVariants}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: "-10% 0px" }}
+              viewport={{ once: true, margin: "0px" }}
               custom={0}
               className="relative group border border-[var(--rule)] rounded-[4px] bg-[var(--surface-subtle)] p-5 sm:p-6 space-y-4 hover:border-[var(--accent-soft)] transition-colors"
             >
@@ -132,39 +201,6 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
                   ))}
                 </div>
               </div>
-
-              {/* Semester Scorecards Verification Links */}
-              <div className="pt-3 border-t border-[var(--rule-subtle)]/70">
-                <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--ink-muted)] block mb-2 font-medium">
-                  Semester Scorecards (Verified Marks)
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { sem: "Sem 1", file: "/docs/sem1.pdf", desc: "Semester 1 Result" },
-                    { sem: "Sem 2", file: "/docs/sem2.pdf", desc: "Semester 2 Result" },
-                    { sem: "Sem 3", file: "/docs/sem3.pdf", desc: "Semester 3 Result" },
-                    { sem: "Sem 4", file: "/docs/sem4.pdf", desc: "Semester 4 Result" },
-                  ].map((s) => (
-                    <button
-                      key={s.sem}
-                      type="button"
-                      onClick={() =>
-                        setDocModalItem({
-                          title: `B.Tech CSE · ${s.sem} Scorecard`,
-                          subtitle: "Dronacharya College of Engineering, Gurugram",
-                          src: s.file,
-                          type: "pdf",
-                          downloadName: `Kartik-Koundal-${s.sem}.pdf`,
-                        })
-                      }
-                      className="font-mono text-xs px-2.5 py-1 border border-[var(--rule)] bg-[var(--paper)] hover:border-[var(--accent)] text-[var(--accent)] rounded-[2px] transition-colors cursor-pointer inline-flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
-                      title={s.desc}
-                    >
-                      <span>{s.sem} &rarr;</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
             </m.div>
 
             {/* Schooling Cards (Class XII & Class X in 2-Column Grid) */}
@@ -174,7 +210,7 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
                 variants={revealVariants}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: "-10% 0px" }}
+                viewport={{ once: true, margin: "0px" }}
                 custom={1}
                 className="relative group border border-[var(--rule-subtle)] rounded-[4px] bg-[var(--surface-subtle)]/60 p-5 space-y-2.5 hover:border-[var(--accent-soft)]/50 transition-colors"
               >
@@ -182,6 +218,24 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
                   className="absolute -left-[31px] sm:-left-[39px] top-6 w-[5px] h-[5px] rounded-none z-20 bg-[var(--rule)] group-hover:bg-[var(--accent)] transition-colors"
                   aria-hidden="true"
                 />
+
+                {/* Marksheet Thumbnail at Top */}
+                <CredentialThumbnailButton
+                  slotId="edu-xii"
+                  title={credentialsContent.education[1].title}
+                  ariaLabel={`View marksheet: ${credentialsContent.education[1].title}`}
+                  isMarksheet={true}
+                  onClick={() =>
+                    setDocModalItem({
+                      title: "Senior Secondary (Class XII) · Marksheet",
+                      subtitle: "St. Martin's Diocesan School · CBSE 2024 (77.4%)",
+                      src: "/docs/12th.jpeg",
+                      type: "image",
+                      downloadName: "Kartik-Koundal-12th-Marksheet.jpeg",
+                    })
+                  }
+                />
+
                 <div className="flex items-center justify-between gap-2 border-b border-[var(--rule-subtle)] pb-2">
                   <h4 className="font-serif text-base sm:text-lg font-semibold text-[var(--ink)]">
                     {credentialsContent.education[1].title}
@@ -218,10 +272,32 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
                 variants={revealVariants}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: "-10% 0px" }}
+                viewport={{ once: true, margin: "0px" }}
                 custom={2}
                 className="relative group border border-[var(--rule-subtle)] rounded-[4px] bg-[var(--surface-subtle)]/60 p-5 space-y-2.5 hover:border-[var(--accent-soft)]/50 transition-colors"
               >
+                <div
+                  className="absolute -left-[31px] sm:-left-[39px] top-6 w-[5px] h-[5px] rounded-none z-20 bg-[var(--rule)] group-hover:bg-[var(--accent)] transition-colors"
+                  aria-hidden="true"
+                />
+
+                {/* Marksheet Thumbnail at Top */}
+                <CredentialThumbnailButton
+                  slotId="edu-x"
+                  title={credentialsContent.education[2].title}
+                  ariaLabel={`View marksheet: ${credentialsContent.education[2].title}`}
+                  isMarksheet={true}
+                  onClick={() =>
+                    setDocModalItem({
+                      title: "Secondary (Class X) · Marksheet",
+                      subtitle: "St. Martin's Diocesan School · CBSE 2022 (77.2%)",
+                      src: "/docs/10th.jpeg",
+                      type: "image",
+                      downloadName: "Kartik-Koundal-10th-Marksheet.jpeg",
+                    })
+                  }
+                />
+
                 <div className="flex items-center justify-between gap-2 border-b border-[var(--rule-subtle)] pb-2">
                   <h4 className="font-serif text-base sm:text-lg font-semibold text-[var(--ink)]">
                     {credentialsContent.education[2].title}
@@ -266,105 +342,119 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
           </div>
 
           <div className="space-y-5">
-            {certList.map((cert, index) => (
-              <m.div
-                key={cert.id}
-                variants={revealVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-10% 0px" }}
-                custom={index + 3}
-                className="relative group border border-[var(--rule)] rounded-[4px] bg-[var(--surface-subtle)] p-5 sm:p-6 space-y-3.5 hover:border-[var(--accent-soft)] transition-colors"
-              >
-                {/* Node: 5px square on the vertical rule line */}
-                <div
-                  className="absolute -left-[31px] sm:-left-[39px] top-6 w-[5px] h-[5px] rounded-none z-20 bg-[var(--accent-soft)]"
-                  aria-hidden="true"
-                />
+            {certList.map((cert, index) => {
+              const previewSlot = certPreviewSlot(cert.id);
 
-                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-[var(--rule-subtle)] pb-3">
-                  <div className="flex flex-wrap items-baseline gap-2.5">
-                    <h4 className="font-serif text-lg sm:text-xl font-semibold text-[var(--ink)]">
-                      {stripVerifyFlags(cert.title)}
-                    </h4>
-                    {cert.badge && (
-                      <span className="font-mono text-xs uppercase tracking-wider text-[var(--accent-soft)] px-2 py-0.5 border border-[var(--accent-border)] bg-[var(--accent-tint)] rounded-[2px] font-medium">
-                        {cert.badge}
-                      </span>
-                    )}
-                    {isReviewMode && cert.confirm && (
-                      <span className="font-mono text-[10px] px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 rounded-[2px]">
-                        confirm
-                      </span>
-                    )}
-                  </div>
+              return (
+                <m.div
+                  key={cert.id}
+                  variants={revealVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "0px" }}
+                  custom={index + 3}
+                  className="relative group border border-[var(--rule)] rounded-[4px] bg-[var(--surface-subtle)] p-5 sm:p-6 space-y-3.5 hover:border-[var(--accent-soft)] transition-colors"
+                >
+                  {/* Node: 5px square on the vertical rule line */}
+                  <div
+                    className="absolute -left-[31px] sm:-left-[39px] top-6 w-[5px] h-[5px] rounded-none z-20 bg-[var(--accent-soft)]"
+                    aria-hidden="true"
+                  />
 
-                  <div className="flex items-center gap-2">
-                    {cert.score && (
-                      <div className="font-mono text-xs font-semibold px-2.5 py-1 rounded-[2px] bg-[var(--accent-tint)] text-[var(--accent)] border border-[var(--accent-border)]">
-                        Score: {cert.score}
-                      </div>
-                    )}
-                    <div className="font-mono text-xs text-[var(--ink-muted)] shrink-0">
-                      {stripVerifyFlags(cert.meta)}
-                    </div>
-                  </div>
-                </div>
-
-                <p className="font-sans text-sm text-[var(--ink-muted)] leading-relaxed max-w-[72ch]">
-                  {cert.body}
-                </p>
-
-                {/* Items/Badges tags if present */}
-                {cert.badges && cert.badges.length > 0 && (
-                  <div className="pt-1">
-                    <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--ink-muted)] block mb-1.5 font-medium">
-                      Featured Badges
-                    </span>
-                    <div className="flex flex-wrap gap-1.5 font-mono text-xs">
-                      {cert.badges.map((b) => (
-                        <span
-                          key={b}
-                          className="px-2.5 py-1 border border-[var(--rule-subtle)] bg-[var(--paper)] text-[var(--ink-muted)] rounded-[2px]"
-                        >
-                          {b}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Actions: View certificate + Verify link */}
-                <div className="flex items-center gap-4 pt-2 border-t border-[var(--rule-subtle)]/60">
-                  {certPreviewSlot(cert.id) && (
-                    <button
+                  {/* Certificate Thumbnail at Top (if real asset exists) */}
+                  {previewSlot && (
+                    <CredentialThumbnailButton
+                      slotId={previewSlot}
+                      title={cert.title}
+                      ariaLabel={`View certificate: ${stripVerifyFlags(cert.title)}`}
                       onClick={() => setModalCertId(cert.id)}
-                      className="font-mono text-xs text-[var(--accent)] hover:underline inline-flex items-center gap-1 cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
-                    >
-                      View certificate &rarr;
-                    </button>
+                    />
                   )}
 
-                  {cert.verifyUrl ? (
-                    <a
-                      href={cert.verifyUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-mono text-xs text-[var(--ink-muted)] hover:text-[var(--ink)] hover:underline inline-flex items-center gap-1"
-                    >
-                      <span>{cert.verifyLabel}</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-                  ) : (
-                    isReviewMode && (
-                      <span className="font-mono text-[10px] text-amber-600 dark:text-amber-400">
-                        Verify: link unconfirmed
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-[var(--rule-subtle)] pb-3">
+                    <div className="flex flex-wrap items-baseline gap-2.5">
+                      <h4 className="font-serif text-lg sm:text-xl font-semibold text-[var(--ink)]">
+                        {stripVerifyFlags(cert.title)}
+                      </h4>
+                      {cert.badge && (
+                        <span className="font-mono text-xs uppercase tracking-wider text-[var(--accent-soft)] px-2 py-0.5 border border-[var(--accent-border)] bg-[var(--accent-tint)] rounded-[2px] font-medium">
+                          {cert.badge}
+                        </span>
+                      )}
+                      {isReviewMode && cert.confirm && (
+                        <span className="font-mono text-[10px] px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 rounded-[2px]">
+                          confirm
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {cert.score && (
+                        <div className="font-mono text-xs font-semibold px-2.5 py-1 rounded-[2px] bg-[var(--accent-tint)] text-[var(--accent)] border border-[var(--accent-border)]">
+                          Score: {cert.score}
+                        </div>
+                      )}
+                      <div className="font-mono text-xs text-[var(--ink-muted)] shrink-0">
+                        {stripVerifyFlags(cert.meta)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="font-sans text-sm text-[var(--ink-muted)] leading-relaxed max-w-[72ch]">
+                    {cert.body}
+                  </p>
+
+                  {/* Items/Badges tags if present */}
+                  {cert.badges && cert.badges.length > 0 && (
+                    <div className="pt-1">
+                      <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--ink-muted)] block mb-1.5 font-medium">
+                        Featured Badges
                       </span>
-                    )
+                      <div className="flex flex-wrap gap-1.5 font-mono text-xs">
+                        {cert.badges.map((b) => (
+                          <span
+                            key={b}
+                            className="px-2.5 py-1 border border-[var(--rule-subtle)] bg-[var(--paper)] text-[var(--ink-muted)] rounded-[2px]"
+                          >
+                            {b}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   )}
-                </div>
-              </m.div>
-            ))}
+
+                  {/* Actions: View certificate + Verify link */}
+                  <div className="flex items-center gap-4 pt-2 border-t border-[var(--rule-subtle)]/60">
+                    {previewSlot && (
+                      <button
+                        onClick={() => setModalCertId(cert.id)}
+                        className="font-mono text-xs text-[var(--accent)] hover:underline inline-flex items-center gap-1 cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
+                      >
+                        View certificate &rarr;
+                      </button>
+                    )}
+
+                    {cert.verifyUrl ? (
+                      <a
+                        href={cert.verifyUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mono text-xs text-[var(--ink-muted)] hover:text-[var(--ink)] hover:underline inline-flex items-center gap-1"
+                      >
+                        <span>{cert.verifyLabel}</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    ) : (
+                      isReviewMode && (
+                        <span className="font-mono text-[10px] text-amber-600 dark:text-amber-400">
+                          Verify: link unconfirmed
+                        </span>
+                      )
+                    )}
+                  </div>
+                </m.div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -387,7 +477,7 @@ export function EducationSection({ isReviewMode = false }: EducationSectionProps
         />
       )}
 
-      {/* Document Preview Modal for Scorecards and Marksheets */}
+      {/* Document Preview Modal for Marksheets */}
       {docModalItem && (
         <DocumentModal
           doc={docModalItem}

@@ -75,7 +75,7 @@ export function DocumentModal({ doc, onClose }: DocumentModalProps) {
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-3 sm:p-6 transition-all duration-200 overscroll-contain animate-fade-in"
+      className="fixed inset-0 z-modal flex items-center justify-center bg-black/75 backdrop-blur-xs p-3 sm:p-6 transition-all duration-200 overscroll-contain animate-fade-in"
     >
       <div
         className="relative w-full max-w-4xl h-[92vh] max-h-[960px] bg-[var(--paper)] border border-[var(--rule)] rounded-[4px] shadow-[0_4px_24px_rgba(0,0,0,0.18)] flex flex-col overflow-hidden"

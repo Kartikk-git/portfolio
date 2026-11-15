@@ -98,7 +98,7 @@ export function ToastManager() {
     <div
       role="status"
       aria-live="polite"
-      className={`fixed bottom-6 right-6 z-[99999] flex items-center gap-2.5 pl-3.5 pr-2 py-2 bg-[var(--surface)] text-[var(--ink)] border border-[var(--accent)] rounded-[4px] shadow-2xl font-mono text-xs select-none transition-all duration-200 pointer-events-auto ${
+      className={`fixed bottom-6 right-6 z-toast flex items-center gap-2.5 pl-3.5 pr-2 py-2 bg-[var(--surface)] text-[var(--ink)] border border-[var(--accent)] rounded-[4px] shadow-2xl font-mono text-xs select-none transition-all duration-200 pointer-events-auto ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"
       }`}
     >

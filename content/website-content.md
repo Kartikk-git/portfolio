@@ -44,6 +44,46 @@ Canonical copy for kartik-koundal's portfolio. Every block has a stable key in b
 
 `toast.copyFailed` Couldn't copy. The address is koundal.k29@gmail.com
 
+`toast.devModeUnlocked` Android Developer Mode unlocked
+
+`cmd.group.navigate` Navigate
+
+`cmd.group.projects` Projects
+
+`cmd.group.actions` Actions
+
+`cmd.group.theme` Theme
+
+`cmd.group.preview` App Preview
+
+`cmd.group.secrets` Easter Eggs
+
+`cmd.empty` No matching commands
+
+`cmd.hint.run` ↵ run
+
+`cmd.hint.navigate` ↑↓ navigate
+
+`cmd.hint.close` esc close
+
+`cmd.action.email` Copy email address
+
+`cmd.action.resume` View résumé (PDF)
+
+`cmd.action.github` Open GitHub profile
+
+`cmd.action.linkedin` Open LinkedIn profile
+
+`cmd.action.leetcode` Open LeetCode profile
+
+`cmd.action.credly` Open Credly profile
+
+`cmd.action.phoneOpen` Open app preview
+
+`cmd.action.phoneClose` Close app preview
+
+`cmd.action.easterEgg` Trigger easter egg
+
 ---
 
 ## 1. Hero
@@ -492,6 +532,16 @@ I believe there's always something new to learn, something better to build and p
 
 `activity.tooltip.leetcode.zero` No submissions on {weekday}, {date}
 
+`activity.replay` Replay
+
+`activity.replayAgain` Replay again
+
+`activity.tooltip.format` {count} contributions on {date}
+
+`activity.tooltip.singular` {count} contribution on {date}
+
+`activity.tooltip.zero` No contributions on {date}
+
 `activity.summary.srOnly` Activity chart. {n} entries over the last year. The busiest day was {busiestDate} with {busiestCount}.
 
 `activity.loading` Loading activity…
@@ -560,7 +610,7 @@ I believe there's always something new to learn, something better to build and p
 
 ## 6. Education and certifications
 
-`edu.eyebrow` 05 · Credentials
+`edu.eyebrow` 06 · Credentials
 
 `edu.heading` Education & Certifications
 
@@ -626,6 +676,14 @@ I believe there's always something new to learn, something better to build and p
 
 `edu.btech.body` A four-year undergraduate degree in Computer Science and Engineering. My coursework and self-study concentrate on data structures and algorithms, object-oriented programming, databases and SQL, alongside the Android and web projects on this site.
 
+`edu.scorecard.sem1` Semester 1 Result
+
+`edu.scorecard.sem2` Semester 2 Result
+
+`edu.scorecard.sem3` Semester 3 Result
+
+`edu.scorecard.sem4` Semester 4 Result
+
 `edu.xii.title` Senior Secondary (Class XII)
 
 `edu.xii.meta` St. Martin's Diocesan School · 2024 · 77.4%
@@ -638,7 +696,7 @@ I believe there's always something new to learn, something better to build and p
 
 ## 7. Contact
 
-`contact.eyebrow` 06 · Contact
+`contact.eyebrow` 07 · Contact
 
 `contact.heading` Get in Touch
 
@@ -715,6 +773,124 @@ Shown until real assets are supplied. Every placeholder shows its label and a on
 `ui.skip` Skip to main content
 
 `ui.reducedMotion.note` Animations reduced to respect your device setting.
+
+---
+
+## 8. Rail navigation
+
+`rail.aria` Section navigation
+
+`rail.buildStatus` assembleDebug
+
+`rail.p1` Projects
+
+`rail.p2` About
+
+`rail.p3` Commit log
+
+`rail.p4` Skills
+
+`rail.p5` Experience
+
+`rail.p6` Credentials
+
+`rail.p7` Contact
+
+---
+
+### 11. Phone Mockup (Student Organizer Preview)
+
+`phone.statusTime` 09:41
+
+`phone.appTitle` Student Organizer
+
+`phone.todayHeading` Today
+
+`phone.c1.name` Data Structures & Algorithms
+
+`phone.c1.time` 09:00 - 10:30 AM
+
+`phone.c1.room` Lab 3, CS Block
+
+`phone.c2.name` Operating Systems
+
+`phone.c2.time` 11:00 AM - 12:30 PM
+
+`phone.c2.room` Hall B, Room 204
+
+`phone.c3.name` Database Management Systems
+
+`phone.c3.time` 02:00 - 03:30 PM
+
+`phone.c3.room` Room 108
+
+`phone.attendanceLabel` Attendance
+
+`phone.attendanceValue` 85%
+
+`phone.attendanceSubtext` Semester Target: 75%
+
+`phone.launcherAria` Open mobile app preview
+
+`phone.closeAria` Close mobile app preview
+
+`phone.dialogTitle` Student Organizer Mobile Preview
+
+`phone.frameAria` Android device mockup
+
+`phone.aboutDegree` B.Tech CSE, 3rd year
+
+`phone.aboutCgpaLabel` CGPA
+
+`phone.aboutProjectsLabel` Projects
+
+`phone.aboutCommitsLabel` Contributions
+
+`phone.activityTitle` Commit Activity
+
+`phone.activityLegendLess` Less
+
+`phone.activityLegendMore` More
+
+`phone.skillsTitle` Gradle Build
+
+`phone.buildSuccess` BUILD SUCCESSFUL
+
+`phone.experienceTitle` Internship Timeline
+
+`phone.experienceMonth` June - July 2026
+
+`phone.experienceCompany` S O Infotech (P) Ltd.
+
+`phone.experienceRole` Industrial Trainee · Android
+
+`phone.experienceDates` 8 June to 20 July
+
+`phone.credentialsTitle` Certifications
+
+`phone.cert1Title` Programming in Java
+
+`phone.cert1Meta` NPTEL, IIT Kharagpur · 95%
+
+`phone.cert2Title` Python Assessment
+
+`phone.cert2Meta` CodeChef Tracks · 90%
+
+`phone.cert3Title` Google Cloud Badges
+
+`phone.cert3Meta` Credly · 15 Badges
+
+`phone.contactNotificationTitle` Internship Opportunity
+
+`phone.contactNotificationText` New message: internship opportunity
+
+`phone.contactActionText` Tap to reply via email
+
+`phone.botInviteBubble` Click me!
+
+`phone.botOpenAria` Open app preview
+
+`phone.botCloseAria` Close app preview
 
 ---
 
