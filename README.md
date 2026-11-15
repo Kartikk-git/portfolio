@@ -7,7 +7,7 @@
 A terminal-flavoured engineering portfolio with a live Android phone preview, built for software and native Android internship applications.
 
 <p align="center">
-  <a href="https://kartik-koundal.pages.dev/"><strong>Live site</strong></a> ·
+  <a href="https://portfolio.kartik-koundal.workers.dev/"><strong>Live site</strong></a> ·
   <a href="https://nextjs.org/">Next.js</a> ·
   <a href="https://www.typescriptlang.org/">TypeScript</a> ·
   <a href="https://tailwindcss.com/">Tailwind</a> ·
