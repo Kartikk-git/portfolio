@@ -1,136 +1,193 @@
-# Kartik Koundal — Developer Portfolio
+<div align="center">
 
-Personal engineering portfolio for **Kartik Koundal**, a B.Tech Computer Science & Engineering student at Dronacharya College of Engineering, built for software engineering and native Android internship applications.
+# Kartik Koundal
 
-Built with **Next.js 15 (App Router, static export)**, **TypeScript (strict)**, **Tailwind CSS v4**, and **Motion**.
+**I turn ideas into apps, and curiosity into code.**
 
----
+A terminal-flavoured engineering portfolio with a live Android phone preview, built for software and native Android internship applications.
 
-## Visual Identity & Design Tokens
+<p align="center">
+  <a href="https://kartik-koundal.pages.dev/"><strong>Live site</strong></a> ·
+  <a href="https://nextjs.org/">Next.js</a> ·
+  <a href="https://www.typescriptlang.org/">TypeScript</a> ·
+  <a href="https://tailwindcss.com/">Tailwind</a> ·
+  <a href="#performance-and-quality">Lighthouse</a>
+</p>
 
-- **Editorial Restraint**: Designed like a high-grade engineering publication. No AI gradients, glowing blurred blobs, or generic card grids.
-- **Color System** (defined in `app/globals.css` and documented in [`docs/design-tokens.md`](docs/design-tokens.md)):
-  - **Light Theme (Paper)**: Base `#FAFAF7`, Surface `#F3F2EC`, Hairline Rule `#DAD8CF`, Ink `#16181D`, Muted Ink `#5A5F69`, Accent `#1B6B4F` (deep green, 5.9:1 contrast).
-  - **Dark Theme**: Background `#111315`, Surface `#181B1E`, Hairline Rule `#2A2E32`, Ink `#E9E8E3`, Muted Ink `#A2A7AE`, Accent `#5FB38F` (8.3:1 contrast).
-- **Typography**:
-  - Headings: **Source Serif 4** (Display title `h2` at `text-3xl font-semibold tracking-tight`, name display clamp `2.5rem–4.25rem`).
-  - Body & UI: **IBM Plex Sans** (Standard body at `text-base leading-[1.65]`).
-  - Metadata, Overlines & Code: **IBM Plex Mono** (Labels at `text-xs uppercase tracking-[0.06em]`).
+<p align="center">
+  <a href="https://kartik-koundal.pages.dev/">Live site</a> ·
+  <a href="https://github.com/Kartikk-git">GitHub</a> ·
+  <a href="mailto:koundal.k29@gmail.com">Email</a>
+</p>
 
----
+</div>
 
-## Site Structure & Key Sections
-
-1. **Hero**: Editorial introduction with current focus, quick positioning, resume download, and contact links.
-2. **Selected Works (`ProjectsSection.tsx`)**:
-   - Architectural timeline replacing generic card grids.
-   - All 5 projects visible in sequence: **Student Organizer** (Android), **MPLAD** (Civic-Tech), **Hospital Management**, **Portfolio v1**, and **TEJOVIK** (Student Wellness).
-   - Commit metadata, branch tags, and slide-over / inline case-study detail views.
-3. **About (`AboutSection.tsx`)**:
-   - Concise background, core technical focus, and engineering strengths.
-4. **Activity & Commit Logs (`CommitLogSection.tsx`)**:
-   - Interactive contribution heatmaps with real GitHub contributions (315 commits) and LeetCode submissions (144 submissions across 18 days).
-   - "Replay Year" animation and platform filtering.
-   - Dynamically code-split to maximize main-thread performance.
-5. **Technical Stack (`SkillsSection.tsx`)**:
-   - Grouped by Languages, Web, Core Fundamentals, Tools, and Frameworks.
-   - Interactive stack explorer highlighting related projects on focus/hover.
-6. **Work & Internships (`ExperienceSection.tsx`)**:
-   - **Industrial Trainee · Java Android Kotlin** at **S O Infotech (P) Ltd. (Ducat)** (8 June – 20 July 2026).
-   - Interactive modal viewers for the **Completion Certificate** and **Training Confirmation Letter**.
-   - Direct link to the 46-page Student Organizer Project Report PDF.
-7. **Education & Credentials (`EducationSection.tsx`)**:
-   - Left-ruled vertical timeline with scroll-linked progress animation.
-   - Formal education (B.Tech CSE, Class XII, Class X) and verified credentials (NPTEL Java Elite 95%, CodeChef Learning Tracks, Google Cloud Skill Badges).
-   - Accessible modal certificate previewer with keyboard navigation.
-8. **Contact & Footer (`ContactSection.tsx`, `Footer.tsx`)**:
-   - Quick copy-email feedback with accessible live region, profile links, and minimal back-to-top navigation.
+<!-- Add a screenshot or short GIF here once the site is live:
+<p align="center"><img src="docs/readme/hero.png" alt="Portfolio hero" width="820"></p>
+-->
 
 ---
 
-## Privacy & Document Redaction
+## About
 
-All original documents in `docs/` are permanently redacted before being published to `public/docs-redacted/`:
-- **Permanent Pixel-Level Redactions**: Third-party names (e.g. father's name) and university roll numbers are redacted using solid black boxes rendered directly into the pixels.
-- **Zero Hidden Text / Overlays**: No CSS overlays or hidden text layers remain in public artifacts.
-- **EXIF Stripped**: Image metadata is stripped to protect user privacy.
+I'm a third-year B.Tech Computer Science student at Dronacharya College of Engineering, Gurugram (2024–2028). My main focus is native Android with Kotlin and Jetpack Compose, plus Python and Flask on the backend and web side. This repository is the source of my portfolio.
 
----
-
-## Built-in Developer Secrets & Easter Eggs
-
-The site includes 5 subtle, fully accessible developer secrets tracked via `lib/secrets.ts` and inspectable in DevTools:
-1. **Footer Bugdroid**: A friendly Android mascot watching from the footer edge.
-2. **Fake Crash Dialog**: Tapping the header name repeatedly triggers an authentic Android ANR/crash dialog.
-3. **Tab Return**: Leaving the browser tab for 45+ seconds triggers a subtle "welcome back" notification.
-4. **Android Eras (Konami Code)**: Typing `↑ ↑ ↓ ↓ ← → ← →` cycles through classic Android visual themes (Android 4.0 Holo, 5.0 Lollipop, Material You) with instant revert controls.
-5. **Ultra Theme Escalation**: Holding or rapidly toggling the theme button unlocks high-contrast Flashbang and pure AMOLED modes.
-
-Open DevTools (`F12`) to inspect progress via `secrets.status()`, get hints with `secrets.hint()`, or reset with `secrets.reset()`.
+**Currently open to software and Android internships.**
 
 ---
 
-## Content System & Source of Truth
+## Highlights
 
-The website content layer strictly separates presentation from copy:
+- **Live Android phone**: An Android mascot invites you to open a phone mockup that follows the section you are reading: Student Organizer, profile, commit grid, a Gradle build log, an internship calendar, credentials and a notification.
+- **Command palette**: `Ctrl/Cmd + K` opens a terminal-style launcher with fuzzy search, grouped commands, theme switching and full keyboard support (ARIA combobox pattern).
+- **Section rail**: A sticky left rail with a scroll-driven build progress readout (`assembleDebug 64%`) and one-click section jumping.
+- **Activity heatmap**: Real GitHub and LeetCode contributions with a replayable fill animation, shared tooltip and a single-tab-stop roving grid.
+- **Motion with restraint**: Typing tagline, count-up numbers, cursor-follow glow and tilt on cards and photos, all disabled on touch devices and with `prefers-reduced-motion`.
+- **Hidden developer secrets**: Five easter eggs tracked in `lib/secrets.ts`. Open DevTools and run `secrets.hint()`.
 
+---
+
+## Projects featured on the site
+
+| Project | Stack | Notes |
+| :--- | :--- | :--- |
+| **Student Organizer** *(flagship, in progress)* | Kotlin, Jetpack Compose, Material 3, Room, Coroutines, ViewPager2, Gradle KTS | Offline-first Android app for courses, assignments, notes, exams and attendance |
+| **MPLAD: Empowered Indian** | TypeScript, HTML, CSS | Frontend of a civic-tech platform built for Smart India Hackathon |
+| **TEJOVIK** | Python, Flask, JavaScript, Chart.js | Student performance and wellness analytics |
+| **Hospital Management Website** | HTML, CSS, JavaScript | Early web project |
+| **Personal Portfolio (v1)** | HTML, CSS, JavaScript | The first version of this site |
+
+---
+
+## Tech stack
+
+| Area | Tools |
+| :--- | :--- |
+| **Framework** | Next.js 15 (App Router, static export), React, TypeScript (strict) |
+| **Styling** | Tailwind CSS v4, CSS variables as design tokens |
+| **Motion** | [Motion](https://motion.dev/) (`motion/react`) with shared tokens in `lib/motion.ts` |
+| **Type** | Source Serif 4, IBM Plex Sans, IBM Plex Mono (self-hosted via `next/font`) |
+| **Hosting** | Cloudflare Pages, automatic HTTPS, security headers via `public/_headers` |
+| **Quality** | ESLint, `tsc --noEmit`, a content-parity checker, headless-browser verification scripts |
+
+---
+
+## Design principles
+
+- **Terminal-editorial look**: Dark `#111315` base with an emerald `#5FB38F` accent, a light "paper" theme (`#FAFAF7` / `#1B6B4F`), and a serif + mono pairing.
+- **Accessible by default**: Visible focus rings, WCAG AA or better contrast, semantic landmarks, keyboard access to every control, and polite live regions.
+- **Motion that respects people**: Every animation is gated by reduced-motion and fine-pointer checks.
+- **Content is separate from layout**: No copy is hardcoded in JSX.
+
+---
+
+## Project structure
+
+```text
+app/
+├── components/          # Sections, rail, phone mockup, palette, modals
+│   └── phone-screens/   # One component per phone screen
+├── projects/            # Case-study routes (5)
+├── styleguide/          # Token and motion reference
+├── layout.tsx           # Fonts, metadata, JSON-LD
+└── globals.css          # Tailwind v4 theme tokens, z-index tokens, keyframes
+content/                 # Single source of truth for all copy and data
+lib/                     # Motion tokens, hooks, active-section and phone stores
+public/                  # Portraits, thumbnails, redacted documents, _headers
+scripts/                 # Content checker, thumbnail generator, verification suites
 ```
-content/
-├── website-content.md          # Canonical single source of truth
-├── site.ts                     # Nav, hero, footer, and UI strings
-├── projects.ts                 # 5 projects (Student Organizer, MPLAD, Hospital, Portfolio v1, TEJOVIK)
-├── about.ts                    # Story, background, at-a-glance facts
-├── activity.ts                 # Commit log & activity chart strings
-├── skills.ts                   # 4 categories & technology definitions
-├── credentials.ts              # Verified certificates, formal education, modal labels
-├── contact.ts                  # Direct contact details and profile links
-├── media.json                  # Media manifest for all asset slots
-├── media.ts                    # Media slot definitions and fallback copy
-├── github-contributions.json   # 315 public commits from real GitHub calendar
-└── leetcode-contributions.json # 144 submissions across 18 days from real LeetCode data
-```
 
-### Content Validation
-Run the automated validator to ensure all strings match the canonical copy verbatim:
+<details>
+<summary><b>Content system</b></summary>
+
+All visible text lives in `content/*.ts` and is mirrored in `content/website-content.md`, which is the canonical reference. A checker verifies that the two match verbatim:
+
 ```bash
 npm run check:content
 ```
+
+Retired keys (for example removed placeholders and semester scorecards) stay documented but are excluded from the check.
+</details>
+
+<details>
+<summary><b>Privacy and document handling</b></summary>
+
+- Personal identifiers on published documents are redacted at the pixel level.
+- Marksheet thumbnails on the page are blurred, and full documents open only in a modal.
+- Image metadata (EXIF) is stripped.
+</details>
+
 ---
 
-## Development & Building
+## Getting started
+
+**Requirements**: Node.js 20 or newer.
 
 ```bash
-# Verify content keys against website-content.md
-npm run check:content
-
-# Run strict TypeScript typecheck
-npx tsc --noEmit
-
-# Run ESLint
-npm run lint
-
-# Start Next.js local development server
+git clone https://github.com/Kartikk-git/<repo-name>.git
+cd <repo-name>
+npm install
 npm run dev
-
-# Build optimized production static export (outputs to /out)
-npm run build
-
-# Serve static output locally on port 3000
-npm run serve
 ```
 
----
-
-## Lighthouse & Performance Benchmarks
-
-Audited on production static build:
-- **Accessibility**: **100** / 100
-- **Best Practices**: **100** / 100
-- **SEO**: **100** / 100
-- **Performance (Desktop)**: **94** / 100
+Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## Static Deployment
+## Scripts
 
-The site exports pure HTML/CSS/JS to `/out` and is 100% compatible with GitHub Pages, Vercel, Netlify, Cloudflare Pages, or any static hosting provider.
+| Command | What it does |
+| :--- | :--- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Production static export to `out/` |
+| `npm run serve` | Serve `out/` locally, applying `_headers` |
+| `npm run lint` | ESLint |
+| `npx tsc --noEmit` | Strict type check |
+| `npm run check:content` | Verify copy against `website-content.md` |
+| `npm run check:fonts` | Verify font preloads |
+
+---
+
+## Deployment
+
+The site is a pure static export, deployed on **Cloudflare Pages**.
+
+| Setting | Value |
+| :--- | :--- |
+| **Build command** | `npm run build` |
+| **Output directory** | `out` |
+| **NODE_VERSION** | `20` |
+| **NEXT_PUBLIC_SITE_URL** | The final site URL (used for canonical, Open Graph and sitemap) |
+
+HTTPS is automatic. Security headers (CSP, nosniff, referrer policy, frame protection) come from `public/_headers`. It also works on Vercel, Netlify and GitHub Pages.
+
+---
+
+## Performance and quality
+
+Measured with Lighthouse on the home page:
+
+| Category | Mobile | Desktop |
+| :--- | :---: | :---: |
+| **Accessibility** | 100 | 100 |
+| **Best Practices** | 100 | 100 |
+| **SEO** | 100 | 100 |
+| **Performance** | 94 | see note |
+
+> **Note**: LCP is about 1.2 s and CLS is 0. The desktop performance figure varies with Lighthouse's simulated CPU throttling, so treat it as a rough indicator.
+
+---
+
+## Contact
+
+I'm looking for a software or Android internship where I can contribute to a real codebase and learn from code review.
+
+- **Email**: [koundal.k29@gmail.com](mailto:koundal.k29@gmail.com)
+- **GitHub**: [@Kartikk-git](https://github.com/Kartikk-git)
+- **Location**: New Delhi, India
+
+<br />
+
+<div align="center">
+<sub>Built by Kartik Koundal · New Delhi, India</sub>
+</div>
